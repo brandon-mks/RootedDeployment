@@ -1,0 +1,35 @@
+body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+  background: #f8f4eb;
+  color: #30382e;
+}
+
+.site-header {
+  padding: 12px 5%;
+  background: #fffaf0;
+  border-bottom: 3px solid #b96f13;
+}
+
+.header-logo {
+  display: block;
+  width: 145px;
+}
+
+main {
+  min-height: 70vh;
+  padding: 48px 5%;
+}
+
+.site-footer {
+  padding: 24px 5%;
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  color: white;
+  background: #344735;
+}
+
+.footer-logo {
+  width: 75px;
+}
