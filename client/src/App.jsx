@@ -1,9 +1,7 @@
+import LandingPage from "./components/LandingPage.jsx";
+
 function App() {
-  return (
-    <div>
-      <h1>Start of your template!</h1>
-    </div>
-  );
+  return <LandingPage />;
 }
 
 export default App;
