@@ -3,15 +3,15 @@ import Footer from "./Footer";
 
 function LandingPage() {
   return (
-    <>
+    <div className="page-layout">
       <Header />
 
-      <main>
+      <main className="page-content">
         <h1>Landing Page</h1>
       </main>
 
       <Footer />
-    </>
+    </div>
   );
 }
 
