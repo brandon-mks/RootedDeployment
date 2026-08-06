@@ -1,4 +1,5 @@
 import logo from "../assets/Rooted Logo.png";
+import Navbar from "./Navbar";
 
 function Header({ showLogo = true }) {
   return (
@@ -6,6 +7,7 @@ function Header({ showLogo = true }) {
       {showLogo && (
         <img src={logo} alt="Rooted" className="header-logo" />
       )}
+      <Navbar />
     </header>
   );
 }

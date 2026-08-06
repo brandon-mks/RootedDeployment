@@ -1,9 +1,11 @@
+import { Link } from "react-router";
+
 function Navbar() {
   return (
     <nav className="site-nav" aria-label="Main navigation">
-      <a href="#about">About Us</a>
-      <a href="#contact">Contact</a>
-      <a href="/login">Log in</a>
+      <Link to="/about">About Us</Link>
+      <Link to="/contact">Contact</Link>
+      <Link to="/login">Log in</Link>
     </nav>
   );
 }
