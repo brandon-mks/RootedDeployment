@@ -52,26 +52,75 @@ a {
   min-height: 100vh;
 }
 
+.page-layout {
+  min-height: 100vh;
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+}
 
 /* ==============================
    Landing Page
 ============================== */
 
-.page-layout {
-  min-height: 100vh;
+.page-content {
+  flex: 1 0 auto;
+  padding: 0 24px;
+}
+
+.landing-hero {
+  width: 100%;
+  max-width: 1050px;
+  min-height: 620px;
+  margin: 0 auto;
+  padding: 64px 0 80px;
+
   display: flex;
   flex-direction: column;
+  justify-content: center;
+  gap: 48px;
 }
 
-.page-content {
-  flex: 1;
-  padding: 40px 24px;
+.hero-copy {
+  max-width: 720px;
+  margin: 0 auto;
+  text-align: center;
 }
 
-.page-content h1 {
-  margin-left: 0;
+.hero-eyebrow {
+  margin: 0 0 12px;
+  color: var(--rooted-green);
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
 }
 
+.hero-copy h1 {
+  margin: 0;
+  color: var(--rooted-plum);
+  font-size: clamp(40px, 6vw, 68px);
+  line-height: 1.05;
+}
+
+.hero-description {
+  max-width: 590px;
+  margin: 20px auto 0;
+  color: #5c5861;
+  font-size: 18px;
+  line-height: 1.6;
+}
+
+
+/* ==============================
+   Featured Area
+============================== */
+
+.featured-area h2 {
+  margin: 0 0 24px;
+  color: var(--rooted-plum);
+  font-size: 22px;
+}
 
 /* ==============================
    Header
@@ -116,12 +165,17 @@ a {
 ============================== */
 
 .site-footer {
+  width: 100%;
+  margin-top: auto;
+  padding: 10px 16px;
+
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  gap: 6px;
-  padding: 10px 16px;
+  flex-shrink: 0;
+  gap: 8px;
+
   text-align: center;
   color: white;
   background: var(--rooted-dark-green);
@@ -134,7 +188,7 @@ a {
 
 .site-footer p {
   margin: 0;
-  font-size: 12px;
+  font-size: 13px;
 }
 
 
@@ -148,6 +202,16 @@ a {
   }
 
   .page-content {
-    padding: 32px 16px;
+    padding: 0 16px;
+  }
+
+  .landing-hero {
+    min-height: auto;
+    padding: 48px 0 64px;
+    gap: 36px;
+  }
+
+  .hero-description {
+    font-size: 16px;
   }
 }

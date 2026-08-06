@@ -11,15 +11,22 @@ function LandingPage() {
       <Header />
 
       <main className="page-content">
-        <h1>Landing Page</h1>
+        <section className="landing-hero">
+          <div className="hero-copy">
+            <p className="hero-eyebrow">Rooted in your community</p>
 
-        <section className="featured-area">
-          <h2>Explore your community</h2>
+            <h1>Discover more of what’s around you.</h1>
 
-          <FeaturedSection
-            items={featuredItems}
-            loading={isLoading}
-          />
+            <p className="hero-description">
+              Support local businesses and connect with events happening in your
+              community.
+            </p>
+          </div>
+
+          <div className="featured-area">
+            <h2>Where would you like to start?</h2>
+            <FeaturedSection />
+          </div>
         </section>
       </main>
 
