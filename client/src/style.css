@@ -81,6 +81,20 @@ a {
   gap: 48px;
 }
 
+.hero-brand {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+  text-align: center;
+}
+
+.hero-logo {
+  display: block;
+  width: clamp(180px, 24vw, 280px);
+  height: auto;
+}
+
 .hero-copy {
   max-width: 720px;
   margin: 0 auto;
@@ -148,6 +162,26 @@ a {
     justify-content: flex-end;
 }
 
+/* ==============================
+   Navigation
+============================== */
+
+.site-nav {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+}
+
+.site-nav a {
+  color: var(--rooted-plum);
+  font-size: 14px;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.site-nav a:hover {
+  color: var(--rooted-green);
+}
 
 /* ==============================
    Featured Area
