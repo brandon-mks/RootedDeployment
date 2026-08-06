@@ -1,73 +1,77 @@
 import {
   Box,
   Card,
+  CardActionArea,
   CardContent,
-  Chip,
-  Grid,
-  Skeleton,
   Typography,
 } from "@mui/material";
+import { Link } from "react-router";
 
-function FeaturedSection({ items = [], loading = false }) {
-  if (loading) {
-    return (
-      <Grid container spacing={3}>
-        {[1, 2].map((placeholder) => (
-          <Grid key={placeholder} size={{ xs: 12, sm: 6, md: 4 }}>
-            <Card>
-              <Skeleton variant="rectangular" height={160} />
+const choices = [
+  {
+    heading: "Discover",
+    subtitle: "Local businesses",
+    path: "/discover",
+    background: "#7aa664",
+  },
+  {
+    heading: "Connect",
+    subtitle: "Events in your area",
+    path: "/connect",
+    background: "#f2a840",
+  },
+];
 
-              <CardContent>
-                <Skeleton width="30%" />
-                <Skeleton width="75%" height={36} />
-                <Skeleton width="100%" />
-                <Skeleton width="60%" />
-              </CardContent>
-            </Card>
-          </Grid>
-        ))}
-      </Grid>
-    );
-  }
-
+function FeaturedSection() {
   return (
-    <Grid container spacing={3}>
-      {items.map((item) => (
-        <Grid key={item.id} size={{ xs: 12, sm: 6, md: 4 }}>
-          <Card>
-            {item.imageUrl && (
-              <Box
-                component="img"
-                src={item.imageUrl}
-                alt=""
-                sx={{
-                  display: "block",
-                  width: "100%",
-                  height: 160,
-                  objectFit: "cover",
-                }}
-              />
-            )}
-
+    <Box
+      sx={{
+        display: "grid",
+        gridTemplateColumns: {
+          xs: "minmax(0, 340px)",
+          sm: "repeat(2, minmax(0, 320px))",
+        },
+        justifyContent: "center",
+        gap: 3,
+        width: "100%",
+        margin: "0 auto",
+      }}
+    >
+      {choices.map((choice) => (
+        <Card
+          key={choice.heading}
+          sx={{
+            width: "100%",
+            borderRadius: 3,
+            backgroundColor: choice.background,
+            color: "#3c3546",
+            boxShadow: "0 5px 14px rgba(60, 53, 70, 0.14)",
+          }}
+        >
+          <CardActionArea
+            component={Link}
+            to={choice.path}
+            sx={{
+              minHeight: 210,
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              textAlign: "center",
+            }}
+          >
             <CardContent>
-              <Chip label={item.type} size="small" />
-
-              <Typography variant="h6" component="h2" sx={{ mt: 1 }}>
-                {item.name}
+              <Typography variant="h4" component="h2" fontWeight={700}>
+                {choice.heading}
               </Typography>
 
-              <Typography variant="body2" color="text.secondary">
-                {item.description}
-              </Typography>
-
-              <Typography variant="caption">
-                {item.location}
+              <Typography variant="body1" sx={{ marginTop: 1 }}>
+                {choice.subtitle}
               </Typography>
             </CardContent>
-          </Card>
-        </Grid>
+          </CardActionArea>
+        </Card>
       ))}
-    </Grid>
+    </Box>
   );
 }
 

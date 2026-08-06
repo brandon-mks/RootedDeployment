@@ -13,7 +13,7 @@ function LandingPage() {
       <main className="page-content">
         <h1>Landing Page</h1>
 
-        <section>
+        <section className="featured-area">
           <h2>Explore your community</h2>
 
           <FeaturedSection

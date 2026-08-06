@@ -1,24 +1,66 @@
+/* ==============================
+   Global
+============================== */
+
+:root {
+  --rooted-green: #7aa664;
+  --rooted-cream: #fdfbd4;
+  --rooted-orange: #f2a840;
+  --rooted-plum: #3c3546;
+  --rooted-dark-green: #344735;
+
+  --rooted-page-background: #f8f4eb;
+  --rooted-header-background: #fffaf0;
+  --rooted-text: #30382e;
+}
+
 * {
   box-sizing: border-box;
 }
 
+html {
+  min-width: 320px;
+  background: var(--rooted-page-background);
+}
+
 body {
+  min-width: 320px;
+  min-height: 100vh;
   margin: 0;
   font-family: "Bahnschrift", "Arial Narrow", Arial, sans-serif;
-  background: #f8f4eb;
-  color: #30382e;
+  color: var(--rooted-text);
+  background: var(--rooted-page-background);
 }
+
+button,
+input,
+textarea,
+select {
+  font: inherit;
+}
+
+img {
+  display: block;
+  max-width: 100%;
+}
+
+a {
+  color: inherit;
+}
+
+#root {
+  min-height: 100vh;
+}
+
+
+/* ==============================
+   Landing Page
+============================== */
 
 .page-layout {
   min-height: 100vh;
   display: flex;
   flex-direction: column;
-}
-
-.site-header {
-  padding: 12px 24px;
-  background: #fffaf0;
-  border-bottom: 3px solid rgba(185, 111, 19, 0.2);
 }
 
 .page-content {
@@ -30,20 +72,48 @@ body {
   margin-left: 0;
 }
 
+
+/* ==============================
+   Header
+============================== */
+
+.site-header {
+  padding: 12px 24px;
+  background: var(--rooted-header-background);
+  border-bottom: 2px solid rgba(185, 111, 19, 0.2);
+}
+
 .header-logo {
   display: block;
   width: 145px;
 }
 
-@media (max-width: 600px) {
-  .site-header {
-    padding: 10px 16px;
-  }
 
-  .page-content {
-    padding: 32px 16px;
-  }
+/* ==============================
+   Featured Area
+============================== */
+
+.featured-area {
+  text-align: center;
 }
+
+
+/* ==============================
+   Featured Section
+============================== */
+
+/*
+  The FeaturedSection card styles currently live in the
+  component through MUI's sx property.
+
+  Component classes can be added here later if we decide
+  to move those styles out of the JSX.
+*/
+
+
+/* ==============================
+   Footer
+============================== */
 
 .site-footer {
   display: flex;
@@ -54,7 +124,7 @@ body {
   padding: 10px 16px;
   text-align: center;
   color: white;
-  background: #344735;
+  background: var(--rooted-dark-green);
 }
 
 .footer-logo {
@@ -65,4 +135,19 @@ body {
 .site-footer p {
   margin: 0;
   font-size: 12px;
+}
+
+
+/* ==============================
+   Responsive
+============================== */
+
+@media (max-width: 600px) {
+  .site-header {
+    padding: 10px 16px;
+  }
+
+  .page-content {
+    padding: 32px 16px;
+  }
 }
