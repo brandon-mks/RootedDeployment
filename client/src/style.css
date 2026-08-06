@@ -127,14 +127,25 @@ a {
 ============================== */
 
 .site-header {
-  padding: 12px 24px;
+  min-height: 64px;
+  padding: 10px 24px;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
   background: var(--rooted-header-background);
-  border-bottom: 2px solid rgba(185, 111, 19, 0.2);
+  border-bottom: 1px solid rgba(185, 111, 19, 0.2);
 }
 
 .header-logo {
   display: block;
   width: 145px;
+  height: auto;
+}
+
+.landing-header {
+    justify-content: flex-end;
 }
 
 
