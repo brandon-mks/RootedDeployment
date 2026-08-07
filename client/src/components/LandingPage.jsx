@@ -1,13 +1,28 @@
 import Header from "./Header";
 import Footer from "./Footer";
+import logo from "../assets/Rooted Logo.png";
+import FeaturedSection from "./FeaturedSection";
 
 function LandingPage() {
+  const featuredItems = [];
+  const isLoading = true;
+
   return (
     <div className="page-layout">
-      <Header />
+      <Header showLogo={false} />
 
       <main className="page-content">
-        <h1>Landing Page</h1>
+        <section className="landing-hero">
+          <div className="hero-brand">
+            <img src={logo} alt="Rooted" className="hero-logo" />
+            <p className="hero-eyebrow">Rooted in your community</p>
+          </div>
+
+          <div className="featured-area" id="explore">
+            <h1>Where would you like to start?</h1>
+            <FeaturedSection />
+          </div>
+        </section>
       </main>
 
       <Footer />
