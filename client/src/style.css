@@ -27,6 +27,7 @@ body {
   min-width: 320px;
   min-height: 100vh;
   margin: 0;
+
   font-family: "Bahnschrift", "Arial Narrow", Arial, sans-serif;
   color: var(--rooted-text);
   background: var(--rooted-page-background);
@@ -52,88 +53,21 @@ a {
   min-height: 100vh;
 }
 
+/* ==============================
+   Page Layout
+============================== */
+
 .page-layout {
   min-height: 100vh;
   min-height: 100dvh;
+
   display: flex;
   flex-direction: column;
 }
-
-/* ==============================
-   Landing Page
-============================== */
 
 .page-content {
   flex: 1 0 auto;
   padding: 0 24px;
-}
-
-.landing-hero {
-  width: 100%;
-  max-width: 1050px;
-  min-height: 620px;
-  margin: 0 auto;
-  padding: 64px 0 80px;
-
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  gap: 48px;
-}
-
-.hero-brand {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 14px;
-  text-align: center;
-}
-
-.hero-logo {
-  display: block;
-  width: clamp(180px, 24vw, 280px);
-  height: auto;
-}
-
-.hero-copy {
-  max-width: 720px;
-  margin: 0 auto;
-  text-align: center;
-}
-
-.hero-eyebrow {
-  margin: 0 0 12px;
-  color: var(--rooted-green);
-  font-size: 13px;
-  font-weight: 700;
-  letter-spacing: 1.5px;
-  text-transform: uppercase;
-}
-
-.hero-copy h1 {
-  margin: 0;
-  color: var(--rooted-plum);
-  font-size: clamp(40px, 6vw, 68px);
-  line-height: 1.05;
-}
-
-.hero-description {
-  max-width: 590px;
-  margin: 20px auto 0;
-  color: #5c5861;
-  font-size: 18px;
-  line-height: 1.6;
-}
-
-
-/* ==============================
-   Featured Area
-============================== */
-
-.featured-area h2 {
-  margin: 0 0 24px;
-  color: var(--rooted-plum);
-  font-size: 22px;
 }
 
 /* ==============================
@@ -159,7 +93,7 @@ a {
 }
 
 .landing-header {
-    justify-content: flex-end;
+  justify-content: flex-end;
 }
 
 /* ==============================
@@ -184,26 +118,304 @@ a {
 }
 
 /* ==============================
+   Landing Page
+============================== */
+
+.landing-hero {
+  width: 100%;
+  max-width: 1050px;
+  min-height: 620px;
+  margin: 0 auto;
+  padding: 64px 0 80px;
+
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 48px;
+}
+
+.hero-brand {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+
+  text-align: center;
+}
+
+.hero-logo {
+  display: block;
+  width: clamp(180px, 24vw, 280px);
+  height: auto;
+}
+
+.hero-copy {
+  max-width: 720px;
+  margin: 0 auto;
+
+  text-align: center;
+}
+
+.hero-eyebrow {
+  margin: 0 0 12px;
+
+  color: var(--rooted-green);
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+}
+
+.hero-copy h1 {
+  margin: 0;
+
+  color: var(--rooted-plum);
+  font-size: clamp(40px, 6vw, 68px);
+  line-height: 1.05;
+}
+
+.hero-description {
+  max-width: 590px;
+  margin: 20px auto 0;
+
+  color: #5c5861;
+  font-size: 18px;
+  line-height: 1.6;
+}
+
+/* ==============================
    Featured Area
 ============================== */
 
 .featured-area {
+  width: 100%;
+
   text-align: center;
 }
 
+.featured-area h2 {
+  margin: 0 0 28px;
+
+  color: var(--rooted-plum);
+  font-size: 22px;
+}
 
 /* ==============================
-   Featured Section
+   Bulletin Board
 ============================== */
 
-/*
-  The FeaturedSection card styles currently live in the
-  component through MUI's sx property.
+.bulletin-board {
+  width: 100%;
+  max-width: 1050px;
+  margin: 0 auto;
+  padding: 54px 44px;
 
-  Component classes can be added here later if we decide
-  to move those styles out of the JSX.
-*/
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 320px));
+  justify-content: center;
+  gap: 40px;
 
+  border: 9px solid #795536;
+  border-radius: 8px;
+
+  background-color: #b98552;
+  background-image:
+    linear-gradient(
+      rgba(110, 75, 45, 0.18),
+      rgba(110, 75, 45, 0.18)
+    ),
+    url("./assets/cork-background.jpg");
+  background-position: center;
+  background-size: cover;
+  background-repeat: no-repeat;
+
+  box-shadow:
+    inset 0 0 34px rgba(70, 42, 22, 0.22),
+    0 14px 30px rgba(60, 53, 70, 0.14);
+}
+
+/* ==============================
+   Pinned Paper Cards
+============================== */
+
+.bulletin-card.MuiCard-root {
+  position: relative;
+  width: 100%;
+  overflow: visible;
+
+  color: var(--rooted-plum);
+
+  /* Slightly imperfect paper edges */
+  border: 1px solid rgba(75, 58, 43, 0.08);
+  border-radius: 2px 4px 10px 3px;
+
+  /* Subtle paper fibers */
+  background-image:
+    radial-gradient(
+      circle at 18% 24%,
+      rgba(255, 255, 255, 0.2) 0 1px,
+      transparent 1.5px
+    ),
+    radial-gradient(
+      circle at 72% 68%,
+      rgba(60, 53, 70, 0.06) 0 1px,
+      transparent 1.5px
+    ),
+    linear-gradient(
+      115deg,
+      rgba(255, 255, 255, 0.12),
+      transparent 35%,
+      rgba(60, 53, 70, 0.035)
+    );
+
+  background-size:
+    17px 17px,
+    23px 23px,
+    100% 100%;
+
+  /* Layered paper shadow */
+  box-shadow:
+    0 2px 2px rgba(55, 40, 28, 0.12),
+    3px 7px 10px rgba(55, 40, 28, 0.2),
+    7px 12px 18px rgba(55, 40, 28, 0.1);
+
+  transition:
+    transform 180ms ease,
+    box-shadow 180ms ease;
+}
+
+.bulletin-card.discover-card {
+  background-color: #d4e5c6;
+  transform: rotate(-1deg);
+}
+
+.bulletin-card.connect-card {
+  background-color: #f4b654;
+  transform: rotate(1deg);
+}
+
+.bulletin-card.MuiCard-root:hover {
+  transform: rotate(0deg) translateY(-6px);
+
+  box-shadow:
+    0 3px 3px rgba(55, 40, 28, 0.12),
+    5px 14px 18px rgba(55, 40, 28, 0.24),
+    10px 20px 25px rgba(55, 40, 28, 0.1);
+}
+
+/* Slightly lifted lower corner */
+.bulletin-card::after {
+  content: "";
+
+  position: absolute;
+  right: 5px;
+  bottom: 4px;
+  z-index: 2;
+
+  width: 34px;
+  height: 18px;
+
+  background: linear-gradient(
+    145deg,
+    transparent 45%,
+    rgba(255, 255, 255, 0.2) 48%,
+    rgba(60, 53, 70, 0.08) 100%
+  );
+
+  border-radius: 0 0 7px 0;
+  opacity: 0.75;
+  pointer-events: none;
+}
+
+/* ==============================
+   Card Content
+============================== */
+
+.bulletin-card-action.MuiCardActionArea-root {
+  position: relative;
+  z-index: 1;
+
+  min-height: 270px;
+  padding: 48px 32px 30px;
+
+  display: flex;
+  align-items: stretch;
+
+  color: inherit;
+  text-align: left;
+  border-radius: inherit;
+}
+
+.bulletin-card-content.MuiCardContent-root {
+  width: 100%;
+  padding: 0;
+}
+
+.bulletin-card-content.MuiCardContent-root:last-child {
+  padding-bottom: 0;
+}
+
+.bulletin-card-label.MuiTypography-root {
+  margin: 0;
+
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+}
+
+.bulletin-card-title.MuiTypography-root {
+  margin: 16px 0 0;
+
+  color: var(--rooted-plum);
+  font-size: 30px;
+  font-weight: 700;
+  line-height: 1.1;
+}
+
+.bulletin-card-subtitle.MuiTypography-root {
+  margin: 12px 0 0;
+
+  font-size: 16px;
+  line-height: 1.5;
+}
+
+.bulletin-card-link.MuiTypography-root {
+  display: block;
+  margin-top: 24px;
+
+  font-size: 16px;
+  font-weight: 700;
+}
+
+/* ==============================
+   Pushpins
+============================== */
+
+.pushpin {
+  position: absolute;
+  z-index: 2;
+  top: 15px;
+  left: 50%;
+
+  width: 18px;
+  height: 18px;
+
+  border: 3px solid rgba(255, 255, 255, 0.45);
+  border-radius: 50%;
+  background: var(--rooted-orange);
+
+  box-shadow:
+    1px 3px 4px rgba(60, 53, 70, 0.35),
+    inset -2px -2px 3px rgba(60, 53, 70, 0.2);
+
+  pointer-events: none;
+  transform: translateX(-50%);
+}
+
+.connect-card .pushpin {
+  background: var(--rooted-green);
+}
 
 /* ==============================
    Footer
@@ -216,13 +428,13 @@ a {
 
   display: flex;
   flex-direction: column;
-  justify-content: center;
   align-items: center;
+  justify-content: center;
   flex-shrink: 0;
   gap: 8px;
 
-  text-align: center;
   color: white;
+  text-align: center;
   background: var(--rooted-dark-green);
 }
 
@@ -233,17 +445,40 @@ a {
 
 .site-footer p {
   margin: 0;
+
   font-size: 13px;
 }
-
 
 /* ==============================
    Responsive
 ============================== */
 
+@media (max-width: 700px) {
+  .bulletin-board {
+    grid-template-columns: minmax(0, 340px);
+    gap: 32px;
+
+    padding: 40px 20px;
+    border-width: 7px;
+  }
+
+  .bulletin-card.discover-card,
+  .bulletin-card.connect-card {
+    transform: none;
+  }
+}
+
 @media (max-width: 600px) {
   .site-header {
     padding: 10px 16px;
+  }
+
+  .site-nav {
+    gap: 14px;
+  }
+
+  .site-nav a {
+    font-size: 13px;
   }
 
   .page-content {
@@ -258,5 +493,16 @@ a {
 
   .hero-description {
     font-size: 16px;
+  }
+}
+
+/* Respect reduced-motion accessibility settings */
+@media (prefers-reduced-motion: reduce) {
+  .bulletin-card.MuiCard-root {
+    transition: none;
+  }
+
+  .bulletin-card.MuiCard-root:hover {
+    transform: none;
   }
 }
