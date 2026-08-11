@@ -1,4 +1,4 @@
-import { Routes, Route } from "react-router-dom";
+import { Routes, Route } from "react-router";
 
 import LandingPage from "./components/LandingPage.jsx";
 import DiscoverPage from "./components/DiscoverPage.jsx";
