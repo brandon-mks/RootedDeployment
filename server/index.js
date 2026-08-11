@@ -29,17 +29,18 @@ app.use((err, req, res, next) => {
 
 const init = async () => {
   const PORT = process.env.PORT || 3000;
-
-// The Places fixture does not require a database connection.
-// Connect and seed only when a database URL has been configured.
+  // The Places fixture does not require a database connection.
+  // Connect and seed only when a database URL has been configured.
   if (process.env.DATABASE_URL) {
-    await client.connect();
-    console.log("connected to database");
-    await seed();
+    try {
+      await client.connect();
+      console.log("connected to database");
+      await seed();
+    } catch (err) {
+      console.log(err);
+    }
   } else {
-    console.log(
-      "DATABASE_URL is not configured; starting without database access"
-    );
+    console.log("DATABASE_URL is not configured; starting without database access");
   }
 
   app.listen(PORT, () => {
