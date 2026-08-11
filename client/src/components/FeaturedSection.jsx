@@ -10,62 +10,52 @@ import { Link } from "react-router";
 const choices = [
   {
     heading: "Discover",
+    title: "Find your kind of local.",
     subtitle: "Local businesses",
+    action: "Start exploring",
     path: "/discover",
-    background: "#7aa664",
+    cardClass: "discover-card",
   },
   {
     heading: "Connect",
+    title: "See what’s happening nearby.",
     subtitle: "Events in your area",
+    action: "Join an event",
     path: "/connect",
-    background: "#f2a840",
+    cardClass: "connect-card",
   },
 ];
 
 function FeaturedSection() {
   return (
-    <Box
-      sx={{
-        display: "grid",
-        gridTemplateColumns: {
-          xs: "minmax(0, 340px)",
-          sm: "repeat(2, minmax(0, 320px))",
-        },
-        justifyContent: "center",
-        gap: 3,
-        width: "100%",
-        margin: "0 auto",
-      }}
-    >
+    <Box className="bulletin-board">
       {choices.map((choice) => (
         <Card
           key={choice.heading}
-          sx={{
-            width: "100%",
-            borderRadius: 3,
-            backgroundColor: choice.background,
-            color: "#3c3546",
-            boxShadow: "0 5px 14px rgba(60, 53, 70, 0.14)",
-          }}
+          className={`bulletin-card ${choice.cardClass}`}
         >
+          <span className="pushpin" aria-hidden="true" />
+
           <CardActionArea
             component={Link}
             to={choice.path}
-            sx={{
-              minHeight: 210,
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              textAlign: "center",
-            }}
+            className="bulletin-card-action"
           >
-            <CardContent>
-              <Typography variant="h4" component="h2" fontWeight={700}>
+            <CardContent className="bulletin-card-content">
+              <Typography className="bulletin-card-label" component="p">
                 {choice.heading}
               </Typography>
 
-              <Typography variant="body1" sx={{ marginTop: 1 }}>
+              <Typography className="bulletin-card-title" component="h3">
+                {choice.title}
+              </Typography>
+
+              <Typography className="bulletin-card-subtitle" component="p">
                 {choice.subtitle}
+              </Typography>
+
+              <Typography className="bulletin-card-link" component="span">
+                {choice.action} →
               </Typography>
             </CardContent>
           </CardActionArea>
