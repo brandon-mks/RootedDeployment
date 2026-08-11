@@ -11629,4 +11629,11 @@ const live_music_venues = [
   },
 ];
 
-export const dummyData = [restaurants, museums, hiking_areas, farmers_markets, live_music_venues];
+export const dummyData = {
+  restaurants,
+  museums,
+  hiking_areas,
+  book_stores,
+  farmers_markets,
+  live_music_venues,
+};

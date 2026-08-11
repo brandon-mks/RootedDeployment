@@ -5,7 +5,7 @@
   "main": "index.js",
   "type": "module",
   "scripts": {
-    "start:dev": "nodemon server"
+    "start:dev": "nodemon --exec \"node --env-file=.env server\""
   },
   "keywords": [],
   "author": "",

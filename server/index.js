@@ -29,10 +29,18 @@ app.use((err, req, res, next) => {
 
 const init = async () => {
   const PORT = process.env.PORT || 3000;
-  await client.connect();
-  console.log("connected to database");
+  try {
+    await client.connect();
+    console.log("connected to database");
+  } catch (err) {
+    console.log(err);
+  }
 
-  await seed();
+  try {
+    await seed();
+  } catch (err) {
+    console.log(err);
+  }
 
   app.listen(PORT, () => {
     console.log(`listening on port ${PORT}`);
