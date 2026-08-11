@@ -4,8 +4,6 @@ import logo from "../assets/Rooted Logo.png";
 import FeaturedSection from "./FeaturedSection";
 
 function LandingPage() {
-  const featuredItems = [];
-  const isLoading = true;
 
   return (
     <div className="page-layout">
