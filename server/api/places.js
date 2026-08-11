@@ -23,13 +23,7 @@ const router = express.Router();
  *
  * [restaurants, museums, hiking_areas, farmers_markets, live_music_venues]
  */
-const categories = [
-  "restaurants",
-  "museums",
-  "hiking_areas",
-  "farmers_markets",
-  "live_music_venues",
-];
+const categories = Object.keys(dummyData).filter((key) => dummyData[key].length > 0);
 
 /**
  * Convert a large Google Places-style object into the smaller object
@@ -65,13 +59,8 @@ const formatPlace = (place) => ({
 router.get("/", (req, res) => {
   const category = req.query.category?.toLowerCase();
 
-  // A category selects one of the nested arrays inside dummyData.
-  const categoryIndex = category
-    ? categories.indexOf(category)
-    : -1;
-
   // Return a helpful message rather than silently returning no records.
-  if (category && categoryIndex === -1) {
+  if (category && !categories.includes(category)) {
     return res.status(400).json({
       error: "Invalid category",
       availableCategories: categories,
@@ -80,8 +69,8 @@ router.get("/", (req, res) => {
 
   // With no category, combine all five arrays into one list.
   const source = category
-    ? dummyData[categoryIndex]
-    : dummyData.flat();
+    ? dummyData[category]
+    : Object.values(dummyData).flat();
 
   const requestedLimit = Number.parseInt(req.query.limit, 10);
 
