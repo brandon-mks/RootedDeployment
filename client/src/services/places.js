@@ -14,11 +14,39 @@ export async function getPlaces({ category, limit = 12 } = {}) {
 
   params.set("limit", String(limit));
 
-  const response = await fetch(`/api/places?${params.toString()}`);
-  const data = await response.json();
+  let response;
+
+  try {
+    response = await fetch(`/api/places?${params.toString()}`);
+  } catch {
+    throw new Error(
+        "Unable to connect to the Rooted API. Please confirm the backend URL and port are correct and that the backend is running."
+    );
+  }
+
+  const responseBody = await response.text();
+    let data = null;
+
+    if (responseBody) {
+      try {
+        data = JSON.parse(responseBody);
+      } catch {
+        throw new Error(
+          `The Rooted API returned an invalid response (${response.status}).`);
+      }
+    }
+
 
   if (!response.ok) {
-    throw new Error(data.error ?? "Unable to load places");
+    throw new Error(
+        data?.error ?? `Unable to load places (${response.status}).`
+    );
+  }
+
+  if (!data) {
+    throw new Error(
+        `The Rooted API returned an empty response (${response.status}).`
+    );
   }
 
   return data;
