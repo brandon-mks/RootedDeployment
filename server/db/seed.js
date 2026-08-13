@@ -5,166 +5,98 @@ import { v4 } from "uuid";
 import { dummyData } from "./db_dummy_data.js";
 import { seedDummyData } from "./business.js";
 
-const uuidv4 = v4;
-
+/**
+ * Create the local development schema and seed it with fixture data.
+ *
+ * The fixture file is temporary and should eventually be replaced by
+ * a controlled import from Google Places or another approved source.
+ */
 const seed = async () => {
-  const SQL = `
-  DROP TABLE IF EXISTS businesses CASCADE;
+  const schemaSQL = `
+    DROP TABLE IF EXISTS business_types CASCADE;
+    DROP TABLE IF EXISTS types CASCADE;
+    DROP TABLE IF EXISTS businesses CASCADE;
 
-  CREATE TABLE businesses(
-    id UUID,
-    business_id VARCHAR(100) NOT NULL PRIMARY KEY,
-    business_name VARCHAR(100) NOT NULL,
-    address VARCHAR(500),
-    phone_number VARCHAR(30),
-    overview VARCHAR(1000),
-    link VARCHAR(500),
-    email VARCHAR(100),
-    rating DECIMAL
+    CREATE TABLE businesses (
+      id UUID NOT NULL,
+      business_id VARCHAR(100) PRIMARY KEY,
+      business_name VARCHAR(100) NOT NULL,
+      address VARCHAR(500),
+      phone_number VARCHAR(30),
+      overview VARCHAR(1000),
+      link VARCHAR(500),
+      email VARCHAR(100),
+      rating DECIMAL
+    );
+
+    CREATE TABLE types (
+      id UUID PRIMARY KEY,
+      type_name VARCHAR(150) UNIQUE NOT NULL
+    );
+
+    CREATE TABLE business_types (
+      business_id VARCHAR(100) NOT NULL,
+      type_id UUID NOT NULL,
+      is_primary BOOLEAN NOT NULL DEFAULT FALSE,
+
+      PRIMARY KEY (business_id, type_id),
+
+      FOREIGN KEY (business_id)
+        REFERENCES businesses(business_id)
+        ON DELETE CASCADE,
+
+      FOREIGN KEY (type_id)
+        REFERENCES types(id)
+        ON DELETE CASCADE
     );
   `;
+  await client.query(schemaSQL);
+  console.log("table/schema created");
 
-  /** CREATE TABLE
-   * tags[] --> new table
-   * events[]: {} --> new table
-   * reviews/ratings --> new table
-   *
-   * calender[] --> not table but a component
-   *
-   * tier 2:
-   * password VARCHAR(50), --
-   * profile photo, --
-   *  ----> w/business accounts feature
-   * comments,
-   * images,
-   */
+  await seedDummyData();
 
-  try {
-    await client.query(SQL);
-    console.log("table/schema created");
-  } catch (err) {
-    console.log(err);
-  }
+  const places = Object.values(dummyData).flat();
 
-  try {
-    await seedDummyData();
-  } catch (err) {
-    console.log(err);
-  }
+  for (const place of places) {
+    for (const typeName of place.types ?? []) {
+      const typeResult = await client.query(
+        `
+          INSERT INTO types (id, type_name)
+          VALUES ($1, $2)
+          ON CONFLICT (type_name)
+          DO UPDATE SET type_name = EXCLUDED.type_name
+          RETURNING id;
+        `,
+        [uuidv4(), typeName],
+      );
 
-  /**
-   * if businesses table is populated
-   * we return all the business_ids and
-   * then filter through the data to
-   * get all of each business' types
-   * with live data, which will be a separate
-   * API call to Place Details
-   * */
-  const rowsExist = async () => {
-    const getIdSQL = `
-    SELECT business_id FROM businesses;`;
-    //checks rows and returns them if populated
-    try {
-      const { rows } = await client.query(getIdSQL);
-      if (rows.length > 1) {
-        return rows;
-      } else {
-        return false;
-      }
-    } catch (err) {
-      console.log(err);
+      await client.query(
+        `
+          INSERT INTO business_types (
+            business_id,
+            type_id,
+            is_primary
+          )
+          VALUES ($1, $2, $3)
+          ON CONFLICT (business_id, type_id)
+          DO UPDATE SET is_primary = EXCLUDED.is_primary;
+        `,
+        [place.id, typeResult.rows[0].id, place.primaryType === typeName],
+      );
     }
-  };
-
-  //creates a table for each business using ids
-  async function createBusTable(business_ids) {
-    await business_ids.map(async (bus_id) => {
-      const { business_id } = bus_id;
-      /**backslashes necessary to escape backticks
-       * and add double quotes to wrap business_id
-       * NOTE: some business_ids have a "-" in them
-       * which confuses SQL as a subtraction operator
-       * sometimes. to fetch from google API all ids
-       * must be exactly the same (all string casing
-       * and internal symbols)
-       * DEBUGGING: when saving, the prettier extension
-       * has, at times, changed the template literal.
-       * please ensure all references to business_ids
-       * within sql have the following syntax:
-       * \"${business_id}\"
-       */
-      const SQL = `
-        DROP TABLE IF EXISTS \"${business_id}\";
-
-        CREATE TABLE \"${business_id}\"(
-          business_id VARCHAR(100) NOT NULL,
-          tags VARCHAR(150) NOT NULL PRIMARY KEY,
-          primary_type BOOLEAN,
-          FOREIGN KEY (business_id) REFERENCES businesses(business_id)
-            ON DELETE CASCADE
-            ON UPDATE CASCADE
-          );
-        `;
-      try {
-        const response = await client.query(SQL);
-      } catch (err) {
-        console.log(err);
-      }
-    });
   }
 
-  //for each type within the place.types array
-  //insert a row into that place's associated
-  //table in the database with that unique type
-  //and if it is the primary_type, then set the
-  //primary_type column within that row to true
-  async function insertTypes(place) {
-    place.types.map(async (type) => {
-      let primary = null;
-      if (place.primaryType == type) {
-        primary = true;
-      }
-      /**see previous note comment within
-       * createBusTable business_ids.map
-       * ensure place.id has the following
-       * syntax: \"${business_id}\" -->
-       * AKA \"${place.id}\"
-       */
-      const SQL = `
-      INSERT INTO \"${place.id}\" (
-      business_id,
-      tags,
-      primary_type
-      )
-      VALUES ($1, $2, $3)
-      RETURNING *;
-      `;
-      try {
-        const response = await client.query(SQL, [place.id, type, primary]);
-        return response.rows;
-      } catch (err) {
-        console.log(err);
-      }
-    });
-  }
-
-  if (await rowsExist()) {
-    const combined = [
-      ...dummyData.book_stores,
-      ...dummyData.farmers_markets,
-      ...dummyData.hiking_areas,
-      ...dummyData.live_music_venues,
-      ...dummyData.museums,
-      ...dummyData.restaurants,
-    ];
-    const businesses = await rowsExist();
-    /**rowsExist returns an array of all business ids
-     * from the businesses table which we pass
-     * in to createBusTable to create a table
-     * for each business
-     */
-    await createBusTable(businesses).then(await combined.map((place) => insertTypes(place)));
-  }
+  console.log("business types successfully seeded");
 };
 
 export default seed;
+
+/**
+ * Planned schema additions:
+ * - Rooted tags and business/event tag relationships
+ * - Events and saved user events
+ * - User comments and moderation fields
+ *
+ * External calendar integration will be implemented through event data
+ * and calendar exports/links, not as a standalone calendar table.
+ */
