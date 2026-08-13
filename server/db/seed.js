@@ -76,11 +76,8 @@ const seed = async () => {
     }
   };
 
-  //creates table for each business using ids
+  //creates a table for each business using ids
   async function createBusTable(business_ids) {
-    //1. for each business_id
-    //2. create a table for that business
-
     await business_ids.map(async (bus_id) => {
       const { business_id } = bus_id;
       /**backslashes necessary to escape backticks
@@ -91,7 +88,7 @@ const seed = async () => {
        * must be exactly the same (all string casing
        * and internal symbols)
        * DEBUGGING: when saving, the prettier extension
-       * has, at times, changed the template literal
+       * has, at times, changed the template literal.
        * please ensure all references to business_ids
        * within sql have the following syntax:
        * \"${business_id}\"
@@ -118,9 +115,9 @@ const seed = async () => {
 
   //for each type within the place.types array
   //insert a row into that place's associated
-  //table with that unique type and if it is
-  //the primary_type, then set the primary_type
-  //within that row to true
+  //table in the database with that unique type
+  //and if it is the primary_type, then set the
+  //primary_type column within that row to true
   async function insertTypes(place) {
     place.types.map(async (type) => {
       let primary = null;
@@ -166,7 +163,7 @@ const seed = async () => {
      * in to createBusTable to create a table
      * for each business
      */
-    await createBusTable(businesses); /*.then(await combined.map((place) => insertTypes(place)));*/
+    await createBusTable(businesses).then(await combined.map((place) => insertTypes(place)));
   }
 };
 
