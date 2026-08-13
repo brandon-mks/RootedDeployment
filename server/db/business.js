@@ -3,8 +3,14 @@ import client from "./client.js";
 import { v4 } from "uuid";
 const uuidv4 = v4;
 
-const { restaurants, museums, hiking_areas, book_stores, farmers_markets, live_music_venues } =
-  dummyData;
+const {
+  restaurants,
+  museums,
+  hiking_areas,
+  book_stores,
+  farmers_markets,
+  live_music_venues,
+} = dummyData;
 
 export const createBusiness = async (place) => {
   const SQL = `
@@ -38,6 +44,26 @@ export const createBusiness = async (place) => {
   } catch (err) {
     console.log(err);
   }
+};
+
+export const getBusinesses = async () => {
+  const SQL = `
+    SELECT
+      id,
+      business_name,
+      address,
+      phone_number,
+      overview,
+      link,
+      email,
+      rating
+    FROM businesses
+    ORDER BY business_name;
+  `;
+
+  const res = await client.query(SQL);
+
+  return res.rows;
 };
 
 /**the following .map(s) will be deleted

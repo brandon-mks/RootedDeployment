@@ -23,7 +23,9 @@ const router = express.Router();
  *
  * [restaurants, museums, hiking_areas, farmers_markets, live_music_venues]
  */
-const categories = Object.keys(dummyData).filter((key) => dummyData[key].length > 0);
+const categories = Object.keys(dummyData).filter(
+  (key) => dummyData[key].length > 0,
+);
 
 /**
  * Convert a large Google Places-style object into the smaller object
