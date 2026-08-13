@@ -1,17 +1,28 @@
 import path from "path";
 import express from "express";
+import cors from "cors";
 import client from "./db/client.js";
 import seed from "./db/seed.js";
 import router from "./api/index.js";
 const app = express();
 //body parsing middleware
+app.use(
+  cors({
+    origin: "http://localhost:5173", // Allows your Vite frontend to connect safely
+  }),
+);
 app.use(express.json());
 
 //for deployment only
 const __dirname = import.meta.dirname;
 
-app.get("/", (req, res) => res.sendFile(path.join(__dirname, "../client/dist/index.html")));
-app.use("/assets", express.static(path.join(__dirname, "../client/dist/assets")));
+app.get("/", (req, res) =>
+  res.sendFile(path.join(__dirname, "../client/dist/index.html")),
+);
+app.use(
+  "/assets",
+  express.static(path.join(__dirname, "../client/dist/assets")),
+);
 
 //use api routes
 app.use("/api", router);
@@ -24,7 +35,9 @@ app.use("/{*path}", (req, res, next) => {
 //custom error handling route
 app.use((err, req, res, next) => {
   console.log(err);
-  res.status(err.status || 500).send({ error: err.message ? err.message : err });
+  res
+    .status(err.status || 500)
+    .send({ error: err.message ? err.message : err });
 });
 
 const init = async () => {
@@ -40,7 +53,9 @@ const init = async () => {
       console.log(err);
     }
   } else {
-    console.log("DATABASE_URL is not configured; starting without database access");
+    console.log(
+      "DATABASE_URL is not configured; starting without database access",
+    );
   }
 
   app.listen(PORT, () => {

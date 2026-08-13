@@ -6,6 +6,7 @@ function Navbar() {
       <Link to="/about">About Us</Link>
       <Link to="/contact">Contact</Link>
       <Link to="/login">Log in</Link>
+      <Link to="/chat">Chat</Link>
     </nav>
   );
 }
