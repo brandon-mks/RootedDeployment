@@ -14,8 +14,10 @@ import Footer from "./Footer.jsx";
 import { getPlaces } from "../services/places.js";
 
 //Filter Categories
+// The temporary fixture key remains "restaurants", but the collection
+// includes restaurants, cafés, and coffee shops.
 const categories = [
-  { value: "restaurants", label: "Restaurants" },
+  { value: "Food & Drink", label: "Restaurants" },
   { value: "museums", label: "Museums" },
   { value: "hiking_areas", label: "Hiking" },
   { value: "farmers_markets", label: "Farmers markets" },
