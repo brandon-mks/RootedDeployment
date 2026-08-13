@@ -3,15 +3,6 @@ import client from "./client.js";
 import { v4 } from "uuid";
 const uuidv4 = v4;
 
-const {
-  restaurants,
-  museums,
-  hiking_areas,
-  book_stores,
-  farmers_markets,
-  live_music_venues,
-} = dummyData;
-
 export const createBusiness = async (place) => {
   const SQL = `
       INSERT INTO businesses (
@@ -66,40 +57,21 @@ export const getBusinesses = async () => {
   return res.rows;
 };
 
-/**the following .map(s) will be deleted
- * and replaced with API calls when
- * we switch to live data
- * will look more like:
+/**
+ * Seed the businesses table using the temporary fixture dataset.
  *
- * APIReturn.map((place) => {
- * createBusiness(place);
- * });
+ * Object.values(dummyData).flat() combines every category into one array.
+ * Promise.all() ensures all database inserts finish before seeding completes.
  *
+ * Replace this fixture source with live API data in the future.
  */
+
 export async function seedDummyData() {
-  await restaurants.map((restaurant) => {
-    createBusiness(restaurant);
-  });
+  const places = Object.values(dummyData).flat();
 
-  await museums.map((museum) => {
-    createBusiness(museum);
-  });
-
-  await hiking_areas.map((hiking_area) => {
-    createBusiness(hiking_area);
-  });
-
-  await book_stores.map((book_store) => {
-    createBusiness(book_store);
-  });
-
-  await farmers_markets.map((farmers_market) => {
-    createBusiness(farmers_market);
-  });
-
-  await live_music_venues.map((live_music_venue) => {
-    createBusiness(live_music_venue);
-  });
+  await Promise.all(
+    places.map((place) => createBusiness(place))
+  );
 
   console.log("businesses table successfully seeded");
 }
