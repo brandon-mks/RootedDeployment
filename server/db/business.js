@@ -1,7 +1,6 @@
 import { dummyData } from "./db_dummy_data.js";
 import client from "./client.js";
-import { v4 } from "uuid";
-const uuidv4 = v4;
+import { v4 as uuidv4 } from "uuid";
 
 export const createBusiness = async (place) => {
   const SQL = `
@@ -37,10 +36,13 @@ export const createBusiness = async (place) => {
   }
 };
 
-export const getBusinesses = async () => {
-  const SQL = `
+export const getBusinesses = async ({ limit } = {}) => {
+  const values = [];
+
+  let SQL = `
     SELECT
       id,
+      business_id,
       business_name,
       address,
       phone_number,
@@ -49,12 +51,40 @@ export const getBusinesses = async () => {
       email,
       rating
     FROM businesses
-    ORDER BY business_name;
+    ORDER BY business_name
   `;
 
-  const res = await client.query(SQL);
+  if (limit !== undefined) {
+    values.push(limit);
+    SQL += ` LIMIT $1`;
+  }
+
+  SQL += `;`;
+
+  const res = await client.query(SQL, values);
 
   return res.rows;
+};
+
+export const getBusinessById = async (businessId) => {
+  const SQL = `
+    SELECT
+      id,
+      business_id,
+      business_name,
+      address,
+      phone_number,
+      overview,
+      link,
+      email,
+      rating
+    FROM businesses
+    WHERE business_id = $1;
+  `;
+
+  const { rows } = await client.query(SQL, [businessId]);
+
+  return rows[0] ?? null;
 };
 
 /**
@@ -69,9 +99,9 @@ export const getBusinesses = async () => {
 export async function seedDummyData() {
   const places = Object.values(dummyData).flat();
 
-  await Promise.all(
-    places.map((place) => createBusiness(place))
-  );
+  for (const place of places) {
+    await createBusiness(place);
+  }
 
   console.log("businesses table successfully seeded");
 }

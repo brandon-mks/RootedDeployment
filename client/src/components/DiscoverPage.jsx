@@ -17,7 +17,7 @@ import { getPlaces } from "../services/places.js";
 // The temporary fixture key remains "restaurants", but the collection
 // includes restaurants, cafés, and coffee shops.
 const categories = [
-  { value: "Food & Drink", label: "Restaurants" },
+  { value: "restaurants", label: "Food & Drink" },
   { value: "museums", label: "Museums" },
   { value: "hiking_areas", label: "Hiking" },
   { value: "farmers_markets", label: "Farmers markets" },

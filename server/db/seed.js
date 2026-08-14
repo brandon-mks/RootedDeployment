@@ -1,5 +1,5 @@
 import client from "./client.js";
-import { v4 } from "uuid";
+import { v4 as uuidv4 } from "uuid";
 
 //this is our static initial dataset
 import { dummyData } from "./db_dummy_data.js";
