@@ -73,6 +73,11 @@ a {
 /* ==============================
    Header
 ============================== */
+.navbar {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+}
 
 .site-header {
   min-height: 64px;
@@ -429,6 +434,21 @@ a {
 /* ==============================
    Footer
 ============================== */
+.footer-navigation {
+  display: flex;
+  justify-content:end;
+  font-size: 14px;
+  gap: 16px;
+}
+
+.footer-navigation a {
+  color: inherit;
+  text-decoration: none;
+}
+
+.footer-navigation a:hover {
+  text-decoration: underline;
+}
 
 .site-footer {
   width: 100%;

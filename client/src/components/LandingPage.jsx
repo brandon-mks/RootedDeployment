@@ -13,7 +13,7 @@ function LandingPage() {
         <section className="landing-hero">
           <div className="hero-brand">
             <img src={logo} alt="Rooted" className="hero-logo" />
-            <p className="hero-eyebrow">Rooted in your community</p>
+            <p className="hero-eyebrow">Made for the places we call home</p>
           </div>
 
           <div className="featured-area" id="explore">
