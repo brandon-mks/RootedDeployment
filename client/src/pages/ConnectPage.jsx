@@ -1,7 +1,35 @@
+import { useState } from "react";
+import { Button, Stack } from "@mui/material";
+
 import Header from "../components/Header.jsx";
 import Footer from "../components/Footer.jsx";
 
+const connectFilters = [
+  { value: "all", label: "All" },
+  { value: "community_events", label: "Community Events" },
+  { value: "volunteer", label: "Volunteer" },
+  { value: "live_music_arts", label: "Live Music & Arts" },
+  { value: "markets_popups", label: "Markets & Pop-ups" },
+  { value: "classes_workshops", label: "Classes & Workshops" },
+];
+
+// Replace this empty array with API results later.
+const opportunities = [];
+
 function ConnectPage() {
+  const [selectedFilter, setSelectedFilter] = useState("all");
+
+  const selectedLabel =
+    connectFilters.find((filter) => filter.value === selectedFilter)?.label ??
+    "All";
+
+  const visibleOpportunities =
+    selectedFilter === "all"
+      ? opportunities
+      : opportunities.filter(
+          (opportunity) => opportunity.kind === selectedFilter,
+        );
+
   return (
     <div className="page-layout">
       <Header />
@@ -15,32 +43,52 @@ function ConnectPage() {
           </p>
         </header>
 
-        <section
-          className="connect-options"
-          aria-labelledby="connect-options-heading"
+        <Stack
+          direction="row"
+          spacing={1}
+          className="connect-filters"
         >
-          <h2 id="connect-options-heading">How would you like to connect?</h2>
+          {connectFilters.map((filter) => {
+            const isSelected = selectedFilter === filter.value;
 
-          <div className="connect-options-grid">
-            <article className="connect-option-card">
-              <h3>Community Events</h3>
-              <p>
-                Explore gatherings, markets, workshops, and neighborhood
-                activities.
-              </p>
-              <span>Event listings coming soon</span>
-            </article>
+            return (
+              <Button
+                key={filter.value}
+                type="button"
+                variant={isSelected ? "contained" : "outlined"}
+                onClick={() => setSelectedFilter(filter.value)}
+                className="connect-filter-button"
+                sx={{
+                  flexShrink: 0,
+                  borderColor: "var(--rooted-green)",
+                  color: isSelected ? "white" : "var(--rooted-plum)",
+                  backgroundColor: isSelected
+                    ? "var(--rooted-green)"
+                    : "transparent",
+                  "&:hover": {
+                    borderColor: "var(--rooted-green)",
+                    backgroundColor: isSelected
+                      ? "var(--rooted-dark-green)"
+                      : "rgba(122, 166, 100, 0.1)",
+                  },
+                }}
+              >
+                {filter.label}
+              </Button>
+            );
+          })}
+        </Stack>
 
-            <article className="connect-option-card">
-              <h3>Volunteer Opportunities</h3>
-              <p>
-                Find meaningful ways to support organizations in your
-                community.
-              </p>
-              <span>Volunteer listings coming soon</span>
-            </article>
-          </div>
-        </section>
+        {visibleOpportunities.length === 0 && (
+          <section className="connect-empty-state" aria-live="polite">
+            <p className="connect-empty-eyebrow">Listings are taking root</p>
+            <h2>{selectedLabel}</h2>
+            <p>
+              Local opportunities will appear here once event data is
+              connected.
+            </p>
+          </section>
+        )}
       </main>
 
       <Footer />
