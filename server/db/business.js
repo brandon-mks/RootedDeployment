@@ -2,7 +2,18 @@ import { dummyData } from "./db_dummy_data.js";
 import client from "./client.js";
 import { v4 as uuidv4 } from "uuid";
 
+const {
+  restaurants,
+  museums,
+  hiking_areas,
+  book_stores,
+  farmers_markets,
+  live_music_venues,
+} = dummyData;
+
 export const createBusiness = async (place) => {
+// Store Google types on the shared business record instead of creating
+// a dynamically named table for every individual business.
   const SQL = `
       INSERT INTO businesses (
       id,
@@ -13,9 +24,11 @@ export const createBusiness = async (place) => {
       overview,
       link,
       email,
-      rating
+      rating,
+      types,
+      primary_type
       )
-      VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
+      VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)
       RETURNING *;
       `;
   try {
@@ -29,6 +42,8 @@ export const createBusiness = async (place) => {
       place.websiteUri,
       null,
       place.rating,
+      place.types ?? [],
+      place.primaryType ?? null,
     ]);
     return res.rows[0];
   } catch (err) {
@@ -97,11 +112,28 @@ export const getBusinessById = async (businessId) => {
  */
 
 export async function seedDummyData() {
-  const places = Object.values(dummyData).flat();
-
-  for (const place of places) {
-    await createBusiness(place);
+  for (const restaurant of restaurants) {
+    await createBusiness(restaurant);
   }
 
+  for (const museum of museums) {
+    await createBusiness(museum);
+  }
+
+  for (const hikingArea of hiking_areas) {
+    await createBusiness(hikingArea);
+  }
+
+  for (const bookStore of book_stores) {
+    await createBusiness(bookStore);
+  }
+
+  for (const farmersMarket of farmers_markets) {
+    await createBusiness(farmersMarket);
+  }
+
+  for (const liveMusicVenue of live_music_venues) {
+    await createBusiness(liveMusicVenue);
+  }
   console.log("businesses table successfully seeded");
 }
