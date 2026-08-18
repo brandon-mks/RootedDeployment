@@ -432,8 +432,73 @@ a {
 }
 
 /* ==============================
+   Discover Pagination
+
+.rooted-pagination {
+  display: flex;
+  justify-content: center;
+  margin-top: 32px;
+}
+
+.rooted-pagination .MuiPaginationItem-root {
+  color: var(--rooted-plum);
+  border-color: var(--rooted-green);
+  font-weight: 600;
+}
+
+.rooted-pagination .MuiPaginationItem-root:hover {
+  background-color: rgba(122, 166, 100, 0.15);
+}
+
+.rooted-pagination .MuiPaginationItem-root.Mui-selected {
+  color: white;
+  background-color: var(--rooted-green);
+  border-color: var(--rooted-green);
+}
+
+.rooted-pagination .MuiPaginationItem-root.Mui-selected:hover {
+  background-color: var(--rooted-dark-green);
+}
+
+/* ==============================
+   Discover Results
+
+.discover-results-grid {
+  min-height: 404px;
+  align-content: start;
+  grid-auto-rows: 190px;
+}
+
+.discover-results-grid .MuiCard-root {
+  height: 100%;
+  overflow: hidden;
+}
+
+.discover-results-grid .MuiCardContent-root {
+  height: 100%;
+}
+
+/* Keep long titles from changing card height. */
+.discover-results-grid h2 {
+  display: -webkit-box;
+  overflow: hidden;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+}
+
+/* Two columns require room for three rows. */
+@media (min-width: 600px) and (max-width: 899px) {
+  .discover-results-grid {
+    min-height: 618px;
+  }
+}
+
+/* Phones can use their natural page height. */
+@media (max-width: 599px) {
+  .discover-results-grid {
+    min-height: 0;
    Support Dialog — Pinned Note
-============================== */
 
 .support-dialog-paper {
   position: relative;

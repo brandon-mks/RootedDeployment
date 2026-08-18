@@ -5,6 +5,7 @@ import {
   Card,
   CardContent,
   CircularProgress,
+  Pagination,
   Stack,
   Typography,
 } from "@mui/material";
@@ -29,6 +30,8 @@ function DiscoverPage() {
   const [selectedCategory, setSelectedCategory] = useState("restaurants");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [page, setPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
 
   useEffect(() => {
     async function loadPlaces() {
@@ -38,9 +41,11 @@ function DiscoverPage() {
         const data = await getPlaces({
           category: selectedCategory,
           limit: 6,
+          page,
         });
 
         setPlaces(data.places);
+        setTotalPages(data.totalPages);
       } catch (requestError) {
         setError(requestError.message);
       } finally {
@@ -49,7 +54,7 @@ function DiscoverPage() {
     }
 
     loadPlaces();
-  }, [selectedCategory]);
+  }, [selectedCategory, page]);
 
   return (
     <div className="page-layout">
@@ -82,7 +87,10 @@ function DiscoverPage() {
                 key={category.value}
                 type="button"
                 variant={isSelected ? "contained" : "outlined"}
-                onClick={() => setSelectedCategory(category.value)}
+                onClick={() => {
+                  setSelectedCategory(category.value);
+                  setPage(1);
+                }}
                 sx={{
                   flexShrink: 0,
                   borderColor: "var(--rooted-green)",
@@ -109,40 +117,54 @@ function DiscoverPage() {
         {error && <Typography color="error">{error}</Typography>}
 
         {!loading && !error && (
-          <Box
-            sx={{
-              display: "grid",
-              gridTemplateColumns: {
-                xs: "1fr",
-                sm: "repeat(2, 1fr)",
-                md: "repeat(3, 1fr)",
-              },
-              gap: 3,
-            }}
-          >
-            {places.map((place) => (
-              <Card key={place.id}>
-                <CardContent>
-                  <Typography variant="h6" component="h2">
-                    {place.name}
-                  </Typography>
-
-                  <Typography
-                    variant="body2"
-                    color="text.secondary"
-                    sx={{ marginTop: 1 }}
-                  >
-                    {place.address}
-                  </Typography>
-
-                  {place.rating && (
-                    <Typography variant="body2" sx={{ marginTop: 2 }}>
-                      Rating: {place.rating}
+          <Box>
+            <Box
+            className="discover-results-grid"
+              sx={{
+                display: "grid",
+                gridTemplateColumns: {
+                  xs: "1fr",
+                  sm: "repeat(2, 1fr)",
+                  md: "repeat(3, 1fr)",
+                },
+                gap: 3,
+              }}
+            >
+              {places.map((place) => (
+                <Card key={place.id}>
+                  <CardContent>
+                    <Typography variant="h6" component="h2">
+                      {place.name}
                     </Typography>
-                  )}
-                </CardContent>
-              </Card>
-            ))}
+
+                    <Typography
+                      variant="body2"
+                      color="text.secondary"
+                      sx={{ marginTop: 1 }}
+                    >
+                      {place.address}
+                    </Typography>
+
+                    {place.rating && (
+                      <Typography variant="body2" sx={{ marginTop: 2 }}>
+                        Rating: {place.rating}
+                      </Typography>
+                    )}
+                  </CardContent>
+                </Card>
+              ))}
+            </Box>
+
+            {totalPages > 1 && (
+              <Pagination
+                count={totalPages}
+                page={page}
+                onChange={(_event, nextPage) => setPage(nextPage)}
+                shape="rounded"
+                variant="outlined"
+                className="rooted-pagination"
+              />
+            )}
           </Box>
         )}
       </main>

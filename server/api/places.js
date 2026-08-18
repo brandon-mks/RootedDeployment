@@ -75,18 +75,28 @@ router.get("/", (req, res) => {
     : Object.values(dummyData).flat();
 
   const requestedLimit = Number.parseInt(req.query.limit, 10);
+  const requestedPage = Number.parseInt(req.query.page, 10);
 
-  // Default to 12 results and prevent a request from returning more than 50.
+  // Keep each page between 1 and 50 records.
   const limit = Number.isInteger(requestedLimit)
     ? Math.min(Math.max(requestedLimit, 1), 50)
-    : 12;
+    : 6;
 
-  const places = source.slice(0, limit).map(formatPlace);
+  // Default to page one and prevent page numbers below one.
+  const page = Number.isInteger(requestedPage) ? Math.max(requestedPage, 1) : 1;
+
+  const total = source.length;
+  const totalPages = Math.ceil(total / limit);
+  const offset = (page - 1) * limit;
+
+  const places = source.slice(offset, offset + limit).map(formatPlace);
 
   res.json({
     places,
-    total: source.length,
+    total,
     limit,
+    page,
+    totalPages,
     category: category ?? "all",
   });
 });

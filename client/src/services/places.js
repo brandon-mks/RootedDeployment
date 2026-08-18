@@ -5,7 +5,7 @@
  * The backend can later switch from dummy data to PostgreSQL or
  * Google Places without requiring components to change.
  */
-export async function getPlaces({ category, limit = 12 } = {}) {
+export async function getPlaces({ category, limit = 6, page = 1 } = {}) {
   const params = new URLSearchParams();
 
   if (category) {
@@ -13,6 +13,7 @@ export async function getPlaces({ category, limit = 12 } = {}) {
   }
 
   params.set("limit", String(limit));
+  params.set("page", String(page));
 
   let response;
 
