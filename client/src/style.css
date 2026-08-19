@@ -19,14 +19,17 @@
 }
 
 html {
+  height: 100%;
   min-width: 320px;
+  overflow: hidden;
   background: var(--rooted-page-background);
 }
 
 body {
+  height: 100%;
   min-width: 320px;
-  min-height: 100vh;
   margin: 0;
+  overflow: hidden;
 
   font-family: "Bahnschrift", "Arial Narrow", Arial, sans-serif;
   color: var(--rooted-text);
@@ -50,7 +53,7 @@ a {
 }
 
 #root {
-  min-height: 100vh;
+  height: 100%;
 }
 
 /* ==============================
@@ -58,16 +61,20 @@ a {
 ============================== */
 
 .page-layout {
-  min-height: 100vh;
-  min-height: 100dvh;
+  height: 100vh;
+  height: 100dvh;
+  min-height: 0;
 
   display: flex;
   flex-direction: column;
+  overflow: hidden;
 }
 
 .page-content {
-  flex: 1 0 auto;
+  flex: 1 1 auto;
+  min-height: 0;
   padding: 0 24px;
+  overflow-y: auto;
 }
 
 /* ==============================
@@ -80,6 +87,11 @@ a {
 }
 
 .site-header {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  flex-shrink: 0;
+
   min-height: 64px;
   padding: 10px 24px;
 
@@ -229,6 +241,7 @@ a {
 
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 320px));
+  align-items: start;
   justify-content: center;
   gap: 40px;
 
@@ -299,11 +312,17 @@ a {
 }
 
 .bulletin-card.discover-card {
-  background-color: #d4e5c6;
+  padding: 0;
+  background-color: #fffdf8;
+  background-image: none;
+  border: 10px solid #fffdf8;
+  border-bottom-width: 20px;
+  border-radius: 2px;
   transform: rotate(-1deg);
 }
 
 .bulletin-card.connect-card {
+  left: 24px;
   background-color: #f4b654;
   transform: rotate(1deg);
 }
@@ -342,7 +361,7 @@ a {
 }
 
 /* ==============================
-   Card Content
+   Featured Card Content and Images
 ============================== */
 
 .bulletin-card-action.MuiCardActionArea-root {
@@ -360,6 +379,26 @@ a {
   border-radius: inherit;
 }
 
+.discover-card .bulletin-card-action.MuiCardActionArea-root {
+  min-height: 0;
+  padding: 0;
+  flex-direction: column;
+  background-color: #fffdf8;
+}
+
+.discover-card .bulletin-card-image {
+  width: 100%;
+  height: 250px;
+  aspect-ratio: auto;
+  object-fit: cover;
+  object-position: center 45%;
+}
+
+/* A Polaroid has a clean lower edge rather than a curled paper corner. */
+.discover-card::after {
+  display: none;
+}
+
 .bulletin-card-content.MuiCardContent-root {
   width: 100%;
   padding: 0;
@@ -367,6 +406,15 @@ a {
 
 .bulletin-card-content.MuiCardContent-root:last-child {
   padding-bottom: 0;
+}
+
+.discover-card .bulletin-card-content.MuiCardContent-root {
+  padding: 18px 18px 4px;
+  background-color: #fffdf8;
+}
+
+.discover-card .bulletin-card-content.MuiCardContent-root:last-child {
+  padding-bottom: 4px;
 }
 
 .bulletin-card-label.MuiTypography-root {
@@ -382,9 +430,9 @@ a {
   margin: 16px 0 0;
 
   color: var(--rooted-plum);
-  font-size: 30px;
+  font-size: 24px;
   font-weight: 700;
-  line-height: 1.1;
+  line-height: 1.15;
 }
 
 .bulletin-card-subtitle.MuiTypography-root {
@@ -402,33 +450,115 @@ a {
   font-weight: 700;
 }
 
+.connect-card .bulletin-card-action.MuiCardActionArea-root {
+  min-height: 0;
+  padding: 10px;
+  flex-direction: column;
+  overflow: visible !important;
+}
+
+.connect-card .connect-card-image {
+  position: relative;
+  z-index: 3;
+
+  width: calc(100% - 18px);
+  height: 250px;
+  margin-right: -34px;
+  align-self: flex-end;
+
+  object-fit: cover;
+  object-position: center;
+  border: 6px solid #fffdf8;
+  border-radius: 1px;
+
+  box-shadow:
+    2px 5px 8px rgba(55, 40, 28, 0.2),
+    5px 10px 16px rgba(55, 40, 28, 0.12);
+
+  transform: rotate(1deg);
+}
+
+.connect-card .bulletin-card-content.MuiCardContent-root {
+  padding: 18px 18px 4px;
+}
+
+.connect-card .bulletin-card-content.MuiCardContent-root:last-child {
+  padding-bottom: 8px;
+}
+
 /* ==============================
-   Pushpins
+   Photographic Pushpins
 ============================== */
 
 .pushpin {
   position: absolute;
-  z-index: 2;
-  top: 15px;
+  z-index: 10;
+  top: 6px;
   left: 50%;
 
-  width: 18px;
-  height: 18px;
+  width: 48px;
+  height: 48px;
 
-  border: 3px solid rgba(255, 255, 255, 0.45);
-  border-radius: 50%;
-  background: var(--rooted-orange);
+  border: 0;
+  background-color: transparent;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: contain;
+  box-shadow: none;
 
-  box-shadow:
-    1px 3px 4px rgba(60, 53, 70, 0.35),
-    inset -2px -2px 3px rgba(60, 53, 70, 0.2);
+  filter:
+    drop-shadow(0 0 1px rgba(255, 255, 255, 0.9))
+    drop-shadow(0 4px 3px rgba(60, 53, 70, 0.42));
 
   pointer-events: none;
   transform: translateX(-50%);
+  transform-origin: center 35%;
+
+  animation: pushpin-sway 5s ease-in-out infinite;
 }
 
+/* Orange pin on the Discover Polaroid. */
+.discover-card .pushpin {
+  background-image: url("./assets/pushpin-orange.png");
+}
+
+/* Green pin on the Connect flyer. */
 .connect-card .pushpin {
-  background: var(--rooted-green);
+  background-image: url("./assets/pushpin-green.png");
+  animation-delay: -1.75s;
+}
+
+/*
+ * Most of the five-second cycle remains still.
+ * The short movement makes the pin feel physical without becoming distracting.
+ */
+@keyframes pushpin-sway {
+  0%,
+  42%,
+  58%,
+  100% {
+    transform: translateX(-50%) rotate(0deg);
+  }
+
+  47% {
+    transform: translateX(-50%) rotate(-1.5deg);
+  }
+
+  53% {
+    transform: translateX(-50%) rotate(1.5deg);
+  }
+}
+
+/* Disable decorative motion when the user requests reduced motion. */
+@media (prefers-reduced-motion: reduce) {
+  .pushpin {
+    animation: none;
+  }
+}
+
+.bulletin-card.MuiCard-root {
+  position: relative;
+  overflow: visible;
 }
 
 /* ==============================
@@ -731,6 +861,10 @@ a {
   .support-dialog-actions {
     padding: 8px 18px 18px !important;
   }
+
+  .support-dialog-logo {
+    height: 22px;
+  }
 }
 
 .support-dialog-heading {
@@ -746,26 +880,23 @@ a {
   object-fit: contain;
 }
 
-@media (max-width: 600px) {
-  .support-dialog-logo {
-    height: 22px;
-  }
-}
-
 /* ==============================
-   Connect Page
+   Discover and Connect Page Headings
 ============================== */
 
-.connect-page-heading,.discover-page-heading {
+.connect-page-heading,
+.discover-page-heading {
   max-width: 720px;
   padding-top: 28px;
 }
 
-.connect-page-heading .hero-eyebrow, .discover-page-heading .hero-eyebrow {
+.connect-page-heading .hero-eyebrow,
+.discover-page-heading .hero-eyebrow {
   margin: 0 0 12px;
 }
 
-.connect-page-heading h1, .discover-page-heading h1 {
+.connect-page-heading h1,
+.discover-page-heading h1 {
   margin: 0 0 14px;
   color: var(--rooted-dark-green);
 
@@ -774,12 +905,17 @@ a {
   line-height: 1.08;
 }
 
-.connect-page-heading > p:last-child, .discover-page-heading > p:last-child {
+.connect-page-heading > p:last-child,
+.discover-page-heading > p:last-child {
   margin: 0;
   color: #5c5861;
   font-size: 17px;
   line-height: 1.6;
 }
+
+/* ==============================
+   Connect Page
+============================== */
 
 .connect-filters {
   margin: 34px 0;
@@ -848,6 +984,10 @@ a {
 }
 
 .site-footer {
+  position: sticky;
+  bottom: 0;
+  z-index: 100;
+
   width: 100%;
   margin-top: auto;
   padding: 10px 16px;
@@ -908,9 +1048,8 @@ a {
     border-width: 7px;
   }
 
-  .bulletin-card.discover-card,
   .bulletin-card.connect-card {
-    transform: none;
+    left: 0;
   }
 }
 
@@ -931,12 +1070,18 @@ a {
     padding: 0 16px;
   }
 
-  .landing-hero {
-    min-height: auto;
-    padding: 48px 0 64px;
-    gap: 36px;
-  }
+.landing-hero {
+  width: 100%;
+  max-width: 1050px;
+  min-height: 100%;
+  margin: 0 auto;
+  padding: 28px 0 36px;
 
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  gap: 28px;
+}
   .hero-description {
     font-size: 16px;
   }
@@ -962,37 +1107,44 @@ a {
   max-width: 600px;
   height: 650px;
   margin: 40px auto;
+
   display: flex;
   flex-direction: column;
+
+  overflow: hidden;
+
   background-color: var(--rooted-header-background);
   border: 1px solid rgba(185, 111, 19, 0.2);
   border-radius: 12px;
-  overflow: hidden;
   box-shadow: 0 14px 30px rgba(60, 53, 70, 0.12);
 }
 
 .chatbot-header-bar {
   padding: 16px 20px;
-  background: var(--rooted-dark-green);
-  color: var(--rooted-cream);
-  font-weight: bold;
-  font-size: 16px;
-  letter-spacing: 0.5px;
+
   display: flex;
-  justify-content: space-between;
   align-items: center;
+  justify-content: space-between;
+
+  color: var(--rooted-cream);
+  font-size: 16px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  background: var(--rooted-dark-green);
 }
 
 .chatbot-clear-btn {
-  background: transparent;
-  border: 1px solid var(--rooted-cream);
-  color: var(--rooted-cream);
   padding: 4px 8px;
+
+  border: 1px solid var(--rooted-cream);
   border-radius: 4px;
+  color: var(--rooted-cream);
   font-size: 11px;
-  cursor: pointer;
   font-weight: 600;
   text-transform: uppercase;
+  background: transparent;
+  cursor: pointer;
+
   transition: background-color 0.2s ease;
 }
 
@@ -1006,21 +1158,25 @@ a {
 
 .chat-window-scroll {
   flex: 1;
-  overflow-y: auto;
+
   display: flex;
   flex-direction: column;
-  padding: 20px;
-  background-color: var(--rooted-page-background);
   gap: 12px;
+
+  padding: 20px;
+  overflow-y: auto;
+
+  background-color: var(--rooted-page-background);
 }
 
 .chat-loading-indicator {
   align-self: flex-start;
+  padding-left: 6px;
+
   color: var(--rooted-green);
-  font-style: italic;
   font-size: 14px;
   font-weight: 600;
-  padding-left: 6px;
+  font-style: italic;
 }
 
 /* ==============================
@@ -1028,8 +1184,9 @@ a {
 ============================== */
 
 .chat-message-bubble {
-  padding: 12px 16px;
   max-width: 80%;
+  padding: 12px 16px;
+
   font-size: 14px;
   line-height: 1.5;
   word-break: break-word;
@@ -1037,19 +1194,21 @@ a {
 
 .chat-message-bubble.user {
   align-self: flex-end;
-  background-color: var(--rooted-green);
+
   color: #ffffff;
+  background-color: var(--rooted-green);
   border-radius: 16px 16px 2px 16px;
   box-shadow: 0 2px 4px rgba(52, 71, 53, 0.15);
 }
 
 .chat-message-bubble.assistant {
   align-self: flex-start;
-  background-color: var(--rooted-header-background);
+
   color: var(--rooted-text);
+  background-color: var(--rooted-header-background);
+  border: 1px solid rgba(60, 53, 70, 0.05);
   border-radius: 16px 16px 16px 2px;
   box-shadow: 0 2px 4px rgba(60, 53, 70, 0.08);
-  border: 1px solid rgba(60, 53, 70, 0.05);
 }
 
 /* ==============================
@@ -1057,23 +1216,28 @@ a {
 ============================== */
 
 .chat-input-form {
-  display: flex;
   padding: 16px;
+
+  display: flex;
+  align-items: center;
+  gap: 12px;
+
   background-color: var(--rooted-header-background);
   border-top: 1px solid rgba(185, 111, 19, 0.15);
-  gap: 12px;
-  align-items: center;
 }
 
 .chat-input-field {
   flex: 1;
   padding: 12px 16px;
+
+  outline: none;
   border: 1px solid rgba(60, 53, 70, 0.2);
   border-radius: 6px;
-  outline: none;
-  font-size: 14px;
+
   color: var(--rooted-text);
+  font-size: 14px;
   background-color: #ffffff;
+
   transition: border-color 0.2s ease;
 }
 
@@ -1083,14 +1247,19 @@ a {
 
 .chat-submit-btn {
   padding: 12px 20px;
-  background-color: var(--rooted-orange);
-  color: var(--rooted-plum);
+
   border: none;
   border-radius: 6px;
-  cursor: pointer;
-  font-weight: 700;
+
+  color: var(--rooted-plum);
   font-size: 14px;
-  transition: all 0.2s ease;
+  font-weight: 700;
+  background-color: var(--rooted-orange);
+  cursor: pointer;
+
+  transition:
+    color 0.2s ease,
+    background-color 0.2s ease;
 }
 
 .chat-submit-btn:disabled {

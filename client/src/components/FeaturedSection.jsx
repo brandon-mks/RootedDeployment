@@ -5,6 +5,8 @@ import {
   CardContent,
   Typography,
 } from "@mui/material";
+import discoverImage from "../assets/Discover.jpg";
+import connectImage from "../assets/Connect.jpg";
 import { Link } from "react-router";
 
 const choices = [
@@ -15,6 +17,8 @@ const choices = [
     action: "Start exploring",
     path: "/discover",
     cardClass: "discover-card",
+    image: discoverImage,
+    imageAlt: "A map, coffee, and a traveler planning where to explore",
   },
   {
     heading: "Connect",
@@ -23,6 +27,8 @@ const choices = [
     action: "Join an event",
     path: "/connect",
     cardClass: "connect-card",
+    image: connectImage,
+    imageAlt: "Community members joining their hands together",
   },
 ];
 
@@ -41,6 +47,14 @@ function FeaturedSection() {
             to={choice.path}
             className="bulletin-card-action"
           >
+            {choice.image && (
+              <img
+                src={choice.image}
+                alt={choice.imageAlt}
+                className="bulletin-card-image"
+              />
+            )}
+
             <CardContent className="bulletin-card-content">
               <Typography className="bulletin-card-label" component="p">
                 {choice.heading}
