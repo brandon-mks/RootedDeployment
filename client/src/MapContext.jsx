@@ -11,7 +11,6 @@ export function MapContextProvider({ children }) {
       lng: Number(position.coords.longitude),
     };
     setCoords(userCoords);
-    console.log(userCoords);
   };
 
   //useEffect to get user location if browser supports it
