@@ -9,6 +9,7 @@ import DiscoverPage from "./components/DiscoverPage.jsx";
 import ConnectPage from "./pages/ConnectPage.jsx";
 import Chatbot from "./components/chatbot/Chatbot.jsx";
 import { DynamicMap } from "./components/DynamicMap.jsx";
+import SupportDialog from "./components/SupportDialog.jsx";
 
 function App() {
   return (
@@ -19,7 +20,7 @@ function App() {
       <Route path="/chat" element={<Chatbot />} />
       <Route path="/login" element={<LoginPage />} />
       <Route path="/about" element={<AboutPage />} />
-      <Route path="/support" element={<SupportPage />} />
+      <Route path="/support" element={<SupportDialog />} />
       <Route path="/mapTesting" element={<DynamicMap />} />
     </Routes>
   );
