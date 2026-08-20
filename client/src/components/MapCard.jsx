@@ -1,4 +1,4 @@
-import { AdvancedMarker, APIProvider, Map, Pin, useMap } from "@vis.gl/react-google-maps";
+import { AdvancedMarker, APIProvider, Map, Pin } from "@vis.gl/react-google-maps";
 
 export const MapCard = ({ place }) => {
   return (
