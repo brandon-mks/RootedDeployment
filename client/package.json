@@ -12,10 +12,12 @@
   "dependencies": {
     "@emotion/react": "^11.14.0",
     "@emotion/styled": "^11.14.1",
+    "@mui/icons-material": "^9.3.1",
     "@mui/material": "^9.3.0",
     "@vis.gl/react-google-maps": "^1.9.0",
     "axios": "^1.19.0",
     "react": "^19.2.7",
+    "react-calendar": "^6.0.1",
     "react-dom": "^19.2.7",
     "react-router": "^7.18.2"
   },

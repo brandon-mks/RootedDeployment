@@ -50,11 +50,19 @@ export const generateAiResponse = async (messages) => {
   });
 
   if (!response.ok) {
-    const errorBody = await response.json().catch(() => ({}));
-    throw new Error(
-      errorBody.error?.message ||
-        `OpenRouter responded with code ${response.status}`,
-    );
+    const errorText = await response.text();
+    let errorMessage = `OpenAI responded with code ${response.status}`;
+
+    try {
+      const errorBody = JSON.parse(errorText);
+      if (errorBody.error?.message) {
+        errorMessage = errorBody.error.message;
+      }
+    } catch {
+      // Leaves errorMessage as the default fallback string if JSON parsing fails
+    }
+
+    throw new Error(errorMessage);
   }
 
   const data = await response.json();

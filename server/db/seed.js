@@ -26,6 +26,77 @@ const seed = async () => {
       types VARCHAR(150)[] NOT NULL DEFAULT '{}',
       primary_type VARCHAR(150)
     );
+  
+    CREATE TABLE users (
+      id UUID PRIMARY KEY,
+      username VARCHAR(50) UNIQUE NOT NULL,
+      email VARCHAR(100) UNIQUE NOT NULL,
+      password_hash VARCHAR(255) NOT NULL
+    );
+
+    CREATE TABLE events (
+      id UUID PRIMARY KEY,
+      created_by UUID REFERENCES users(id) ON DELETE SET NULL,
+      business_id UUID REFERENCES businesses(id) ON DELETE SET NULL,
+      title VARCHAR(150) NOT NULL,
+      description TEXT,
+      location TEXT,
+      event_date DATE NOT NULL,
+      start_time TIME,
+      end_time TIME
+    );
+    
+    CREATE TABLE favorite_businesses (
+     id UUID PRIMARY KEY,
+     user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+     business_id UUID NOT NULL REFERENCES businesses(id) ON DELETE CASCADE, 
+
+     UNIQUE(user_id, business_id)
+    );
+
+    CREATE TABLE favorite_events (
+      id UUID PRIMARY KEY,
+      user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+      event_id UUID NOT NULL REFERENCES events(id) ON DELETE CASCADE,
+
+      UNIQUE(user_id, event_id)
+    );
+
+    CREATE TABLE business_reviews (
+      id UUID PRIMARY KEY, 
+      user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+      business_id UUID NOT NULL REFERENCES businesses(id) ON DELETE CASCADE,
+      rating INTEGER NOT NULL CHECK (rating BETWEEN 1 AND 5),
+      review_text TEXT NOT NULL,
+
+      UNIQUE(user_id, business_id)
+    );
+     
+    CREATE TABLE event_reviews (
+      id UUID PRIMARY KEY, 
+      user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+      event_id UUID NOT NULL REFERENCES events(id) ON DELETE CASCADE,
+      rating INTEGER NOT NULL CHECK (rating BETWEEN 1 AND 5),
+      review_text TEXT NOT NULL,
+      
+      UNIQUE(user_id, event_id)
+    );
+
+    CREATE TABLE business_visits (
+      id UUID PRIMARY KEY,
+      user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+      business_id UUID NOT NULL REFERENCES businesses(id) ON DELETE CASCADE,
+      
+      UNIQUE(user_id, business_id)
+    );
+
+    CREATE TABLE event_attendance (
+      id UUID PRIMARY KEY,
+      user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+      event_id UUID NOT NULL REFERENCES events(id) ON DELETE CASCADE,
+      
+      UNIQUE(user_id, event_id)
+    );
   `;
   await client.query(schemaSQL);
   console.log("table/schema created");
