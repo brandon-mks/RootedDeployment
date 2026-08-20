@@ -803,25 +803,6 @@ a {
   rotate: -0.35deg;
 }
 
-/* Pushpin */
-
-.support-dialog-paper::before {
-  content: "";
-  position: absolute;
-  z-index: 2;
-  top: -13px;
-  left: 50%;
-  width: 24px;
-  height: 24px;
-  border: 3px solid #d9912f;
-  border-radius: 50%;
-  background: var(--rooted-orange);
-  box-shadow:
-    inset 3px 3px 0 rgba(255, 255, 255, 0.35),
-    0 4px 6px rgba(60, 53, 70, 0.35);
-  transform: translateX(-50%);
-}
-
 /* Dialog heading */
 
 .support-dialog-title {
