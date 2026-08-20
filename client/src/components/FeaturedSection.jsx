@@ -5,9 +5,12 @@ import {
   CardContent,
   Typography,
 } from "@mui/material";
+import { Link } from "react-router";
+
 import discoverImage from "../assets/Discover.jpg";
 import connectImage from "../assets/Connect.jpg";
-import { Link } from "react-router";
+import communityFlyer from "../assets/community-flyer.png";
+import orangePushpin from "../assets/pushpin-orange.png";
 
 const choices = [
   {
@@ -47,13 +50,12 @@ function FeaturedSection() {
             to={choice.path}
             className="bulletin-card-action"
           >
-            {choice.image && (
-              <img
-                src={choice.image}
-                alt={choice.imageAlt}
-                className="bulletin-card-image"
-              />
-            )}
+            <img
+              src={choice.image}
+              alt={choice.imageAlt}
+              className="bulletin-card-image"
+              draggable="false"
+            />
 
             <CardContent className="bulletin-card-content">
               <Typography className="bulletin-card-label" component="p">
@@ -75,6 +77,27 @@ function FeaturedSection() {
           </CardActionArea>
         </Card>
       ))}
+
+      <Link
+        to="/register"
+        className="community-flyer-link"
+        aria-label="Create a Rooted account. Save favorites, create events, and connect locally."
+      >
+        <img
+          src={orangePushpin}
+          alt=""
+          aria-hidden="true"
+          className="community-flyer-pushpin"
+          draggable="false"
+        />
+        <img
+          src={communityFlyer}
+          alt=""
+          aria-hidden="true"
+          className="community-flyer-image"
+          draggable="false"
+        />
+      </Link>
     </Box>
   );
 }

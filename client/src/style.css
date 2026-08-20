@@ -234,16 +234,24 @@ a {
 ============================== */
 
 .bulletin-board {
+  --featured-card-width: 320px;
+  --featured-card-height: 420px;
+  --featured-image-height: 210px;
+
+  position: relative;
+  isolation: isolate;
+
+  box-sizing: border-box;
   width: 100%;
   max-width: 1050px;
   margin: 0 auto;
-  padding: 54px 44px;
+  padding: 44px 48px;
 
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 320px));
-  align-items: start;
+  grid-template-columns: repeat(2, var(--featured-card-width));
+  align-items: center;
   justify-content: center;
-  gap: 40px;
+  gap: 56px;
 
   border: 9px solid #795536;
   border-radius: 8px;
@@ -262,21 +270,25 @@ a {
 }
 
 /* ==============================
-   Pinned Paper Cards
+   Equal-Sized Pinned Cards
 ============================== */
 
 .bulletin-card.MuiCard-root {
   position: relative;
-  width: 100%;
+
+  box-sizing: border-box;
+  width: var(--featured-card-width);
+  height: var(--featured-card-height);
+  margin: 0;
+  padding: 0;
   overflow: visible;
 
   color: var(--rooted-plum);
 
-  /* Slightly imperfect paper edges */
-  border: 1px solid rgba(75, 58, 43, 0.08);
-  border-radius: 2px 4px 10px 3px;
+  border-style: solid;
+  border-width: 10px 10px 20px;
+  border-radius: 2px;
 
-  /* Subtle paper fibers */
   background-image:
     radial-gradient(
       circle at 18% 24%,
@@ -300,11 +312,12 @@ a {
     23px 23px,
     100% 100%;
 
-  /* Layered paper shadow */
   box-shadow:
     0 2px 2px rgba(55, 40, 28, 0.12),
     3px 7px 10px rgba(55, 40, 28, 0.2),
     7px 12px 18px rgba(55, 40, 28, 0.1);
+
+  transform-origin: 50% 8px;
 
   transition:
     transform 180ms ease,
@@ -312,43 +325,39 @@ a {
 }
 
 .bulletin-card.discover-card {
-  padding: 0;
+  border-color: #fffdf8;
   background-color: #fffdf8;
   background-image: none;
-  border: 10px solid #fffdf8;
-  border-bottom-width: 20px;
-  border-radius: 2px;
-  transform-origin: 50% 8px;
+
   transform: translate(-18px, 12px) rotate(-1.75deg);
 }
 
 .bulletin-card.connect-card {
-  left: 24px;
+  left: auto;
+
+  border-color: #f4b654;
   background-color: #f4b654;
-  transform-origin: 50% 8px;
+
   transform: translate(14px, -8px) rotate(1.25deg);
 }
 
-.community-flyer-link {
-  position: absolute;
-  top: 18px;
-  right: 18px;
-  width: 175px;
-
-  transform-origin: 50% 8px;
-  transform: rotate(3deg);
-}
-
 .bulletin-card.MuiCard-root:hover {
-  transform: rotate(0deg) translateY(-6px);
-
   box-shadow:
     0 3px 3px rgba(55, 40, 28, 0.12),
     5px 14px 18px rgba(55, 40, 28, 0.24),
     10px 20px 25px rgba(55, 40, 28, 0.1);
 }
 
-/* Slightly lifted lower corner */
+.bulletin-card.discover-card:hover {
+  transform: translate(-18px, 5px) rotate(-1deg);
+}
+
+.bulletin-card.connect-card:hover {
+  transform: translate(14px, -15px) rotate(0.75deg);
+}
+
+/* Lifted paper corner on the yellow card. */
+
 .bulletin-card::after {
   content: "";
 
@@ -360,73 +369,70 @@ a {
   width: 34px;
   height: 18px;
 
+  border-radius: 0 0 7px;
+  opacity: 0.75;
+  pointer-events: none;
+
   background: linear-gradient(
     145deg,
     transparent 45%,
     rgba(255, 255, 255, 0.2) 48%,
     rgba(60, 53, 70, 0.08) 100%
   );
-
-  border-radius: 0 0 7px 0;
-  opacity: 0.75;
-  pointer-events: none;
 }
 
-/* ==============================
-   Featured Card Content and Images
-============================== */
-
-.bulletin-card-action.MuiCardActionArea-root {
-  position: relative;
-  z-index: 1;
-
-  min-height: 270px;
-  padding: 48px 32px 30px;
-
-  display: flex;
-  align-items: stretch;
-
-  color: inherit;
-  text-align: left;
-  border-radius: inherit;
-}
-
-.discover-card .bulletin-card-action.MuiCardActionArea-root {
-  min-height: 0;
-  padding: 0;
-  flex-direction: column;
-  background-color: #fffdf8;
-}
-
-.discover-card .bulletin-card-image {
-  width: 100%;
-  height: 250px;
-  aspect-ratio: auto;
-  object-fit: cover;
-  object-position: center 45%;
-}
-
-/* A Polaroid has a clean lower edge rather than a curled paper corner. */
-.discover-card::after {
+.bulletin-card.discover-card::after {
   display: none;
 }
 
-.bulletin-card-content.MuiCardContent-root {
+/* ==============================
+   Equal Card Images and Content
+============================== */
+
+.bulletin-card.MuiCard-root
+  .bulletin-card-action.MuiCardActionArea-root {
+  box-sizing: border-box;
   width: 100%;
+  height: 100%;
+  min-height: 0;
   padding: 0;
+
+  display: grid;
+  grid-template-rows: var(--featured-image-height) minmax(0, 1fr);
+
+  overflow: hidden !important;
+  color: inherit;
+  text-align: left;
+  border-radius: inherit;
+  background-color: inherit;
 }
 
+.bulletin-card.MuiCard-root .bulletin-card-image {
+  display: block;
+
+  width: 100%;
+  height: var(--featured-image-height);
+  min-height: var(--featured-image-height);
+
+  object-fit: cover;
+  object-position: center;
+}
+
+.bulletin-card.discover-card .bulletin-card-image {
+  object-position: center 45%;
+}
+
+.bulletin-card-content.MuiCardContent-root,
 .bulletin-card-content.MuiCardContent-root:last-child {
-  padding-bottom: 0;
-}
+  box-sizing: border-box;
+  width: 100%;
+  min-height: 0;
+  padding: 16px 18px;
 
-.discover-card .bulletin-card-content.MuiCardContent-root {
-  padding: 18px 18px 4px;
-  background-color: #fffdf8;
-}
+  display: flex;
+  flex-direction: column;
 
-.discover-card .bulletin-card-content.MuiCardContent-root:last-child {
-  padding-bottom: 4px;
+  background-color: inherit;
 }
 
 .bulletin-card-label.MuiTypography-root {
@@ -439,7 +445,7 @@ a {
 }
 
 .bulletin-card-title.MuiTypography-root {
-  margin: 16px 0 0;
+  margin: 12px 0 0;
 
   color: var(--rooted-plum);
   font-size: 24px;
@@ -448,54 +454,136 @@ a {
 }
 
 .bulletin-card-subtitle.MuiTypography-root {
-  margin: 12px 0 0;
+  margin: 8px 0 0;
 
   font-size: 16px;
-  line-height: 1.5;
+  line-height: 1.4;
 }
 
 .bulletin-card-link.MuiTypography-root {
   display: block;
-  margin-top: 24px;
+  margin-top: auto;
 
   font-size: 16px;
   font-weight: 700;
 }
 
-.connect-card .bulletin-card-action.MuiCardActionArea-root {
-  min-height: 0;
-  padding: 10px;
-  flex-direction: column;
-  overflow: visible !important;
+/* ==============================
+   Community Account Flyer
+============================== */
+
+.bulletin-board > .community-flyer-link {
+  position: absolute;
+  z-index: 8;
+  top: 18px;
+  right: 0px;
+
+  display: block;
+  width: 200px;
+
+  border-radius: 2px;
+  transform-origin: 50% 8px;
+  transform: rotate(3deg);
+
+  filter: drop-shadow(4px 8px 8px rgba(55, 40, 28, 0.3));
+
+  transition:
+    transform 180ms ease,
+    filter 180ms ease;
 }
 
-.connect-card .connect-card-image {
-  position: relative;
+.bulletin-board > .community-flyer-link:hover {
+  transform: translateY(-6px) rotate(1deg) scale(1.05);
+  filter: drop-shadow(6px 12px 12px rgba(55, 40, 28, 0.35));
+}
+
+.bulletin-board > .community-flyer-link:focus-visible {
+  outline: 4px solid var(--rooted-green);
+  outline-offset: 5px;
+}
+
+.community-flyer-image {
+  display: block;
+  width: 100%;
+  height: auto;
+
+  border-radius: 2px;
+}
+
+.community-flyer-link {
+  overflow: visible;
+}
+
+.community-flyer-pushpin {
+  position: absolute;
+  top: -5px;
+  left: 50%;
   z-index: 3;
 
-  width: calc(100% - 18px);
-  height: 250px;
-  margin-right: -34px;
-  align-self: flex-end;
+  width: 30px;
+  height: 30px;
+  object-fit: contain;
 
-  object-fit: cover;
-  object-position: center;
-  border: 6px solid #fffdf8;
-  border-radius: 1px;
-
-  box-shadow:
-    2px 5px 8px rgba(55, 40, 28, 0.2),
-    5px 10px 16px rgba(55, 40, 28, 0.12);
-
-  transform: rotate(1deg);
+  transform: translateX(-50%);
+  filter: drop-shadow(0 3px 3px rgba(45, 31, 20, 0.35));
+  pointer-events: none;
 }
 
-.connect-card .bulletin-card-content.MuiCardContent-root {
-  padding: 18px 18px 4px;
+/* ==============================
+   Featured Section Responsive
+============================== */
+
+@media (max-width: 900px) {
+  .bulletin-board > .community-flyer-link {
+    width: 145px;
+    top: 14px;
+    right: 12px;
+  }
 }
 
-.connect-card .bulletin-card-content.MuiCardContent-root:last-child {
-  padding-bottom: 8px;
+@media (max-width: 700px) {
+  .bulletin-board {
+    grid-template-columns: minmax(
+      0,
+      var(--featured-card-width)
+    );
+
+    gap: 32px;
+    padding: 40px 20px;
+  }
+
+  .bulletin-card.MuiCard-root {
+    width: min(100%, var(--featured-card-width));
+  }
+
+  .bulletin-card.discover-card {
+    transform: translate(-5px, 4px) rotate(-1.5deg);
+  }
+
+  .bulletin-card.connect-card {
+    transform: translate(5px, -4px) rotate(1.25deg);
+  }
+
+  .bulletin-board > .community-flyer-link {
+    position: relative;
+    top: auto;
+    right: auto;
+
+    grid-column: 1;
+    justify-self: center;
+
+    width: 200px;
+    margin-top: 4px;
+
+    transform: rotate(1.5deg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .bulletin-card.MuiCard-root,
+  .bulletin-board > .community-flyer-link {
+    transition: none;
+  }
 }
 
 /* ==============================
