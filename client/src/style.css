@@ -99,7 +99,8 @@ a {
   align-items: center;
   justify-content: space-between;
 
-  background: var(--rooted-header-background);
+  
+  background: var(--rooted-dark-green);
   border-bottom: 1px solid rgba(185, 111, 19, 0.2);
 }
 
@@ -136,14 +137,14 @@ a {
 }
 
 .site-nav a {
-  color: var(--rooted-plum);
+  color: white;
   font-size: 14px;
   font-weight: 600;
   text-decoration: none;
 }
 
 .site-nav a:hover {
-  color: var(--rooted-green);
+  color: var(--rooted-orange);
 }
 
 /* ==============================

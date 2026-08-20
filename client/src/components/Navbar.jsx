@@ -26,6 +26,9 @@ function Navbar() {
           Log in
         </Link>
       )}
+      
+      <Link to="/discover">Discover</Link>
+      <Link to="/connect">Connect</Link>
 
       <Link to="/chat">Chat</Link>
     </nav>
