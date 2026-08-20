@@ -98,8 +98,6 @@ a {
   display: flex;
   align-items: center;
   justify-content: space-between;
-
-  
   background: var(--rooted-dark-green);
   border-bottom: 1px solid rgba(185, 111, 19, 0.2);
 }
