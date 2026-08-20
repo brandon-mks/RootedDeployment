@@ -489,8 +489,8 @@ a {
   filter: drop-shadow(4px 8px 8px rgba(55, 40, 28, 0.3));
 
   transition:
-    transform 720ms ease,
-    filter 720ms ease;
+    transform 800ms ease,
+    filter 800ms ease;
 }
 
 .bulletin-board > .community-flyer-link:hover {
@@ -781,6 +781,176 @@ a {
 @media (max-width: 599px) {
   .discover-results-grid {
     min-height: 0;
+  }
+}
+
+/* ==============================
+   Details Dialog
+============================== */
+
+.details-dialog-backdrop.MuiBackdrop-root {
+  background-color: rgba(34, 29, 38, 0.58) !important;
+  backdrop-filter: blur(3px);
+}
+
+.details-dialog-paper.MuiDialog-paper {
+  overflow: visible;
+
+  color: var(--rooted-plum);
+  background-color: #fffdf8;
+  border: 1px solid rgba(52, 71, 53, 0.25);
+  border-radius: 10px;
+
+  box-shadow: 0 24px 60px rgba(25, 20, 32, 0.38);
+}
+
+.details-dialog-title {
+  position: relative;
+
+  padding: 22px 112px 18px 24px !important;
+
+  background-color: #fff9ee;
+  border-bottom: 3px solid var(--rooted-orange);
+}
+
+.details-dialog-category {
+  margin: 0 !important;
+
+  color: var(--rooted-green);
+  font-size: 16px !important;
+  font-weight: 700 !important;
+  letter-spacing: 0.1em !important;
+  text-transform: uppercase;
+}
+
+.details-dialog-name {
+  margin: 4px 0 0 !important;
+
+  color: var(--rooted-dark-green);
+  font-size: 27px !important;
+  font-weight: 700 !important;
+  line-height: 1.2 !important;
+}
+
+.details-dialog-favorite {
+  position: absolute !important;
+  top: 22px;
+  right: 75px;
+
+  color: var(--rooted-plum) !important;
+}
+
+.details-dialog-favorite[aria-pressed="true"] {
+  color: var(--rooted-orange) !important;
+}
+
+.details-dialog-close {
+  position: absolute !important;
+  top: 17px;
+  right: 14px;
+
+  color: var(--rooted-plum) !important;
+}
+
+.details-dialog-content {
+  padding: 28px 24px !important;
+}
+
+.details-dialog-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(320px, 42%);
+  align-items: start;
+  gap: 32px;
+}
+
+.details-dialog-map-panel {
+  display: flex;
+  justify-content: flex-end;
+  align-items: flex-start;
+
+  width: 100%;
+  min-width: 0;
+}
+
+.details-dialog-map-panel .mapContainer {
+  width: 100%;
+  height: 290px;
+}
+
+.details-dialog-information {
+  min-width: 0;
+}
+
+.details-dialog-field h3 {
+  margin-bottom: 5px;
+
+  color: var(--rooted-dark-green);
+  font-weight: 700;
+}
+
+.details-dialog-map-fallback {
+  display: grid;
+  place-items: center;
+
+  width: 200px;
+  height: 200px;
+
+  color: var(--rooted-plum);
+  background-color: #e6eadb;
+  border-radius: 8px;
+}
+
+.details-dialog-actions {
+  justify-content: space-between !important;
+  flex-wrap: wrap;
+
+  padding: 14px 20px 18px !important;
+  gap: 14px;
+
+  background-color: #fff9ee;
+}
+
+.details-dialog-carousel {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.details-dialog-carousel span {
+  min-width: 55px;
+
+  text-align: center;
+  font-weight: 500;
+}
+
+.details-dialog-action-buttons {
+  margin-left: auto;
+}
+
+.details-dialog-action-buttons .MuiButton-contained {
+  background-color: var(--rooted-green);
+}
+
+.details-dialog-action-buttons .MuiButton-contained:hover {
+  background-color: var(--rooted-dark-green);
+}
+
+@media (max-width: 700px) {
+  .details-dialog-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .details-dialog-map-panel {
+    justify-content: center;
+  }
+
+  .details-dialog-actions {
+    justify-content: center !important;
+  }
+
+  .details-dialog-action-buttons {
+    justify-content: center;
+    margin-left: 0;
   }
 }
 
