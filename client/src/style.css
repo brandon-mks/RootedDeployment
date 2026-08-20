@@ -152,14 +152,14 @@ a {
 .landing-hero {
   width: 100%;
   max-width: 1050px;
-  min-height: 620px;
+  min-height: 0;
   margin: 0 auto;
-  padding: 64px 0 80px;
+  padding: 44px 0 24px;
 
   display: flex;
   flex-direction: column;
-  justify-content: center;
-  gap: 48px;
+  justify-content: flex-start;
+  gap: 30px;
 }
 
 .hero-brand {
@@ -185,7 +185,7 @@ a {
 }
 
 .hero-eyebrow {
-  margin: 0 0 12px;
+  margin: 0;
 
   color: var(--rooted-green);
   font-size: 13px;
@@ -222,7 +222,7 @@ a {
 }
 
 .featured-area h2 {
-  margin: 0 0 28px;
+  margin: 0 0 18px;
 
   color: var(--rooted-plum);
   font-size: 22px;
