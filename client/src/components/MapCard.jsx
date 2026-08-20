@@ -6,7 +6,7 @@ export const MapCard = ({ place }) => {
       <Map
         //vis.gl react-google-maps documentation states
         //200px x 200px is the smallest size map can render
-        style={{ width: "200px", height: "200px" }}
+        style={{ width: "100%", height: "300px" }}
         center={place.location}
         //change default zoom as needed to how close you
         //want the map camera to be

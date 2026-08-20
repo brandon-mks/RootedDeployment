@@ -7,6 +7,11 @@ import {
 } from "@mui/material";
 import { Link } from "react-router";
 
+import discoverImage from "../assets/Discover.jpg";
+import connectImage from "../assets/Connect.jpg";
+import communityFlyer from "../assets/community-flyer.png";
+import orangePushpin from "../assets/pushpin-orange.png";
+
 const choices = [
   {
     heading: "Discover",
@@ -15,6 +20,8 @@ const choices = [
     action: "Start exploring",
     path: "/discover",
     cardClass: "discover-card",
+    image: discoverImage,
+    imageAlt: "A map, coffee, and a traveler planning where to explore",
   },
   {
     heading: "Connect",
@@ -23,6 +30,8 @@ const choices = [
     action: "Join an event",
     path: "/connect",
     cardClass: "connect-card",
+    image: connectImage,
+    imageAlt: "Community members joining their hands together",
   },
 ];
 
@@ -41,6 +50,13 @@ function FeaturedSection() {
             to={choice.path}
             className="bulletin-card-action"
           >
+            <img
+              src={choice.image}
+              alt={choice.imageAlt}
+              className="bulletin-card-image"
+              draggable="false"
+            />
+
             <CardContent className="bulletin-card-content">
               <Typography className="bulletin-card-label" component="p">
                 {choice.heading}
@@ -61,6 +77,27 @@ function FeaturedSection() {
           </CardActionArea>
         </Card>
       ))}
+
+      <Link
+        to="/register"
+        className="community-flyer-link"
+        aria-label="Create a Rooted account. Save favorites, create events, and connect locally."
+      >
+        <img
+          src={orangePushpin}
+          alt=""
+          aria-hidden="true"
+          className="community-flyer-pushpin"
+          draggable="false"
+        />
+        <img
+          src={communityFlyer}
+          alt=""
+          aria-hidden="true"
+          className="community-flyer-image"
+          draggable="false"
+        />
+      </Link>
     </Box>
   );
 }

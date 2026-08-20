@@ -3,6 +3,7 @@ import {
   Box,
   Button,
   Card,
+  CardActionArea,
   CardContent,
   CircularProgress,
   Pagination,
@@ -12,6 +13,7 @@ import {
 
 import Header from "./Header.jsx";
 import Footer from "./Footer.jsx";
+import DetailsDialog from "./DetailsDialog.jsx";
 import { getPlaces } from "../services/places.js";
 
 //Filter Categories
@@ -32,6 +34,7 @@ function DiscoverPage() {
   const [error, setError] = useState("");
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
+  const [selectedPlace, setSelectedPlace] = useState(null);
 
   useEffect(() => {
     async function loadPlaces() {
@@ -61,18 +64,21 @@ function DiscoverPage() {
       <Header />
 
       <main className="page-content">
-        <Typography variant="h3" component="h1" gutterBottom>
-          Discover
-        </Typography>
+        <header className="discover-page-heading">
+          <p className="hero-eyebrow">Discover your community</p>
 
-        <Typography variant="body1" sx={{ marginBottom: 4 }}>
-          Find your next favorite spot in your community. Browse restaurants,
-          museums, and more.
-        </Typography>
+          <h1>Find your next favorite spot.</h1>
+
+          <p>
+            Browse restaurants, museums, outdoor spaces, markets, and live music
+            nearby.
+          </p>
+        </header>
 
         <Stack
           direction="row"
           spacing={1}
+          className="discover-filters"
           sx={{
             marginBottom: 4,
             overflowX: "auto",
@@ -119,7 +125,7 @@ function DiscoverPage() {
         {!loading && !error && (
           <Box>
             <Box
-            className="discover-results-grid"
+              className="discover-results-grid"
               sx={{
                 display: "grid",
                 gridTemplateColumns: {
@@ -132,25 +138,38 @@ function DiscoverPage() {
             >
               {places.map((place) => (
                 <Card key={place.id}>
-                  <CardContent>
-                    <Typography variant="h6" component="h2">
-                      {place.name}
-                    </Typography>
-
-                    <Typography
-                      variant="body2"
-                      color="text.secondary"
-                      sx={{ marginTop: 1 }}
-                    >
-                      {place.address}
-                    </Typography>
-
-                    {place.rating && (
-                      <Typography variant="body2" sx={{ marginTop: 2 }}>
-                        Rating: {place.rating}
+                  <CardActionArea
+                    onClick={() => setSelectedPlace(place)}
+                    aria-label={`View details for ${place.name}`}
+                    className="discover-card-action"
+                  >
+                    <CardContent>
+                      <Typography variant="h6" component="h2">
+                        {place.name}
                       </Typography>
-                    )}
-                  </CardContent>
+
+                      <Typography
+                        variant="body2"
+                        color="text.secondary"
+                        sx={{ marginTop: 1 }}
+                      >
+                        {place.address}
+                      </Typography>
+
+                      {place.rating != null && (
+                        <Typography variant="body2" sx={{ marginTop: 2 }}>
+                          Rating: {place.rating}
+                        </Typography>
+                      )}
+                      <Typography
+                        variant="button"
+                        component="span"
+                        className="discover-details-link"
+                      >
+                        View details
+                      </Typography>
+                    </CardContent>
+                  </CardActionArea>
                 </Card>
               ))}
             </Box>
@@ -168,7 +187,12 @@ function DiscoverPage() {
           </Box>
         )}
       </main>
-
+      <DetailsDialog
+        place={selectedPlace}
+        places={places}
+        onPlaceChange={setSelectedPlace}
+        onClose={() => setSelectedPlace(null)}
+      />
       <Footer />
     </div>
   );

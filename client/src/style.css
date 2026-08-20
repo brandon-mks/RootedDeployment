@@ -19,14 +19,17 @@
 }
 
 html {
+  height: 100%;
   min-width: 320px;
+  overflow: hidden;
   background: var(--rooted-page-background);
 }
 
 body {
+  height: 100%;
   min-width: 320px;
-  min-height: 100vh;
   margin: 0;
+  overflow: hidden;
 
   font-family: "Bahnschrift", "Arial Narrow", Arial, sans-serif;
   color: var(--rooted-text);
@@ -50,7 +53,7 @@ a {
 }
 
 #root {
-  min-height: 100vh;
+  height: 100%;
 }
 
 /* ==============================
@@ -58,16 +61,20 @@ a {
 ============================== */
 
 .page-layout {
-  min-height: 100vh;
-  min-height: 100dvh;
+  height: 100vh;
+  height: 100dvh;
+  min-height: 0;
 
   display: flex;
   flex-direction: column;
+  overflow: hidden;
 }
 
 .page-content {
-  flex: 1 0 auto;
+  flex: 1 1 auto;
+  min-height: 0;
   padding: 0 24px;
+  overflow-y: auto;
 }
 
 /* ==============================
@@ -80,14 +87,18 @@ a {
 }
 
 .site-header {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  flex-shrink: 0;
+
   min-height: 64px;
   padding: 10px 24px;
 
   display: flex;
   align-items: center;
   justify-content: space-between;
-
-  background: var(--rooted-header-background);
+  background: var(--rooted-dark-green);
   border-bottom: 1px solid rgba(185, 111, 19, 0.2);
 }
 
@@ -124,14 +135,14 @@ a {
 }
 
 .site-nav a {
-  color: var(--rooted-plum);
+  color: white;
   font-size: 14px;
   font-weight: 600;
   text-decoration: none;
 }
 
 .site-nav a:hover {
-  color: var(--rooted-green);
+  color: var(--rooted-orange);
 }
 
 /* ==============================
@@ -141,14 +152,14 @@ a {
 .landing-hero {
   width: 100%;
   max-width: 1050px;
-  min-height: 620px;
+  min-height: 0;
   margin: 0 auto;
-  padding: 64px 0 80px;
+  padding: 44px 0 24px;
 
   display: flex;
   flex-direction: column;
-  justify-content: center;
-  gap: 48px;
+  justify-content: flex-start;
+  gap: 30px;
 }
 
 .hero-brand {
@@ -174,7 +185,7 @@ a {
 }
 
 .hero-eyebrow {
-  margin: 0 0 12px;
+  margin: 0;
 
   color: var(--rooted-green);
   font-size: 13px;
@@ -211,7 +222,7 @@ a {
 }
 
 .featured-area h2 {
-  margin: 0 0 28px;
+  margin: 0 0 18px;
 
   color: var(--rooted-plum);
   font-size: 22px;
@@ -222,15 +233,24 @@ a {
 ============================== */
 
 .bulletin-board {
+  --featured-card-width: 320px;
+  --featured-card-height: 420px;
+  --featured-image-height: 210px;
+
+  position: relative;
+  isolation: isolate;
+
+  box-sizing: border-box;
   width: 100%;
   max-width: 1050px;
   margin: 0 auto;
-  padding: 54px 44px;
+  padding: 44px 48px;
 
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 320px));
+  grid-template-columns: repeat(2, var(--featured-card-width));
+  align-items: center;
   justify-content: center;
-  gap: 40px;
+  gap: 56px;
 
   border: 9px solid #795536;
   border-radius: 8px;
@@ -249,21 +269,25 @@ a {
 }
 
 /* ==============================
-   Pinned Paper Cards
+   Equal-Sized Pinned Cards
 ============================== */
 
 .bulletin-card.MuiCard-root {
   position: relative;
-  width: 100%;
+
+  box-sizing: border-box;
+  width: var(--featured-card-width);
+  height: var(--featured-card-height);
+  margin: 0;
+  padding: 0;
   overflow: visible;
 
   color: var(--rooted-plum);
 
-  /* Slightly imperfect paper edges */
-  border: 1px solid rgba(75, 58, 43, 0.08);
-  border-radius: 2px 4px 10px 3px;
+  border-style: solid;
+  border-width: 10px 10px 20px;
+  border-radius: 2px;
 
-  /* Subtle paper fibers */
   background-image:
     radial-gradient(
       circle at 18% 24%,
@@ -287,11 +311,12 @@ a {
     23px 23px,
     100% 100%;
 
-  /* Layered paper shadow */
   box-shadow:
     0 2px 2px rgba(55, 40, 28, 0.12),
     3px 7px 10px rgba(55, 40, 28, 0.2),
     7px 12px 18px rgba(55, 40, 28, 0.1);
+
+  transform-origin: 50% 8px;
 
   transition:
     transform 180ms ease,
@@ -299,25 +324,39 @@ a {
 }
 
 .bulletin-card.discover-card {
-  background-color: #d4e5c6;
-  transform: rotate(-1deg);
+  border-color: #fffdf8;
+  background-color: #fffdf8;
+  background-image: none;
+
+  transform: translate(-18px, 12px);
 }
 
 .bulletin-card.connect-card {
+  left: auto;
+
+  border-color: #f4b654;
   background-color: #f4b654;
-  transform: rotate(1deg);
+
+  transform: translate(14px, -8px);
 }
 
 .bulletin-card.MuiCard-root:hover {
-  transform: rotate(0deg) translateY(-6px);
-
   box-shadow:
-    0 3px 3px rgba(55, 40, 28, 0.12),
+ 0 3px 3px rgba(55, 40, 28, 0.12),
     5px 14px 18px rgba(55, 40, 28, 0.24),
     10px 20px 25px rgba(55, 40, 28, 0.1);
 }
 
-/* Slightly lifted lower corner */
+.bulletin-card.discover-card:hover {
+  transform: translate(-18px, 5px) rotate(-1deg);
+}
+
+.bulletin-card.connect-card:hover {
+  transform: translate(14px, -15px) rotate(0.75deg);
+}
+
+/* Lifted paper corner on the yellow card. */
+
 .bulletin-card::after {
   content: "";
 
@@ -329,44 +368,70 @@ a {
   width: 34px;
   height: 18px;
 
+  border-radius: 0 0 7px;
+  opacity: 0.75;
+  pointer-events: none;
+
   background: linear-gradient(
     145deg,
     transparent 45%,
     rgba(255, 255, 255, 0.2) 48%,
     rgba(60, 53, 70, 0.08) 100%
   );
+}
 
-  border-radius: 0 0 7px 0;
-  opacity: 0.75;
-  pointer-events: none;
+.bulletin-card.discover-card::after {
+  display: none;
 }
 
 /* ==============================
-   Card Content
+   Equal Card Images and Content
 ============================== */
 
-.bulletin-card-action.MuiCardActionArea-root {
-  position: relative;
-  z-index: 1;
+.bulletin-card.MuiCard-root
+  .bulletin-card-action.MuiCardActionArea-root {
+  box-sizing: border-box;
+  width: 100%;
+  height: 100%;
+  min-height: 0;
+  padding: 0;
 
-  min-height: 270px;
-  padding: 48px 32px 30px;
+  display: grid;
+  grid-template-rows: var(--featured-image-height) minmax(0, 1fr);
 
-  display: flex;
-  align-items: stretch;
-
+  overflow: hidden !important;
   color: inherit;
   text-align: left;
   border-radius: inherit;
+  background-color: inherit;
 }
 
-.bulletin-card-content.MuiCardContent-root {
+.bulletin-card.MuiCard-root .bulletin-card-image {
+  display: block;
+
   width: 100%;
-  padding: 0;
+  height: var(--featured-image-height);
+  min-height: var(--featured-image-height);
+
+  object-fit: cover;
+  object-position: center;
 }
 
+.bulletin-card.discover-card .bulletin-card-image {
+  object-position: center 45%;
+}
+
+.bulletin-card-content.MuiCardContent-root,
 .bulletin-card-content.MuiCardContent-root:last-child {
-  padding-bottom: 0;
+  box-sizing: border-box;
+  width: 100%;
+  min-height: 0;
+  padding: 16px 18px;
+
+  display: flex;
+  flex-direction: column;
+
+  background-color: inherit;
 }
 
 .bulletin-card-label.MuiTypography-root {
@@ -379,56 +444,220 @@ a {
 }
 
 .bulletin-card-title.MuiTypography-root {
-  margin: 16px 0 0;
+  margin: 12px 0 0;
 
   color: var(--rooted-plum);
-  font-size: 30px;
+  font-size: 24px;
   font-weight: 700;
-  line-height: 1.1;
+  line-height: 1.15;
 }
 
 .bulletin-card-subtitle.MuiTypography-root {
-  margin: 12px 0 0;
+  margin: 8px 0 0;
 
   font-size: 16px;
-  line-height: 1.5;
+  line-height: 1.4;
 }
 
 .bulletin-card-link.MuiTypography-root {
   display: block;
-  margin-top: 24px;
+  margin-top: auto;
 
   font-size: 16px;
   font-weight: 700;
 }
 
 /* ==============================
-   Pushpins
+   Community Account Flyer
+============================== */
+
+.bulletin-board > .community-flyer-link {
+  position: absolute;
+  z-index: 8;
+  top: 18px;
+  right: 0px;
+
+  display: block;
+  width: 200px;
+
+  border-radius: 2px;
+  transform-origin: 50% 8px;
+  transform: rotate(4deg);
+
+  filter: drop-shadow(4px 8px 8px rgba(55, 40, 28, 0.3));
+
+  transition:
+    transform 800ms ease,
+    filter 800ms ease;
+}
+
+.bulletin-board > .community-flyer-link:hover {
+  transform: translateY(-2px) rotate(1deg) scale(1.4);
+  filter: drop-shadow(6px 12px 12px rgba(55, 40, 28, 0.35));
+}
+
+.bulletin-board > .community-flyer-link:focus-visible {
+  outline: 4px solid var(--rooted-green);
+  outline-offset: 5px;
+}
+
+.community-flyer-image {
+  display: block;
+  width: 100%;
+  height: auto;
+
+  border-radius: 2px;
+}
+
+.community-flyer-link {
+  overflow: visible;
+}
+
+.community-flyer-pushpin {
+  position: absolute;
+  top: -5px;
+  left: 50%;
+  z-index: 3;
+
+  width: 30px;
+  height: 30px;
+  object-fit: contain;
+
+  transform: translateX(-50%);
+  filter: drop-shadow(0 3px 3px rgba(45, 31, 20, 0.35));
+  pointer-events: none;
+}
+
+/* ==============================
+   Featured Section Responsive
+============================== */
+
+@media (max-width: 900px) {
+  .bulletin-board > .community-flyer-link {
+    width: 145px;
+    top: 14px;
+    right: 12px;
+  }
+}
+
+@media (max-width: 700px) {
+  .bulletin-board {
+    grid-template-columns: minmax(
+      0,
+      var(--featured-card-width)
+    );
+
+    gap: 32px;
+    padding: 40px 20px;
+  }
+
+  .bulletin-card.MuiCard-root {
+    width: min(100%, var(--featured-card-width));
+  }
+
+  .bulletin-card.discover-card {
+    transform: translate(-5px, 4px) rotate(-1.5deg);
+  }
+
+  .bulletin-card.connect-card {
+    transform: translate(5px, -4px) rotate(1.25deg);
+  }
+
+  .bulletin-board > .community-flyer-link {
+    position: relative;
+    top: auto;
+    right: auto;
+
+    grid-column: 1;
+    justify-self: center;
+
+    width: 200px;
+    margin-top: 4px;
+
+    transform: rotate(1.5deg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .bulletin-card.MuiCard-root,
+  .bulletin-board > .community-flyer-link {
+    transition: none;
+  }
+}
+
+/* ==============================
+   Photographic Pushpins
 ============================== */
 
 .pushpin {
   position: absolute;
-  z-index: 2;
-  top: 15px;
+  z-index: 10;
+  top: 6px;
   left: 50%;
 
-  width: 18px;
-  height: 18px;
+  width: 48px;
+  height: 48px;
 
-  border: 3px solid rgba(255, 255, 255, 0.45);
-  border-radius: 50%;
-  background: var(--rooted-orange);
+  border: 0;
+  background-color: transparent;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: contain;
+  box-shadow: none;
 
-  box-shadow:
-    1px 3px 4px rgba(60, 53, 70, 0.35),
-    inset -2px -2px 3px rgba(60, 53, 70, 0.2);
+  filter:
+    drop-shadow(0 0 1px rgba(255, 255, 255, 0.9))
+    drop-shadow(0 4px 3px rgba(60, 53, 70, 0.42));
 
   pointer-events: none;
   transform: translateX(-50%);
+  transform-origin: center 35%;
+
+  animation: pushpin-sway 5s ease-in-out infinite;
 }
 
+/* Orange pin on the Discover Polaroid. */
+.discover-card .pushpin {
+  background-image: url("./assets/pushpin-orange.png");
+}
+
+/* Green pin on the Connect flyer. */
 .connect-card .pushpin {
-  background: var(--rooted-green);
+  background-image: url("./assets/pushpin-green.png");
+  animation-delay: -1.75s;
+}
+
+/*
+ * Most of the five-second cycle remains still.
+ * The short movement makes the pin feel physical without becoming distracting.
+ */
+@keyframes pushpin-sway {
+  0%,
+  42%,
+  58%,
+  100% {
+    transform: translateX(-50%) rotate(0deg);
+  }
+
+  47% {
+    transform: translateX(-50%) rotate(-1.5deg);
+  }
+
+  53% {
+    transform: translateX(-50%) rotate(1.5deg);
+  }
+}
+
+/* Disable decorative motion when the user requests reduced motion. */
+@media (prefers-reduced-motion: reduce) {
+  .pushpin {
+    animation: none;
+  }
+}
+
+.bulletin-card.MuiCard-root {
+  position: relative;
+  overflow: visible;
 }
 
 /* ==============================
@@ -466,9 +695,12 @@ a {
 ============================== */
 
 .discover-results-grid {
-  min-height: 404px;
+  width: 100%;
+  max-width: 1180px;
+  min-height: 464px;
+  margin-inline: auto;
   align-content: start;
-  grid-auto-rows: 190px;
+  grid-auto-rows: 220px;
 }
 
 .discover-results-grid .MuiCard-root {
@@ -477,7 +709,10 @@ a {
 }
 
 .discover-results-grid .MuiCardContent-root {
+  display: flex;
+  flex-direction: column;
   height: 100%;
+  padding: 22px;
 }
 
 /* Keep long titles from changing card height. */
@@ -489,10 +724,54 @@ a {
   line-clamp: 2;
 }
 
+.discover-card-action {
+  height: 100%;
+  transition:
+    background-color 160ms ease,
+    transform 160ms ease;
+}
+
+.discover-card-action:hover {
+  background-color: rgba(122, 166, 100, 0.12);
+}
+
+.discover-card-action:focus-visible {
+  outline: 3px solid var(--rooted-green);
+  outline-offset: -3px;
+}
+
+.discover-details-link {
+  display: inline-block;
+  margin-top: 16px;
+  color: var(--rooted-green);
+  font-weight: 700;
+}
+
+.discover-details-link.MuiTypography-root {
+  align-self: flex-end;
+  margin-top: auto;
+  padding: 7px 13px;
+  color: var(--rooted-dark-green);
+  font-weight: 700;
+  line-height: 1.2;
+  border: 1px solid var(--rooted-green);
+  border-radius: 999px;
+  background-color: rgba(122, 166, 100, 0.08);
+}
+
+.discover-card-action:hover .discover-details-link {
+  color: white;
+  background-color: var(--rooted-green);
+}
+
+.discover-filters {
+  margin-top: 34px;
+}
+
 /* Two columns require room for three rows. */
 @media (min-width: 600px) and (max-width: 899px) {
   .discover-results-grid {
-    min-height: 618px;
+    min-height: 708px;
   }
 }
 
@@ -500,6 +779,176 @@ a {
 @media (max-width: 599px) {
   .discover-results-grid {
     min-height: 0;
+  }
+}
+
+/* ==============================
+   Details Dialog
+============================== */
+
+.details-dialog-backdrop.MuiBackdrop-root {
+  background-color: rgba(34, 29, 38, 0.58) !important;
+  backdrop-filter: blur(3px);
+}
+
+.details-dialog-paper.MuiDialog-paper {
+  overflow: visible;
+
+  color: var(--rooted-plum);
+  background-color: #fffdf8;
+  border: 1px solid rgba(52, 71, 53, 0.25);
+  border-radius: 10px;
+
+  box-shadow: 0 24px 60px rgba(25, 20, 32, 0.38);
+}
+
+.details-dialog-title {
+  position: relative;
+
+  padding: 22px 112px 18px 24px !important;
+
+  background-color: #fff9ee;
+  border-bottom: 3px solid var(--rooted-orange);
+}
+
+.details-dialog-category {
+  margin: 0 !important;
+
+  color: var(--rooted-green);
+  font-size: 16px !important;
+  font-weight: 700 !important;
+  letter-spacing: 0.1em !important;
+  text-transform: uppercase;
+}
+
+.details-dialog-name {
+  margin: 4px 0 0 !important;
+
+  color: var(--rooted-dark-green);
+  font-size: 27px !important;
+  font-weight: 700 !important;
+  line-height: 1.2 !important;
+}
+
+.details-dialog-favorite {
+  position: absolute !important;
+  top: 22px;
+  right: 75px;
+
+  color: var(--rooted-plum) !important;
+}
+
+.details-dialog-favorite[aria-pressed="true"] {
+  color: var(--rooted-orange) !important;
+}
+
+.details-dialog-close {
+  position: absolute !important;
+  top: 17px;
+  right: 14px;
+
+  color: var(--rooted-plum) !important;
+}
+
+.details-dialog-content {
+  padding: 28px 24px !important;
+}
+
+.details-dialog-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(320px, 42%);
+  align-items: start;
+  gap: 32px;
+}
+
+.details-dialog-map-panel {
+  display: flex;
+  justify-content: flex-end;
+  align-items: flex-start;
+
+  width: 100%;
+  min-width: 0;
+}
+
+.details-dialog-map-panel .mapContainer {
+  width: 100%;
+  height: 290px;
+}
+
+.details-dialog-information {
+  min-width: 0;
+}
+
+.details-dialog-field h3 {
+  margin-bottom: 5px;
+
+  color: var(--rooted-dark-green);
+  font-weight: 700;
+}
+
+.details-dialog-map-fallback {
+  display: grid;
+  place-items: center;
+
+  width: 200px;
+  height: 200px;
+
+  color: var(--rooted-plum);
+  background-color: #e6eadb;
+  border-radius: 8px;
+}
+
+.details-dialog-actions {
+  justify-content: space-between !important;
+  flex-wrap: wrap;
+
+  padding: 14px 20px 18px !important;
+  gap: 14px;
+
+  background-color: #fff9ee;
+}
+
+.details-dialog-carousel {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.details-dialog-carousel span {
+  min-width: 55px;
+
+  text-align: center;
+  font-weight: 500;
+}
+
+.details-dialog-action-buttons {
+  margin-left: auto;
+}
+
+.details-dialog-action-buttons .MuiButton-contained {
+  background-color: var(--rooted-green);
+}
+
+.details-dialog-action-buttons .MuiButton-contained:hover {
+  background-color: var(--rooted-dark-green);
+}
+
+@media (max-width: 700px) {
+  .details-dialog-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .details-dialog-map-panel {
+    justify-content: center;
+  }
+
+  .details-dialog-actions {
+    justify-content: center !important;
+  }
+
+  .details-dialog-action-buttons {
+    justify-content: center;
+    margin-left: 0;
   }
 }
 
@@ -520,26 +969,7 @@ a {
   box-shadow:
     5px 9px 0 rgba(60, 53, 70, 0.15),
     0 26px 65px rgba(25, 20, 32, 0.42) !important;
-  rotate: -0.35deg;
-}
-
-/* Pushpin */
-
-.support-dialog-paper::before {
-  content: "";
-  position: absolute;
-  z-index: 2;
-  top: -13px;
-  left: 50%;
-  width: 24px;
-  height: 24px;
-  border: 3px solid #d9912f;
-  border-radius: 50%;
-  background: var(--rooted-orange);
-  box-shadow:
-    inset 3px 3px 0 rgba(255, 255, 255, 0.35),
-    0 4px 6px rgba(60, 53, 70, 0.35);
-  transform: translateX(-50%);
+  rotate: 0deg;
 }
 
 /* Dialog heading */
@@ -681,6 +1111,10 @@ a {
   .support-dialog-actions {
     padding: 8px 18px 18px !important;
   }
+
+  .support-dialog-logo {
+    height: 22px;
+  }
 }
 
 .support-dialog-heading {
@@ -696,26 +1130,23 @@ a {
   object-fit: contain;
 }
 
-@media (max-width: 600px) {
-  .support-dialog-logo {
-    height: 22px;
-  }
-}
-
 /* ==============================
-   Connect Page
+   Discover and Connect Page Headings
 ============================== */
 
-.connect-page-heading {
+.connect-page-heading,
+.discover-page-heading {
   max-width: 720px;
   padding-top: 28px;
 }
 
-.connect-page-heading .hero-eyebrow {
+.connect-page-heading .hero-eyebrow,
+.discover-page-heading .hero-eyebrow {
   margin: 0 0 12px;
 }
 
-.connect-page-heading h1 {
+.connect-page-heading h1,
+.discover-page-heading h1 {
   margin: 0 0 14px;
   color: var(--rooted-dark-green);
 
@@ -725,12 +1156,17 @@ a {
   line-height: 1.08;
 }
 
-.connect-page-heading > p:last-child {
+.connect-page-heading > p:last-child,
+.discover-page-heading > p:last-child {
   margin: 0;
   color: #5c5861;
   font-size: 17px;
   line-height: 1.6;
 }
+
+/* ==============================
+   Connect Page
+============================== */
 
 .connect-filters {
   margin: 34px 0;
@@ -799,6 +1235,10 @@ a {
 }
 
 .site-footer {
+  position: sticky;
+  bottom: 0;
+  z-index: 100;
+
   width: 100%;
   margin-top: auto;
   padding: 10px 16px;
@@ -859,9 +1299,8 @@ a {
     border-width: 7px;
   }
 
-  .bulletin-card.discover-card,
   .bulletin-card.connect-card {
-    transform: none;
+    left: 0;
   }
 }
 
@@ -882,12 +1321,18 @@ a {
     padding: 0 16px;
   }
 
-  .landing-hero {
-    min-height: auto;
-    padding: 48px 0 64px;
-    gap: 36px;
-  }
+.landing-hero {
+  width: 100%;
+  max-width: 1050px;
+  min-height: 100%;
+  margin: 0 auto;
+  padding: 28px 0 36px;
 
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  gap: 28px;
+}
   .hero-description {
     font-size: 16px;
   }
@@ -913,37 +1358,44 @@ a {
   max-width: 600px;
   height: 650px;
   margin: 40px auto;
+
   display: flex;
   flex-direction: column;
+
+  overflow: hidden;
+
   background-color: var(--rooted-header-background);
   border: 1px solid rgba(185, 111, 19, 0.2);
   border-radius: 12px;
-  overflow: hidden;
   box-shadow: 0 14px 30px rgba(60, 53, 70, 0.12);
 }
 
 .chatbot-header-bar {
   padding: 16px 20px;
-  background: var(--rooted-dark-green);
-  color: var(--rooted-cream);
-  font-weight: bold;
-  font-size: 16px;
-  letter-spacing: 0.5px;
+
   display: flex;
-  justify-content: space-between;
   align-items: center;
+  justify-content: space-between;
+
+  color: var(--rooted-cream);
+  font-size: 16px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  background: var(--rooted-dark-green);
 }
 
 .chatbot-clear-btn {
-  background: transparent;
-  border: 1px solid var(--rooted-cream);
-  color: var(--rooted-cream);
   padding: 4px 8px;
+
+  border: 1px solid var(--rooted-cream);
   border-radius: 4px;
+  color: var(--rooted-cream);
   font-size: 11px;
-  cursor: pointer;
   font-weight: 600;
   text-transform: uppercase;
+  background: transparent;
+  cursor: pointer;
+
   transition: background-color 0.2s ease;
 }
 
@@ -957,21 +1409,25 @@ a {
 
 .chat-window-scroll {
   flex: 1;
-  overflow-y: auto;
+
   display: flex;
   flex-direction: column;
-  padding: 20px;
-  background-color: var(--rooted-page-background);
   gap: 12px;
+
+  padding: 20px;
+  overflow-y: auto;
+
+  background-color: var(--rooted-page-background);
 }
 
 .chat-loading-indicator {
   align-self: flex-start;
+  padding-left: 6px;
+
   color: var(--rooted-green);
-  font-style: italic;
   font-size: 14px;
   font-weight: 600;
-  padding-left: 6px;
+  font-style: italic;
 }
 
 /* ==============================
@@ -979,8 +1435,9 @@ a {
 ============================== */
 
 .chat-message-bubble {
-  padding: 12px 16px;
   max-width: 80%;
+  padding: 12px 16px;
+
   font-size: 14px;
   line-height: 1.5;
   word-break: break-word;
@@ -988,19 +1445,21 @@ a {
 
 .chat-message-bubble.user {
   align-self: flex-end;
-  background-color: var(--rooted-green);
+
   color: #ffffff;
+  background-color: var(--rooted-green);
   border-radius: 16px 16px 2px 16px;
   box-shadow: 0 2px 4px rgba(52, 71, 53, 0.15);
 }
 
 .chat-message-bubble.assistant {
   align-self: flex-start;
-  background-color: var(--rooted-header-background);
+
   color: var(--rooted-text);
+  background-color: var(--rooted-header-background);
+  border: 1px solid rgba(60, 53, 70, 0.05);
   border-radius: 16px 16px 16px 2px;
   box-shadow: 0 2px 4px rgba(60, 53, 70, 0.08);
-  border: 1px solid rgba(60, 53, 70, 0.05);
 }
 
 /* ==============================
@@ -1008,23 +1467,28 @@ a {
 ============================== */
 
 .chat-input-form {
-  display: flex;
   padding: 16px;
+
+  display: flex;
+  align-items: center;
+  gap: 12px;
+
   background-color: var(--rooted-header-background);
   border-top: 1px solid rgba(185, 111, 19, 0.15);
-  gap: 12px;
-  align-items: center;
 }
 
 .chat-input-field {
   flex: 1;
   padding: 12px 16px;
+
+  outline: none;
   border: 1px solid rgba(60, 53, 70, 0.2);
   border-radius: 6px;
-  outline: none;
-  font-size: 14px;
+
   color: var(--rooted-text);
+  font-size: 14px;
   background-color: #ffffff;
+
   transition: border-color 0.2s ease;
 }
 
@@ -1034,14 +1498,19 @@ a {
 
 .chat-submit-btn {
   padding: 12px 20px;
-  background-color: var(--rooted-orange);
-  color: var(--rooted-plum);
+
   border: none;
   border-radius: 6px;
-  cursor: pointer;
-  font-weight: 700;
+
+  color: var(--rooted-plum);
   font-size: 14px;
-  transition: all 0.2s ease;
+  font-weight: 700;
+  background-color: var(--rooted-orange);
+  cursor: pointer;
+
+  transition:
+    color 0.2s ease,
+    background-color 0.2s ease;
 }
 
 .chat-submit-btn:disabled {

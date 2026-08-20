@@ -1,9 +1,12 @@
-import { Link, useNavigate } from "react-router";
+import { Link, useLocation, useNavigate } from "react-router";
 import { useAuth } from "../context/AuthContext";
 
 function Navbar() {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
+  const { pathname } = useLocation();
+
+  const isLandingPage = pathname === "/";
 
   const handleLogout = async () => {
     await logout();
@@ -12,7 +15,8 @@ function Navbar() {
 
   return (
     <nav className="site-nav" aria-label="Main navigation">
-      <Link to="/">Home</Link>
+      {!isLandingPage && <Link to="/">Home</Link>}
+
       {user ? (
         <button type="button" className="navbar-login" onClick={handleLogout}>
           Log out
@@ -22,6 +26,9 @@ function Navbar() {
           Log in
         </Link>
       )}
+      <Link to="/discover">Discover</Link>
+      <Link to="/connect">Connect</Link>
+
       <Link to="/chat">Chat</Link>
     </nav>
   );
