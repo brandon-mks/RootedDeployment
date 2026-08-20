@@ -189,6 +189,8 @@ function DiscoverPage() {
       </main>
       <DetailsDialog
         place={selectedPlace}
+        places={places}
+        onPlaceChange={setSelectedPlace}
         onClose={() => setSelectedPlace(null)}
       />
       <Footer />
