@@ -902,6 +902,7 @@ a {
 
   /* Responsive heading: minimum 32px, scales with screen width, maximum 48px */
   font-size: clamp(32px, 4vw, 48px);
+  font-size: clamp(32px, 4vw, 48px);
   line-height: 1.08;
 }
 
@@ -1270,4 +1271,561 @@ a {
 .chat-submit-btn:not(:disabled):hover {
   background-color: var(--rooted-green);
   color: #ffffff;
+}
+
+/* ==============================
+   Login/Register Page & Authentication
+============================== */
+
+.auth-container {
+  min-height: 80vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 3rem 1rem;
+}
+
+.auth-card {
+  width: 100%;
+  max-width: 450px;
+  padding: 40px; /* Equivalent to MUI pad 5 on desktop */
+  background: var(--rooted-header-background);
+  border: 1px solid rgba(60, 53, 70, 0.14);
+  border-radius: 4px 8px 12px 4px; /* Organic imperfect paper edges match */
+  box-shadow: 0 14px 30px rgba(60, 53, 70, 0.14);
+}
+
+@media (max-width: 600px) {
+  .auth-card {
+    padding: 24px; /* Equivalent to MUI pad 3 on mobile screens */
+  }
+}
+
+.auth-header {
+  text-align: center;
+  margin-bottom: 32px;
+}
+
+.auth-title {
+  color: var(--rooted-plum);
+  font-weight: 700;
+  margin: 0 0 8px 0;
+}
+
+.auth-subtitle {
+  color: #5c5861;
+  margin: 0;
+}
+
+/* Custom overwrites for MUI Inputs inside Login */
+.auth-input-field {
+  margin-top: 8px !important;
+  margin-bottom: 16px !important;
+}
+
+.auth-input-field
+  .MuiOutlinedInput-root.Mui-focused
+  .MuiOutlinedInput-notchedOutline {
+  border-color: var(--rooted-green) !important;
+}
+
+.auth-input-field .MuiInputLabel-root.Mui-focused {
+  color: var(--rooted-green) !important;
+}
+
+.auth-submit-btn.MuiButton-root {
+  margin-top: 24px;
+  padding-top: 12px;
+  padding-bottom: 12px;
+  border-radius: 8px;
+  text-transform: none;
+  font-size: 1rem;
+  font-weight: 600;
+  background-color: var(--rooted-green);
+}
+
+.auth-submit-btn.MuiButton-root:hover {
+  background-color: var(--rooted-dark-green);
+}
+
+.auth-divider-container {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-top: 24px;
+  margin-bottom: 24px;
+}
+
+.auth-divider-line {
+  flex: 1;
+  height: 1px;
+  background-color: rgba(185, 111, 19, 0.2);
+}
+
+.auth-footer-text {
+  color: #5c5861;
+  text-align: center;
+}
+
+.auth-register-link {
+  font-weight: 600;
+  text-decoration: none;
+  color: var(--rooted-green);
+}
+
+.auth-register-link:hover {
+  color: var(--rooted-dark-green);
+  text-decoration: underline;
+}
+
+/* ==============================
+   User Page
+============================== */
+
+.user-page {
+  width: 100%;
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 56px 24px 80px;
+}
+
+.user-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 32px;
+  margin-bottom: 36px;
+}
+
+.user-eyebrow,
+.section-eyebrow {
+  margin: 0 0 10px;
+
+  color: var(--rooted-green);
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 1.5px;
+}
+
+.user-title {
+  color: var(--rooted-plum);
+  font-size: clamp(36px, 5vw, 58px) !important;
+  font-weight: 700 !important;
+  line-height: 1.05 !important;
+}
+
+.user-description {
+  max-width: 620px;
+  margin-top: 16px !important;
+
+  color: #5c5861;
+  font-size: 17px !important;
+  line-height: 1.6 !important;
+}
+
+/* ==============================
+   User Activity
+============================== */
+
+.activity-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+  margin-bottom: 28px;
+}
+
+.activity-card {
+  background: var(--rooted-header-background) !important;
+  border: 1px solid rgba(122, 166, 100, 0.25);
+  border-radius: 14px !important;
+  box-shadow: none !important;
+}
+
+.activity-card .MuiCardContent-root {
+  padding: 24px;
+}
+
+.activity-number {
+  color: var(--rooted-plum);
+  font-size: 38px !important;
+  font-weight: 700 !important;
+  line-height: 1;
+}
+
+.activity-label {
+  margin-top: 8px !important;
+
+  color: #5c5861;
+  font-size: 14px !important;
+}
+
+/* ==============================
+   User Dashboard
+============================== */
+
+.user-dashboard-card {
+  overflow: hidden;
+  background: var(--rooted-header-background) !important;
+  border: 1px solid rgba(185, 111, 19, 0.2);
+  border-radius: 16px !important;
+  box-shadow: none !important;
+}
+
+.rooted-tabs .MuiTab-root,
+.favorite-tabs .MuiTab-root {
+  color: var(--rooted-plum);
+  font-family: "Bahnschrift", "Arial Narrow", Arial, sans-serif;
+  font-weight: 600;
+  text-transform: none;
+}
+
+.rooted-tabs .Mui-selected,
+.favorite-tabs .Mui-selected {
+  color: var(--rooted-green) !important;
+}
+
+.rooted-tabs .MuiTabs-indicator,
+.favorite-tabs .MuiTabs-indicator {
+  background: var(--rooted-orange);
+}
+
+.dashboard-content {
+  padding: 32px;
+}
+
+.section-title {
+  margin: 0 0 20px !important;
+
+  color: var(--rooted-plum);
+  font-size: 30px !important;
+  font-weight: 700 !important;
+}
+
+.favorite-tabs {
+  margin-bottom: 24px;
+}
+
+/* ==============================
+   Favorites
+============================== */
+
+.favorite-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 16px;
+}
+
+.favorite-card {
+  background: #ffffff !important;
+  border: 1px solid rgba(122, 166, 100, 0.3);
+  border-radius: 12px !important;
+  box-shadow: none !important;
+}
+
+.favorite-card h3 {
+  margin: 14px 0 8px;
+
+  color: var(--rooted-plum);
+  font-size: 21px;
+}
+
+.favorite-card p {
+  color: #5c5861;
+}
+
+.rooted-chip {
+  background: var(--rooted-cream) !important;
+  color: var(--rooted-dark-green) !important;
+  font-weight: 700 !important;
+}
+
+.remove-button {
+  margin-top: 12px !important;
+  padding: 4px 0 !important;
+
+  color: var(--rooted-plum) !important;
+  font-size: 13px !important;
+  text-transform: none !important;
+}
+
+.remove-button:hover {
+  color: var(--rooted-orange) !important;
+}
+
+.empty-state {
+  grid-column: 1 / -1;
+
+  padding: 48px 24px;
+  text-align: center;
+
+  border: 1px dashed rgba(122, 166, 100, 0.5);
+  border-radius: 12px;
+}
+
+.empty-state h3 {
+  margin: 0 0 10px;
+
+  color: var(--rooted-plum);
+  font-size: 22px;
+}
+
+.empty-state p {
+  max-width: 480px;
+  margin: 0 auto 20px;
+
+  color: #5c5861;
+}
+
+/* ==============================
+   Rooted Buttons
+============================== */
+
+.rooted-button {
+  margin-top: 20px !important;
+
+  background: var(--rooted-green) !important;
+  color: #ffffff !important;
+
+  font-family: "Bahnschrift", "Arial Narrow", Arial, sans-serif !important;
+  font-weight: 700 !important;
+  text-transform: none !important;
+
+  box-shadow: none !important;
+}
+
+.rooted-button:hover {
+  background: var(--rooted-dark-green) !important;
+}
+
+.rooted-outline-button {
+  border-color: var(--rooted-green) !important;
+  color: var(--rooted-dark-green) !important;
+
+  font-family: "Bahnschrift", "Arial Narrow", Arial, sans-serif !important;
+  font-weight: 600 !important;
+  text-transform: none !important;
+}
+
+.rooted-outline-button:hover {
+  border-color: var(--rooted-orange) !important;
+  background: rgba(242, 168, 64, 0.08) !important;
+}
+
+/* ==============================
+   Reviews
+============================== */
+
+.reviews-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 20px;
+}
+
+.review-section-card {
+  background: #ffffff !important;
+  border: 1px solid rgba(122, 166, 100, 0.25);
+  border-radius: 12px !important;
+  box-shadow: none !important;
+}
+
+.review-section-card h3 {
+  margin-bottom: 16px;
+
+  color: var(--rooted-plum);
+  font-size: 21px;
+}
+
+.review-card {
+  padding: 16px 0;
+
+  border-top: 1px solid rgba(60, 53, 70, 0.12);
+}
+
+.review-card h4 {
+  margin: 0 0 8px;
+
+  color: var(--rooted-plum);
+}
+
+.review-stars {
+  color: var(--rooted-orange);
+  letter-spacing: 2px;
+}
+
+/* ==============================
+   Calendar
+============================== */
+
+.calendar-description {
+  margin-bottom: 24px !important;
+
+  color: #5c5861;
+}
+
+.calendar-wrapper {
+  padding: 20px;
+  width: fit-content;
+
+  background: #ffffff;
+  border: 1px solid rgba(122, 166, 100, 0.3);
+  border-radius: 12px;
+}
+
+.calendar-wrapper .react-calendar {
+  border: none;
+  background: transparent;
+  font-family: "Bahnschrift", "Arial Narrow", Arial, sans-serif;
+}
+
+.calendar-wrapper .react-calendar__navigation button {
+  color: var(--rooted-plum);
+  font-weight: 700;
+}
+
+.calendar-wrapper .react-calendar__tile {
+  border-radius: 6px;
+}
+
+.calendar-wrapper .react-calendar__tile--now {
+  background: var(--rooted-cream);
+  color: var(--rooted-dark-green);
+}
+
+.calendar-wrapper .react-calendar__tile--active {
+  background: var(--rooted-green);
+  color: #ffffff;
+}
+
+.selected-date {
+  margin-top: 20px;
+  padding: 16px 20px;
+
+  background: var(--rooted-cream);
+  border-left: 4px solid var(--rooted-orange);
+  border-radius: 8px;
+}
+
+.selected-date-label {
+  margin-bottom: 4px !important;
+
+  color: var(--rooted-green);
+  font-size: 12px !important;
+  font-weight: 700 !important;
+  letter-spacing: 1px;
+}
+
+.selected-date h3 {
+  color: var(--rooted-plum);
+}
+
+/* ==============================
+   Create Event
+============================== */
+
+.event-form {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+
+  max-width: 800px;
+  margin-top: 28px;
+}
+
+.event-form .MuiTextField-root {
+  background: #ffffff;
+}
+
+.event-form .MuiOutlinedInput-root:hover .MuiOutlinedInput-notchedOutline {
+  border-color: var(--rooted-green);
+}
+
+.event-form
+  .MuiOutlinedInput-root.Mui-focused
+  .MuiOutlinedInput-notchedOutline {
+  border-color: var(--rooted-green);
+  border-width: 2px;
+}
+
+.event-form .MuiInputLabel-root.Mui-focused {
+  color: var(--rooted-green);
+}
+
+.event-alert {
+  max-width: 800px;
+  margin-top: 20px;
+}
+
+/* ==============================
+   User Footer
+============================== */
+
+.user-footer {
+  margin-top: 40px;
+  padding: 40px 0;
+
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 24px;
+
+  border-top: 1px solid rgba(185, 111, 19, 0.2);
+}
+
+.user-footer h2 {
+  margin: 0;
+
+  color: var(--rooted-plum);
+  font-size: 28px;
+}
+
+/* ==============================
+   User Page Responsive
+============================== */
+
+@media (max-width: 800px) {
+  .user-header {
+    flex-direction: column;
+  }
+
+  .activity-grid,
+  .favorite-grid,
+  .reviews-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .dashboard-content {
+    padding: 24px 18px;
+  }
+
+  .user-footer {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}
+
+@media (max-width: 500px) {
+  .user-page {
+    padding: 36px 16px 60px;
+  }
+
+  .activity-grid {
+    gap: 10px;
+  }
+
+  .activity-card .MuiCardContent-root {
+    padding: 18px;
+  }
+
+  .activity-number {
+    font-size: 30px !important;
+  }
+
+  .calendar-wrapper {
+    width: 100%;
+    padding: 10px;
+  }
+
+  .calendar-wrapper .react-calendar {
+    width: 100%;
+  }
 }

@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router";
-import { useAuth } from "../context/AuthContext";
+import { useAuth } from "../context/AuthContext.jsx";
 import {
   Alert,
   Box,
@@ -14,19 +14,22 @@ import {
 } from "@mui/material";
 import Visibility from "@mui/icons-material/Visibility";
 import VisibilityOff from "@mui/icons-material/VisibilityOff";
-import Header from "../components/Header";
-import Footer from "../components/Footer";
+import Header from "../components/Header.jsx";
+import Footer from "../components/Footer.jsx";
 
-function LoginPage() {
-  const { login } = useAuth();
+function RegisterPage() {
+  const { register } = useAuth();
   const navigate = useNavigate();
 
   const [formData, setFormData] = useState({
     username: "",
+    email: "",
     password: "",
+    confirmPassword: "",
   });
 
   const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
@@ -43,18 +46,33 @@ function LoginPage() {
     event.preventDefault();
     setError("");
 
-    if (!formData.username || !formData.password) {
-      setError("Please enter your username and password.");
+    if (
+      !formData.username ||
+      !formData.email ||
+      !formData.password ||
+      !formData.confirmPassword
+    ) {
+      setError("Please complete all fields.");
+      return;
+    }
+
+    if (formData.password !== formData.confirmPassword) {
+      setError("Passwords do not match.");
+      return;
+    }
+
+    if (formData.password.length < 8) {
+      setError("Password must be at least 8 characters.");
       return;
     }
 
     setLoading(true);
 
     try {
-      await login(formData.username, formData.password);
-      navigate("/"); // Redirect to dashboard/home after successful login
+      await register(formData.username, formData.email, formData.password);
+      navigate("/login");
     } catch (error) {
-      setError(error.message || "Unable to log in. Please try again.");
+      setError(error.message || "Unable to create your account.");
     } finally {
       setLoading(false);
     }
@@ -68,10 +86,10 @@ function LoginPage() {
         <Paper elevation={0} className="auth-card">
           <div className="auth-header">
             <Typography variant="h3" component="h1" className="auth-title">
-              Welcome back
+              Create an account
             </Typography>
             <Typography variant="body1" className="auth-subtitle">
-              Log in to Rooted to connect with your community.
+              Join Rooted and start discovering your community.
             </Typography>
           </div>
 
@@ -91,7 +109,20 @@ function LoginPage() {
               autoComplete="username"
               required
               className="auth-input-field"
-              sx={{ mb: 2 }} // Added spacing between elements
+              sx={{ mb: 2 }} // Added spacing consistency to match login
+            />
+
+            <TextField
+              fullWidth
+              label="Email"
+              name="email"
+              type="email"
+              value={formData.email}
+              onChange={handleChange}
+              autoComplete="email"
+              required
+              className="auth-input-field"
+              sx={{ mb: 2 }}
             />
 
             <TextField
@@ -101,10 +132,11 @@ function LoginPage() {
               type={showPassword ? "text" : "password"}
               value={formData.password}
               onChange={handleChange}
-              autoComplete="current-password"
+              autoComplete="new-password"
               required
+              helperText="Must be at least 8 characters."
               className="auth-input-field"
-              sx={{ mb: 3 }}
+              sx={{ mb: 2 }}
               slotProps={{
                 input: {
                   endAdornment: (
@@ -124,6 +156,44 @@ function LoginPage() {
               }}
             />
 
+            <TextField
+              fullWidth
+              label="Confirm Password"
+              name="confirmPassword"
+              type={showConfirmPassword ? "text" : "password"}
+              value={formData.confirmPassword}
+              onChange={handleChange}
+              autoComplete="new-password"
+              required
+              className="auth-input-field"
+              sx={{ mb: 3 }}
+              slotProps={{
+                input: {
+                  endAdornment: (
+                    <InputAdornment position="end">
+                      <IconButton
+                        onClick={() =>
+                          setShowConfirmPassword((previous) => !previous)
+                        }
+                        edge="end"
+                        aria-label={
+                          showConfirmPassword
+                            ? "Hide password"
+                            : "Show password"
+                        }
+                      >
+                        {showConfirmPassword ? (
+                          <VisibilityOff />
+                        ) : (
+                          <Visibility />
+                        )}
+                      </IconButton>
+                    </InputAdornment>
+                  ),
+                },
+              }}
+            />
+
             <Button
               type="submit"
               fullWidth
@@ -135,7 +205,7 @@ function LoginPage() {
               {loading ? (
                 <CircularProgress size={24} color="inherit" />
               ) : (
-                "Log In"
+                "Create Account"
               )}
             </Button>
           </Box>
@@ -149,9 +219,9 @@ function LoginPage() {
           </div>
 
           <Typography variant="body2" className="auth-footer-text">
-            Don't have an account?{" "}
-            <Link to="/register" className="auth-register-link">
-              Create an account
+            Already have an account?{" "}
+            <Link to="/login" className="auth-register-link">
+              Log in
             </Link>
           </Typography>
         </Paper>
@@ -162,4 +232,4 @@ function LoginPage() {
   );
 }
 
-export default LoginPage;
+export default RegisterPage;

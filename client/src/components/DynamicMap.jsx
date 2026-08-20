@@ -1,6 +1,6 @@
 import { AdvancedMarker, APIProvider, Map, Pin, useMap } from "@vis.gl/react-google-maps";
 import { useState, useEffect } from "react";
-import { useMapContext } from "../MapContext";
+import { useMapContext } from "../mapContext/useMapContext";
 
 export const DynamicMap = () => {
   const { coords } = useMapContext();

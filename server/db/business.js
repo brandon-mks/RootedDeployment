@@ -12,8 +12,8 @@ const {
 } = dummyData;
 
 export const createBusiness = async (place) => {
-// Store Google types on the shared business record instead of creating
-// a dynamically named table for every individual business.
+  // Store Google types on the shared business record instead of creating
+  // a dynamically named table for every individual business.
   const SQL = `
       INSERT INTO businesses (
       id,

@@ -1,6 +1,7 @@
 import path from "path";
 import express from "express";
 import cors from "cors";
+import cookieParser from "cookie-parser";
 import client from "./db/client.js";
 import seed from "./db/seed.js";
 import router from "./api/index.js";
@@ -8,10 +9,12 @@ const app = express();
 //body parsing middleware
 app.use(
   cors({
-    origin: "http://localhost:5173", // Allows your Vite frontend to connect safely
+    origin: "http://localhost:5173",
+    credentials: true,
   }),
 );
 app.use(express.json());
+app.use(cookieParser());
 
 //for deployment only
 const __dirname = import.meta.dirname;
