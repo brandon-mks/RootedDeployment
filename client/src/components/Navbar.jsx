@@ -1,4 +1,6 @@
-import { NavLink, useLocation, useNavigate } from "react-router";
+import { Avatar } from "@mui/material";
+import { Link, NavLink, useLocation, useNavigate } from "react-router";
+
 import { useAuth } from "../context/AuthContext";
 
 function getNavLinkClass({ isActive }) {
@@ -28,13 +30,25 @@ function Navbar() {
       )}
 
       {user ? (
-        <button
-          type="button"
-          className="navbar-login"
-          onClick={handleLogout}
-        >
-          Log out
-        </button>
+        <div className="navbar-user">
+          <Link to="/user" className="navbar-profile-link">
+            <Avatar
+              src={user.avatar_url || ""}
+              alt={user.username || "Profile"}
+              className="navbar-avatar"
+            />
+
+            <span className="navbar-username">{user.username}</span>
+          </Link>
+
+          <button
+            type="button"
+            className="navbar-login"
+            onClick={handleLogout}
+          >
+            Log out
+          </button>
+        </div>
       ) : (
         <NavLink
           to="/login"
@@ -52,10 +66,6 @@ function Navbar() {
 
       <NavLink to="/connect" className={getNavLinkClass}>
         Connect
-      </NavLink>
-
-      <NavLink to="/chat" className={getNavLinkClass}>
-        Chat
       </NavLink>
     </nav>
   );

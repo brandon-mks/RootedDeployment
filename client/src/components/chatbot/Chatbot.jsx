@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import ChatWindow from "./ChatWindow";
 import ChatInput from "./ChatInput";
 
-export default function Chatbot() {
+export default function Chatbot({ onClose }) {
   const [messages, setMessages] = useState([
     {
       role: "assistant",
@@ -46,20 +46,31 @@ export default function Chatbot() {
     <div className="chatbot-main-container">
       <div className="chatbot-header-bar">
         <span>Rooted Assistant</span>
-        <button
-          className="chatbot-clear-btn"
-          onClick={() =>
-            setMessages([
-              {
-                role: "assistant",
-                content:
-                  "Hello! History cleared. How can I help you fresh today?",
-              },
-            ])
-          }
-        >
-          Clear Chat
-        </button>
+        <div className="chatbot-header-actions">
+          <button
+            className="chatbot-clear-btn"
+            onClick={() =>
+              setMessages([
+                {
+                  role: "assistant",
+                  content:
+                    "Hello! History cleared. How can I help you fresh today?",
+                },
+              ])
+            }
+          >
+            Clear Chat
+          </button>
+          {onClose && (
+            <button
+              className="chatbot-close-btn"
+              onClick={onClose}
+              aria-label="Close chat"
+            >
+              ✕
+            </button>
+          )}
+        </div>
       </div>
       <ChatWindow messages={messages} isLoading={isLoading} />
       <ChatInput onSend={handleSendMessage} disabled={isLoading} />
