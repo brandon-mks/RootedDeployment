@@ -145,6 +145,46 @@ a {
   color: var(--rooted-orange);
 }
 
+.site-nav-link {
+  position: relative;
+
+  display: inline-flex;
+  align-items: center;
+  padding: 10px 0;
+
+  transition: color 160ms ease;
+}
+
+.site-nav-link::after {
+  content: "";
+
+  position: absolute;
+  right: 0;
+  bottom: 4px;
+  left: 0;
+
+  height: 3px;
+
+  background-color: var(--rooted-orange);
+  border-radius: 999px;
+
+  transform: scaleX(0);
+  transform-origin: center;
+  transition: transform 160ms ease;
+}
+
+.site-nav-link:hover::after {
+  transform: scaleX(0.45);
+}
+
+.site-nav-link--active {
+  color: var(--rooted-orange) !important;
+}
+
+.site-nav-link--active::after {
+  transform: scaleX(1);
+}
+
 /* ==============================
    Landing Page
 ============================== */

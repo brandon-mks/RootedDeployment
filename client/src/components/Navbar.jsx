@@ -1,5 +1,11 @@
-import { Link, useLocation, useNavigate } from "react-router";
+import { NavLink, useLocation, useNavigate } from "react-router";
 import { useAuth } from "../context/AuthContext";
+
+function getNavLinkClass({ isActive }) {
+  return isActive
+    ? "site-nav-link site-nav-link--active"
+    : "site-nav-link";
+}
 
 function Navbar() {
   const { user, logout } = useAuth();
@@ -15,21 +21,42 @@ function Navbar() {
 
   return (
     <nav className="site-nav" aria-label="Main navigation">
-      {!isLandingPage && <Link to="/">Home</Link>}
+      {!isLandingPage && (
+        <NavLink to="/" end className={getNavLinkClass}>
+          Home
+        </NavLink>
+      )}
 
       {user ? (
-        <button type="button" className="navbar-login" onClick={handleLogout}>
+        <button
+          type="button"
+          className="navbar-login"
+          onClick={handleLogout}
+        >
           Log out
         </button>
       ) : (
-        <Link to="/login" className="navbar-login">
+        <NavLink
+          to="/login"
+          className={({ isActive }) =>
+            `navbar-login ${getNavLinkClass({ isActive })}`
+          }
+        >
           Log in
-        </Link>
+        </NavLink>
       )}
-      <Link to="/discover">Discover</Link>
-      <Link to="/connect">Connect</Link>
 
-      <Link to="/chat">Chat</Link>
+      <NavLink to="/discover" className={getNavLinkClass}>
+        Discover
+      </NavLink>
+
+      <NavLink to="/connect" className={getNavLinkClass}>
+        Connect
+      </NavLink>
+
+      <NavLink to="/chat" className={getNavLinkClass}>
+        Chat
+      </NavLink>
     </nav>
   );
 }
