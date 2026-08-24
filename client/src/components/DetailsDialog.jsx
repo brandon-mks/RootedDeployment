@@ -12,19 +12,49 @@ import {
 } from "@mui/material";
 import ChevronLeftRoundedIcon from "@mui/icons-material/ChevronLeftRounded";
 import ChevronRightRoundedIcon from "@mui/icons-material/ChevronRightRounded";
+import EventAvailableRoundedIcon from "@mui/icons-material/EventAvailableRounded";
 import FavoriteBorderRoundedIcon from "@mui/icons-material/FavoriteBorderRounded";
 import FavoriteRoundedIcon from "@mui/icons-material/FavoriteRounded";
+import { useNavigate } from "react-router";
 
+import { useAuth } from "../context/AuthContext.jsx";
+import { addEventToCalendar } from "../services/events.js";
 import { MapCard } from "./MapCard.jsx";
 
 function DetailsDialog({ place, places = [], onPlaceChange, onClose }) {
+  const { user, loading: authLoading } = useAuth();
+  const navigate = useNavigate();
+
   // Temporary visual state until the favorites POST request is connected.
   const [favoriteItemIds, setFavoriteItemIds] = useState(() => new Set());
+
+  const [calendarEventIds, setCalendarEventIds] = useState(() => new Set());
+  const [calendarPendingId, setCalendarPendingId] = useState(null);
+  const [calendarFeedback, setCalendarFeedback] = useState({
+    eventId: null,
+    message: "",
+    isError: false,
+  });
 
   const isOpen = Boolean(place);
 
   if (!place) {
     return null;
+  }
+
+  const isEvent = Boolean(place.kind || place.eventDate);
+  const isOnCalendar = calendarEventIds.has(place.id);
+  const isCalendarPending = calendarPendingId === place.id;
+
+  const visibleCalendarFeedback =
+    calendarFeedback.eventId === place.id ? calendarFeedback : null;
+
+  let calendarButtonLabel = "Add to Calendar";
+
+  if (isCalendarPending) {
+    calendarButtonLabel = "Adding…";
+  } else if (isOnCalendar) {
+    calendarButtonLabel = "Added to Calendar";
   }
 
   // Businesses use name/category while events use title/kind.
@@ -128,6 +158,56 @@ function DetailsDialog({ place, places = [], onPlaceChange, onClose }) {
     });
   };
 
+  const handleAddToCalendar = async () => {
+    if (authLoading) {
+      return;
+    }
+
+    if (!user) {
+      onClose();
+      navigate("/login", {
+        state: {
+          from: "/connect",
+        },
+      });
+      return;
+    }
+
+    setCalendarPendingId(place.id);
+    setCalendarFeedback({
+      eventId: place.id,
+      message: "",
+      isError: false,
+    });
+
+    try {
+      const result = await addEventToCalendar(place.id);
+
+      setCalendarEventIds((currentIds) => {
+        const nextIds = new Set(currentIds);
+        nextIds.add(place.id);
+        return nextIds;
+      });
+
+      setCalendarFeedback({
+        eventId: place.id,
+        message: result.message ?? "Event added to your calendar.",
+        isError: false,
+      });
+    } catch (error) {
+      setCalendarFeedback({
+        eventId: place.id,
+        message:
+          error instanceof Error
+            ? error.message
+            : "Unable to add this event to your calendar.",
+        isError: true,
+      });
+    } finally {
+      setCalendarPendingId(null);
+    }
+  };
+
   return (
     <Dialog
       open={isOpen}
@@ -188,9 +268,7 @@ function DetailsDialog({ place, places = [], onPlaceChange, onClose }) {
                   About
                 </Typography>
 
-                <Typography variant="body1">
-                  {place.description}
-                </Typography>
+                <Typography variant="body1">{place.description}</Typography>
               </Box>
             )}
 
@@ -200,9 +278,7 @@ function DetailsDialog({ place, places = [], onPlaceChange, onClose }) {
                   Date
                 </Typography>
 
-                <Typography variant="body1">
-                  {eventDateLabel}
-                </Typography>
+                <Typography variant="body1">{eventDateLabel}</Typography>
               </Box>
             )}
 
@@ -245,9 +321,7 @@ function DetailsDialog({ place, places = [], onPlaceChange, onClose }) {
                   Rating
                 </Typography>
 
-                <Typography variant="body1">
-                  {place.rating} out of 5
-                </Typography>
+                <Typography variant="body1">{place.rating} out of 5</Typography>
               </Box>
             )}
           </Stack>
@@ -265,6 +339,22 @@ function DetailsDialog({ place, places = [], onPlaceChange, onClose }) {
             )}
           </Box>
         </Box>
+
+        {visibleCalendarFeedback?.message && (
+          <Typography
+            component="p"
+            role={visibleCalendarFeedback.isError ? "alert" : "status"}
+            sx={{
+              marginTop: 2,
+              color: visibleCalendarFeedback.isError
+                ? "error.main"
+                : "var(--rooted-dark-green)",
+              fontWeight: 700,
+            }}
+          >
+            {visibleCalendarFeedback.message}
+          </Typography>
+        )}
       </DialogContent>
 
       <DialogActions className="details-dialog-actions">
@@ -303,6 +393,19 @@ function DetailsDialog({ place, places = [], onPlaceChange, onClose }) {
           <Button type="button" onClick={onClose}>
             Close
           </Button>
+
+          {isEvent && (
+            <Button
+              type="button"
+              variant="contained"
+              startIcon={<EventAvailableRoundedIcon />}
+              onClick={handleAddToCalendar}
+              disabled={authLoading || isCalendarPending || isOnCalendar}
+              aria-pressed={isOnCalendar}
+            >
+              {calendarButtonLabel}
+            </Button>
+          )}
 
           {directionsUrl && (
             <Button

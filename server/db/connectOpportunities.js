@@ -1,0 +1,326 @@
+import client from "./client.js";
+import { v5 as uuidv5 } from "uuid";
+
+const cityHubs = {
+  richmond: {
+    city: "Richmond",
+    region: "VA",
+    country: "USA",
+    timeZone: "America/New_York",
+    location: { lat: 37.5407, lng: -77.436 },
+  },
+  austin: {
+    city: "Austin",
+    region: "TX",
+    country: "USA",
+    timeZone: "America/Chicago",
+    location: { lat: 30.2672, lng: -97.7431 },
+  },
+  stuttgart: {
+    city: "Stuttgart",
+    region: "Baden-Württemberg",
+    country: "Germany",
+    timeZone: "Europe/Berlin",
+    location: { lat: 48.7758, lng: 9.1829 },
+  },
+};
+
+function createOpportunity({
+  id,
+  cityKey,
+  kind,
+  title,
+  description,
+  venue,
+  eventDate,
+  startTime,
+  endTime,
+  offset = { lat: 0, lng: 0 },
+}) {
+  const city = cityHubs[cityKey];
+
+  const eventId = uuidv5(
+    `https://rooted.local/events/${id}`,
+    uuidv5.URL,
+  );
+
+    return {
+    id: eventId,
+    kind,
+    title,
+    description,
+    venue,
+    imageUrl: null,
+    imageAlt: `${title} in ${city.city}`,
+    address: `${venue}, ${city.city}, ${city.region}, ${city.country}`,
+    city: city.city,
+    region: city.region,
+    country: city.country,
+    timeZone: city.timeZone,
+    eventDate,
+    startTime,
+    endTime,
+    location: {
+      lat: city.location.lat + offset.lat,
+      lng: city.location.lng + offset.lng,
+    },
+    isFree: true,
+    isDemo: true,
+  };
+}
+
+export const opportunities = [
+  createOpportunity({
+    id: "richmond-community-picnic",
+    cityKey: "richmond",
+    kind: "community_events",
+    title: "River City Welcome Picnic",
+    description:
+      "Meet neighbors and enjoy an afternoon of food, games, and conversation.",
+    venue: "Richmond Community Green",
+    eventDate: "2026-09-12",
+    startTime: "12:00",
+    endTime: "15:00",
+    offset: { lat: 0.004, lng: -0.003 },
+  }),
+  createOpportunity({
+    id: "richmond-garden-workday",
+    cityKey: "richmond",
+    kind: "volunteer",
+    title: "Community Garden Workday",
+    description:
+      "Help prepare garden beds and shared growing spaces for the fall season.",
+    venue: "Northside Community Garden",
+    eventDate: "2026-09-19",
+    startTime: "09:00",
+    endTime: "12:00",
+    offset: { lat: 0.006, lng: 0.003 },
+  }),
+  createOpportunity({
+    id: "richmond-porchlight-music",
+    cityKey: "richmond",
+    kind: "live_music_arts",
+    title: "Porchlight Local Music Night",
+    description:
+      "An outdoor evening featuring local musicians and neighborhood artists.",
+    venue: "River City Arts Courtyard",
+    eventDate: "2026-09-25",
+    startTime: "18:30",
+    endTime: "21:00",
+    offset: { lat: -0.003, lng: 0.004 },
+  }),
+  createOpportunity({
+    id: "richmond-makers-popup",
+    cityKey: "richmond",
+    kind: "markets_popups",
+    title: "River City Makers Pop-up",
+    description:
+      "Browse handmade goods, local foods, prints, and neighborhood creations.",
+    venue: "Downtown Makers Hall",
+    eventDate: "2026-10-03",
+    startTime: "10:00",
+    endTime: "16:00",
+    offset: { lat: -0.004, lng: -0.002 },
+  }),
+  createOpportunity({
+    id: "richmond-compost-workshop",
+    cityKey: "richmond",
+    kind: "classes_workshops",
+    title: "Neighborhood Compost Workshop",
+    description:
+      "Learn practical composting techniques for apartments and small gardens.",
+    venue: "Richmond Learning Garden",
+    eventDate: "2026-10-10",
+    startTime: "11:00",
+    endTime: "13:00",
+    offset: { lat: 0.002, lng: 0.006 },
+  }),
+
+  createOpportunity({
+    id: "austin-community-supper",
+    cityKey: "austin",
+    kind: "community_events",
+    title: "Eastside Community Supper",
+    description:
+      "Bring a dish or simply join neighbors for a relaxed community meal.",
+    venue: "Eastside Gathering Lawn",
+    eventDate: "2026-09-13",
+    startTime: "17:00",
+    endTime: "20:00",
+    offset: { lat: 0.003, lng: -0.004 },
+  }),
+  createOpportunity({
+    id: "austin-creek-cleanup",
+    cityKey: "austin",
+    kind: "volunteer",
+    title: "Creekside Cleanup Crew",
+    description:
+      "Join a volunteer team removing litter and caring for neighborhood trails.",
+    venue: "Austin Creek Trailhead",
+    eventDate: "2026-09-20",
+    startTime: "08:30",
+    endTime: "11:30",
+    offset: { lat: -0.004, lng: 0.005 },
+  }),
+  createOpportunity({
+    id: "austin-songwriters-showcase",
+    cityKey: "austin",
+    kind: "live_music_arts",
+    title: "Sunset Songwriters Showcase",
+    description:
+      "Hear original music from emerging Austin performers in an outdoor setting.",
+    venue: "East Austin Arts Patio",
+    eventDate: "2026-09-26",
+    startTime: "19:00",
+    endTime: "22:00",
+    offset: { lat: 0.005, lng: 0.003 },
+  }),
+  createOpportunity({
+    id: "austin-night-market",
+    cityKey: "austin",
+    kind: "markets_popups",
+    title: "Local Makers Night Market",
+    description:
+      "Shop small businesses, food vendors, vintage finds, and handmade goods.",
+    venue: "Austin Neighborhood Market Square",
+    eventDate: "2026-10-02",
+    startTime: "17:00",
+    endTime: "22:00",
+    offset: { lat: -0.003, lng: -0.005 },
+  }),
+  createOpportunity({
+    id: "austin-printing-workshop",
+    cityKey: "austin",
+    kind: "classes_workshops",
+    title: "Beginner Screen-Printing Workshop",
+    description:
+      "Create a one-color print while learning the basics of screen printing.",
+    venue: "Austin Community Print Studio",
+    eventDate: "2026-10-11",
+    startTime: "13:00",
+    endTime: "16:00",
+    offset: { lat: 0.001, lng: 0.006 },
+  }),
+
+  createOpportunity({
+    id: "stuttgart-culture-picnic",
+    cityKey: "stuttgart",
+    kind: "community_events",
+    title: "Neighborhood Culture Picnic",
+    description:
+      "Share food, stories, and traditions during an afternoon in the park.",
+    venue: "Stuttgart Community Meadow",
+    eventDate: "2026-09-12",
+    startTime: "13:00",
+    endTime: "17:00",
+    offset: { lat: 0.003, lng: -0.003 },
+  }),
+  createOpportunity({
+    id: "stuttgart-garden-volunteers",
+    cityKey: "stuttgart",
+    kind: "volunteer",
+    title: "Urban Garden Volunteer Morning",
+    description:
+      "Help maintain shared planting beds and prepare the garden for autumn.",
+    venue: "Stuttgart Urban Garden",
+    eventDate: "2026-09-19",
+    startTime: "09:00",
+    endTime: "12:00",
+    offset: { lat: -0.004, lng: 0.004 },
+  }),
+  createOpportunity({
+    id: "stuttgart-jazz-art",
+    cityKey: "stuttgart",
+    kind: "live_music_arts",
+    title: "Courtyard Jazz & Art Evening",
+    description:
+      "Enjoy live jazz alongside work from independent Stuttgart artists.",
+    venue: "Stuttgart Arts Courtyard",
+    eventDate: "2026-09-25",
+    startTime: "18:00",
+    endTime: "21:30",
+    offset: { lat: 0.005, lng: 0.002 },
+  }),
+  createOpportunity({
+    id: "stuttgart-design-popup",
+    cityKey: "stuttgart",
+    kind: "markets_popups",
+    title: "Local Design & Food Pop-up",
+    description:
+      "Discover regional designers, independent makers, and local food vendors.",
+    venue: "Stuttgart Community Market Hall",
+    eventDate: "2026-10-03",
+    startTime: "11:00",
+    endTime: "18:00",
+    offset: { lat: -0.002, lng: -0.005 },
+  }),
+  createOpportunity({
+    id: "stuttgart-bicycle-workshop",
+    cityKey: "stuttgart",
+    kind: "classes_workshops",
+    title: "Community Bicycle Repair Workshop",
+    description:
+      "Learn basic bicycle maintenance with help from neighborhood volunteers.",
+    venue: "Stuttgart Community Workshop",
+    eventDate: "2026-10-10",
+    startTime: "10:00",
+    endTime: "13:00",
+    offset: { lat: 0.001, lng: 0.006 },
+  }),
+];
+
+export async function seedConnectOpportunities() {
+  const SQL = `
+    INSERT INTO events (
+      id,
+      kind,
+      title,
+      description,
+      venue,
+      location,
+      city,
+      region,
+      country,
+      time_zone,
+      latitude,
+      longitude,
+      event_date,
+      start_time,
+      end_time,
+      image_url,
+      is_free,
+      is_demo
+    )
+    VALUES (
+      $1, $2, $3, $4, $5, $6,
+      $7, $8, $9, $10, $11, $12,
+      $13, $14, $15, $16, $17, $18
+    )
+    ON CONFLICT (id) DO NOTHING;
+  `;
+
+  for (const opportunity of opportunities) {
+    await client.query(SQL, [
+      opportunity.id,
+      opportunity.kind,
+      opportunity.title,
+      opportunity.description,
+      opportunity.venue,
+      opportunity.address,
+      opportunity.city,
+      opportunity.region,
+      opportunity.country,
+      opportunity.timeZone,
+      opportunity.location.lat,
+      opportunity.location.lng,
+      opportunity.eventDate,
+      opportunity.startTime,
+      opportunity.endTime,
+      opportunity.imageUrl,
+      opportunity.isFree,
+      opportunity.isDemo,
+    ]);
+  }
+
+  console.log("Connect opportunities successfully seeded");
+}

@@ -1,5 +1,6 @@
 import client from "./client.js";
 import { seedDummyData } from "./business.js";
+import { seedConnectOpportunities } from "./connectOpportunities.js";
 
 /**
  * Create the local development schema and seed it with fixture data.
@@ -12,7 +13,7 @@ const seed = async () => {
     DROP TABLE IF EXISTS business_types CASCADE;
     DROP TABLE IF EXISTS types CASCADE;
     DROP TABLE IF EXISTS event_attendance CASCADE;
-    DROP TABLE IF EXISTS buisness_visits CASCADE;
+    DROP TABLE IF EXISTS business_visits CASCADE;
     DROP TABLE IF EXISTS favorite_events CASCADE;
     DROP TABLE IF EXISTS favorite_businesses CASCADE;
     DROP TABLE IF EXISTS events CASCADE;
@@ -45,12 +46,24 @@ const seed = async () => {
       id UUID PRIMARY KEY,
       created_by UUID REFERENCES users(id) ON DELETE SET NULL,
       business_id UUID REFERENCES businesses(id) ON DELETE SET NULL,
+      kind VARCHAR(50) NOT NULL DEFAULT 'community_events',
       title VARCHAR(150) NOT NULL,
       description TEXT,
+      venue VARCHAR(200),
       location TEXT,
+      city VARCHAR(100),
+      region VARCHAR(100),
+      country VARCHAR(100),
+      time_zone VARCHAR(100),
+      latitude DOUBLE PRECISION,
+      longitude DOUBLE PRECISION,
       event_date DATE NOT NULL,
       start_time TIME,
-      end_time TIME
+      end_time TIME,
+      image_url TEXT,
+      is_free BOOLEAN NOT NULL DEFAULT FALSE,
+      is_demo BOOLEAN NOT NULL DEFAULT FALSE,
+      created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
     );
 
     CREATE TABLE favorite_businesses (
@@ -89,6 +102,7 @@ const seed = async () => {
   console.log("table/schema created");
 
   await seedDummyData();
+  await seedConnectOpportunities();
 };
 
 export default seed;

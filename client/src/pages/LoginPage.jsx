@@ -52,7 +52,7 @@ function LoginPage() {
 
     try {
       await login(formData.username, formData.password);
-      navigate("/"); // Redirect to dashboard/home after successful login
+      navigate("/user", { replace: true }); // Redirect to dashboard/home after successful login
     } catch (error) {
       setError(error.message || "Unable to log in. Please try again.");
     } finally {
