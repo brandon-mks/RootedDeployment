@@ -593,24 +593,65 @@ function DetailsDialog({ place, places = [], onPlaceChange, onClose }) {
         }`}
         open={Boolean(visibleCalendarFeedback?.message)}
         message={visibleCalendarFeedback?.message ?? ""}
-        autoHideDuration={5000}
+        autoHideDuration={6000}
         onClose={handleCalendarFeedbackClose}
         anchorOrigin={{
           vertical: "bottom",
           horizontal: "center",
         }}
         action={
-          visibleCalendarFeedback &&
-          !visibleCalendarFeedback.isError ? (
+          visibleCalendarFeedback && !visibleCalendarFeedback.isError ? (
             <Button
-              color="inherit"
+              type="button"
               size="small"
               onClick={handleViewCalendar}
+              sx={{
+                color: "#ffffff",
+                fontWeight: 800,
+                backgroundColor: "var(--rooted-plum)",
+                borderRadius: "6px",
+                paddingInline: 2,
+                "&:hover": {
+                  backgroundColor: "var(--rooted-dark-green)",
+                },
+              }}
             >
               View Calendar
             </Button>
           ) : null
         }
+        sx={{
+          bottom: { xs: 20, sm: 28 },
+
+          "& .MuiSnackbarContent-root": {
+            minWidth: {
+              xs: "calc(100vw - 32px)",
+              sm: "470px",
+            },
+            padding: "10px 14px",
+            color: visibleCalendarFeedback?.isError
+              ? "var(--rooted-plum)"
+              : "var(--rooted-dark-green)",
+            backgroundColor: visibleCalendarFeedback?.isError
+              ? "#f7e7e3"
+              : "#e7efe2",
+            border: "1px solid",
+            borderColor: visibleCalendarFeedback?.isError
+              ? "#c97868"
+              : "var(--rooted-green)",
+            borderLeft: "6px solid",
+            borderLeftColor: visibleCalendarFeedback?.isError
+              ? "#c97868"
+              : "var(--rooted-green)",
+            borderRadius: "10px",
+            boxShadow: "0 6px 18px rgba(25, 20, 32, 0.25)",
+          },
+
+          "& .MuiSnackbarContent-message": {
+            fontSize: "15px",
+            fontWeight: 700,
+          },
+        }}
       />
     </>
   );
