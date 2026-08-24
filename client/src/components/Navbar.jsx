@@ -1,5 +1,6 @@
 import { Link, useLocation, useNavigate } from "react-router";
 import { useAuth } from "../context/AuthContext";
+import { Avatar } from "@mui/material";
 
 function Navbar() {
   const { user, logout } = useAuth();
@@ -18,9 +19,19 @@ function Navbar() {
       {!isLandingPage && <Link to="/">Home</Link>}
 
       {user ? (
-        <button type="button" className="navbar-login" onClick={handleLogout}>
-          Log out
-        </button>
+        <div className="navbar-user">
+          <Link to="/user" className="navbar-profile-link">
+            <Avatar
+              src={user?.avatar_url || ""}
+              alt={user?.username || "Profile"}
+              className="navbar-avatar"
+            />
+            <span className="navbar-username">{user?.username}</span>
+          </Link>
+          <button type="button" className="navbar-login" onClick={handleLogout}>
+            Log out
+          </button>
+        </div>
       ) : (
         <Link to="/login" className="navbar-login">
           Log in
@@ -28,8 +39,6 @@ function Navbar() {
       )}
       <Link to="/discover">Discover</Link>
       <Link to="/connect">Connect</Link>
-
-      <Link to="/chat">Chat</Link>
     </nav>
   );
 }

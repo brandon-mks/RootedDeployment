@@ -11,7 +11,13 @@ const seed = async () => {
   const schemaSQL = `
     DROP TABLE IF EXISTS business_types CASCADE;
     DROP TABLE IF EXISTS types CASCADE;
+    DROP TABLE IF EXISTS event_attendance CASCADE;
+    DROP TABLE IF EXISTS buisness_visits CASCADE;
+    DROP TABLE IF EXISTS favorite_events CASCADE;
+    DROP TABLE IF EXISTS favorite_businesses CASCADE;
+    DROP TABLE IF EXISTS events CASCADE;
     DROP TABLE IF EXISTS businesses CASCADE;
+    DROP TABLE IF EXISTS users CASCADE;
 
     CREATE TABLE businesses (
       id UUID NOT NULL,
@@ -31,7 +37,8 @@ const seed = async () => {
       id UUID PRIMARY KEY,
       username VARCHAR(50) UNIQUE NOT NULL,
       email VARCHAR(100) UNIQUE NOT NULL,
-      password_hash VARCHAR(255) NOT NULL
+      password_hash VARCHAR(255) NOT NULL,
+      avatar_url TEXT
     );
 
     CREATE TABLE events (
@@ -59,26 +66,6 @@ const seed = async () => {
       user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
       event_id UUID NOT NULL REFERENCES events(id) ON DELETE CASCADE,
 
-      UNIQUE(user_id, event_id)
-    );
-
-    CREATE TABLE business_reviews (
-      id UUID PRIMARY KEY, 
-      user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
-      business_id UUID NOT NULL REFERENCES businesses(id) ON DELETE CASCADE,
-      rating INTEGER NOT NULL CHECK (rating BETWEEN 1 AND 5),
-      review_text TEXT NOT NULL,
-
-      UNIQUE(user_id, business_id)
-    );
-     
-    CREATE TABLE event_reviews (
-      id UUID PRIMARY KEY, 
-      user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
-      event_id UUID NOT NULL REFERENCES events(id) ON DELETE CASCADE,
-      rating INTEGER NOT NULL CHECK (rating BETWEEN 1 AND 5),
-      review_text TEXT NOT NULL,
-      
       UNIQUE(user_id, event_id)
     );
 

@@ -7,6 +7,7 @@ import Footer from "../components/Footer.jsx";
 
 import {
   Alert,
+  Avatar,
   Box,
   Button,
   Card,
@@ -136,6 +137,14 @@ function UserPage() {
         {/* Header */}
         <section className="user-header">
           <Box>
+            <Avatar
+              src={user?.avatar_url || ""}
+              alt={user?.username || "Profile"}
+              className="profile-avatar"
+            >
+              {user?.username?.charAt(0).toUpperCase()}
+            </Avatar>
+
             <Typography className="user-eyebrow">
               YOUR ROOTED PROFILE
             </Typography>
@@ -208,7 +217,6 @@ function UserPage() {
             scrollButtons="auto"
           >
             <Tab label="Favorites" />
-            <Tab label="Reviews" />
             <Tab label="Calendar" />
             <Tab label="Create Event" />
           </Tabs>
@@ -227,20 +235,20 @@ function UserPage() {
                   Your Favorites
                 </Typography>
 
-                <Tabs
-                  value={favoriteTab}
-                  onChange={(_, newValue) => setFavoriteTab(newValue)}
-                  className="favorite-tabs"
-                >
-                  <Tab label="Businesses" />
-                  <Tab label="Events" />
-                </Tabs>
+                {/* BUSINESSES SECTION */}
+                <Box className="favorite-section-group" sx={{ mb: 6 }}>
+                  <Typography
+                    variant="h3"
+                    className="subsection-title"
+                    sx={{ mb: 2 }}
+                  >
+                    Saved Businesses
+                  </Typography>
 
-                {favoriteTab === 0 && (
                   <Box className="favorite-grid">
                     {favorites.businesses.length === 0 ? (
                       <Box className="empty-state">
-                        <Typography variant="h3">
+                        <Typography variant="h4">
                           No saved businesses yet
                         </Typography>
 
@@ -251,7 +259,7 @@ function UserPage() {
 
                         <Button
                           component={Link}
-                          to="/connect"
+                          to="/discover"
                           variant="contained"
                           className="rooted-button"
                         >
@@ -270,6 +278,9 @@ function UserPage() {
 
                             <Typography>{business.address}</Typography>
 
+                            {/* Empty text block to maintain 3-line height consistency with Event cards */}
+                            <Typography>&nbsp;</Typography>
+
                             <Button
                               onClick={() =>
                                 removeFavorite("businesses", business.id)
@@ -283,19 +294,38 @@ function UserPage() {
                       ))
                     )}
                   </Box>
-                )}
+                </Box>
 
-                {favoriteTab === 1 && (
+                {/* EVENTS SECTION */}
+                <Box className="favorite-section-group">
+                  <Typography
+                    variant="h3"
+                    className="subsection-title"
+                    sx={{ mb: 2 }}
+                  >
+                    Saved Events
+                  </Typography>
+
                   <Box className="favorite-grid">
                     {favorites.events.length === 0 ? (
                       <Box className="empty-state">
-                        <Typography variant="h3">
+                        <Typography variant="h4">
                           No saved events yet
                         </Typography>
 
                         <Typography>
-                          Save events you want to attend later.
+                          Explore Rooted and save events you want to attend
+                          later.
                         </Typography>
+
+                        <Button
+                          component={Link}
+                          to="/connect"
+                          variant="contained"
+                          className="rooted-button"
+                        >
+                          Explore Events
+                        </Button>
                       </Box>
                     ) : (
                       favorites.events.map((event) => (
@@ -320,79 +350,12 @@ function UserPage() {
                       ))
                     )}
                   </Box>
-                )}
-              </>
-            )}
-
-            {/* REVIEWS */}
-            {activeTab === 1 && (
-              <>
-                <Typography className="section-eyebrow">
-                  YOUR COMMUNITY VOICE
-                </Typography>
-
-                <Typography variant="h2" className="section-title">
-                  Your Reviews
-                </Typography>
-
-                <Box className="reviews-grid">
-                  <Card className="review-section-card">
-                    <CardContent>
-                      <Typography variant="h3">Business Reviews</Typography>
-
-                      {reviews.businesses.length === 0 ? (
-                        <Typography>
-                          You haven't reviewed a business yet.
-                        </Typography>
-                      ) : (
-                        reviews.businesses.map((review) => (
-                          <Box className="review-card" key={review.id}>
-                            <Typography variant="h4">
-                              {review.business_name}
-                            </Typography>
-
-                            <Typography className="review-stars">
-                              {"★".repeat(review.rating)}
-                              {"☆".repeat(5 - review.rating)}
-                            </Typography>
-
-                            <Typography>{review.review_text}</Typography>
-                          </Box>
-                        ))
-                      )}
-                    </CardContent>
-                  </Card>
-
-                  <Card className="review-section-card">
-                    <CardContent>
-                      <Typography variant="h3">Event Reviews</Typography>
-
-                      {reviews.events.length === 0 ? (
-                        <Typography>
-                          You haven't reviewed an event yet.
-                        </Typography>
-                      ) : (
-                        reviews.events.map((review) => (
-                          <Box className="review-card" key={review.id}>
-                            <Typography variant="h4">{review.title}</Typography>
-
-                            <Typography className="review-stars">
-                              {"★".repeat(review.rating)}
-                              {"☆".repeat(5 - review.rating)}
-                            </Typography>
-
-                            <Typography>{review.review_text}</Typography>
-                          </Box>
-                        ))
-                      )}
-                    </CardContent>
-                  </Card>
                 </Box>
               </>
             )}
 
             {/* CALENDAR */}
-            {activeTab === 2 && (
+            {activeTab === 1 && (
               <>
                 <Typography className="section-eyebrow">
                   PLAN YOUR COMMUNITY LIFE
@@ -421,7 +384,7 @@ function UserPage() {
             )}
 
             {/* CREATE EVENT */}
-            {activeTab === 3 && (
+            {activeTab === 2 && (
               <>
                 <Typography className="section-eyebrow">
                   BRING PEOPLE TOGETHER
@@ -541,22 +504,7 @@ function UserPage() {
         </Card>
 
         {/* Footer */}
-        <section className="user-footer">
-          <Box>
-            <Typography className="section-eyebrow">KEEP EXPLORING</Typography>
-
-            <Typography variant="h2">Find your next local favorite.</Typography>
-          </Box>
-
-          <Button
-            component={Link}
-            to="/chat"
-            variant="contained"
-            className="rooted-button"
-          >
-            Ask Rooted
-          </Button>
-        </section>
+        <section className="user-footer"></section>
       </main>
 
       <Footer />

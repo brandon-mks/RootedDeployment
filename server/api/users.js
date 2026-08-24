@@ -41,7 +41,7 @@ export const requireAuth = (req, res, next) => {
 
 // POST /api/users/register
 usersRouter.post("/register", async (req, res, next) => {
-  const { username, email, password } = req.body;
+  const { username, email, password, avatar_url = null } = req.body;
 
   if (!username || !email || !password) {
     return res
@@ -69,10 +69,10 @@ usersRouter.post("/register", async (req, res, next) => {
     const id = uuidv4();
 
     const result = await client.query(
-      `INSERT INTO users(id, username, email, password_hash)
-       VALUES ($1, $2, $3, $4)
-       RETURNING id, username, email`,
-      [id, username, email, password_hash],
+      `INSERT INTO users(id, username, email, password_hash, avatar_url)
+       VALUES ($1, $2, $3, $4, $5)
+       RETURNING id, username, email, avatar_url`,
+      [id, username, email, password_hash, avatar_url],
     );
 
     const user = result.rows[0];
@@ -97,7 +97,7 @@ usersRouter.post("/login", async (req, res, next) => {
 
   try {
     const result = await client.query(
-      `SELECT id, username, email, password_hash FROM users WHERE username = $1`,
+      `SELECT id, username, email, password_hash, avatar_url FROM users WHERE username = $1`,
       [username],
     );
     const user = result.rows[0];
@@ -116,7 +116,12 @@ usersRouter.post("/login", async (req, res, next) => {
     setAuthCookie(res, token);
 
     res.json({
-      user: { id: user.id, username: user.username, email: user.email },
+      user: {
+        id: user.id,
+        username: user.username,
+        email: user.email,
+        avatar_url: user.avatar_url,
+      },
     });
   } catch (err) {
     next(err);
@@ -133,7 +138,7 @@ usersRouter.post("/logout", (req, res) => {
 usersRouter.get("/me", requireAuth, async (req, res, next) => {
   try {
     const result = await client.query(
-      `SELECT id, username, email FROM users WHERE id = $1`,
+      `SELECT id, username, email, avatar_url FROM users WHERE id = $1`,
       [req.user.id],
     );
     if (result.rows.length === 0) {
