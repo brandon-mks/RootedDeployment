@@ -827,11 +827,25 @@ function UserPage() {
 
                           <Button
                             type="button"
-                            onClick={() =>
-                              handleRemoveCalendarEvent(event.id)
-                            }
+                            variant="outlined"
+                            onClick={() => handleRemoveCalendarEvent(event.id)}
                             disabled={calendarRemovingId === event.id}
-                            className="remove-button"
+                            sx={{
+                              marginTop: 2,
+                              alignSelf: "flex-start",
+                              color: "#984f45",
+                              backgroundColor: "#fff8f6",
+                              borderColor: "#c97868",
+                              borderWidth: "2px",
+                              fontWeight: 700,
+                              textTransform: "none",
+                              "&:hover": {
+                                color: "#ffffff",
+                                backgroundColor: "#984f45",
+                                borderColor: "#984f45",
+                                borderWidth: "2px",
+                              },
+                            }}
                           >
                             {calendarRemovingId === event.id
                               ? "Removing…"
