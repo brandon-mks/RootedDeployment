@@ -51,7 +51,12 @@ const init = async () => {
     try {
       await client.connect();
       console.log("connected to database");
+      if (process.env.SEED_DATABASE === "true") {
       await seed();
+      console.log("database seed completed");
+    } else {
+      console.log("database seeding skipped");
+    }
     } catch (err) {
       console.log(err);
     }

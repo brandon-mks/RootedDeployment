@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   Box,
   Button,
@@ -7,6 +7,7 @@ import {
   DialogContent,
   DialogTitle,
   IconButton,
+  Snackbar,
   Stack,
   Typography,
 } from "@mui/material";
@@ -15,26 +16,69 @@ import ChevronRightRoundedIcon from "@mui/icons-material/ChevronRightRounded";
 import EventAvailableRoundedIcon from "@mui/icons-material/EventAvailableRounded";
 import FavoriteBorderRoundedIcon from "@mui/icons-material/FavoriteBorderRounded";
 import FavoriteRoundedIcon from "@mui/icons-material/FavoriteRounded";
-import { useNavigate } from "react-router";
+import { useLocation, useNavigate } from "react-router";
 
 import { useAuth } from "../context/AuthContext.jsx";
-import { addEventToCalendar } from "../services/events.js";
+import {
+  addEventToCalendar,
+  getCalendarEvents,
+} from "../services/events.js";
 import { MapCard } from "./MapCard.jsx";
 
 function DetailsDialog({ place, places = [], onPlaceChange, onClose }) {
   const { user, loading: authLoading } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
 
-  // Temporary visual state until the favorites POST request is connected.
+  const [authPromptAction, setAuthPromptAction] = useState(null);
+
+  // Temporary visual state until the favorites API is connected.
   const [favoriteItemIds, setFavoriteItemIds] = useState(() => new Set());
 
   const [calendarEventIds, setCalendarEventIds] = useState(() => new Set());
+  const [calendarLoadedForUserId, setCalendarLoadedForUserId] = useState(null);
   const [calendarPendingId, setCalendarPendingId] = useState(null);
+
   const [calendarFeedback, setCalendarFeedback] = useState({
     eventId: null,
     message: "",
     isError: false,
   });
+
+  const calendarUserId = user?.id ?? user?.username ?? null;
+
+  useEffect(() => {
+    if (!calendarUserId) {
+      return undefined;
+    }
+
+    let isCurrent = true;
+
+    async function loadCalendarStatus() {
+      try {
+        const data = await getCalendarEvents();
+        const events = Array.isArray(data.events) ? data.events : [];
+
+        if (!isCurrent) {
+          return;
+        }
+
+        setCalendarEventIds(
+          new Set(events.map((event) => event.id)),
+        );
+
+        setCalendarLoadedForUserId(calendarUserId);
+      } catch {
+        // Calendar status should not prevent the details dialog from opening.
+      }
+    }
+
+    loadCalendarStatus();
+
+    return () => {
+      isCurrent = false;
+    };
+  }, [calendarUserId]);
 
   const isOpen = Boolean(place);
 
@@ -43,7 +87,12 @@ function DetailsDialog({ place, places = [], onPlaceChange, onClose }) {
   }
 
   const isEvent = Boolean(place.kind || place.eventDate);
-  const isOnCalendar = calendarEventIds.has(place.id);
+
+  const isOnCalendar =
+    Boolean(user) &&
+    calendarLoadedForUserId === calendarUserId &&
+    calendarEventIds.has(place.id);
+
   const isCalendarPending = calendarPendingId === place.id;
 
   const visibleCalendarFeedback =
@@ -126,10 +175,42 @@ function DetailsDialog({ place, places = [], onPlaceChange, onClose }) {
   const carouselTotal = Math.max(places.length, 1);
   const isFavorite = favoriteItemIds.has(place.id);
 
+  const clearCalendarFeedback = () => {
+    setCalendarFeedback({
+      eventId: null,
+      message: "",
+      isError: false,
+    });
+  };
+
+  const handleClose = () => {
+    setAuthPromptAction(null);
+    clearCalendarFeedback();
+    onClose();
+  };
+
+  const handleAuthNavigation = (destination) => {
+    const intendedAction = authPromptAction;
+
+    setAuthPromptAction(null);
+    onClose();
+
+    navigate(destination, {
+      state: {
+        from: location.pathname,
+        intendedAction,
+        itemId: place.id,
+      },
+    });
+  };
+
   const handlePrevious = () => {
     if (!canNavigate) {
       return;
     }
+
+    setAuthPromptAction(null);
+    clearCalendarFeedback();
 
     const previousIndex = (currentIndex - 1 + places.length) % places.length;
     onPlaceChange(places[previousIndex]);
@@ -140,11 +221,25 @@ function DetailsDialog({ place, places = [], onPlaceChange, onClose }) {
       return;
     }
 
+    setAuthPromptAction(null);
+    clearCalendarFeedback();
+
     const nextIndex = (currentIndex + 1) % places.length;
     onPlaceChange(places[nextIndex]);
   };
 
   const handleFavorite = () => {
+    if (authLoading) {
+      return;
+    }
+
+    if (!user) {
+      setAuthPromptAction("favorite");
+      return;
+    }
+
+    setAuthPromptAction(null);
+
     setFavoriteItemIds((currentFavorites) => {
       const nextFavorites = new Set(currentFavorites);
 
@@ -164,16 +259,13 @@ function DetailsDialog({ place, places = [], onPlaceChange, onClose }) {
     }
 
     if (!user) {
-      onClose();
-      navigate("/login", {
-        state: {
-          from: "/connect",
-        },
-      });
+      setAuthPromptAction("calendar");
       return;
     }
 
+    setAuthPromptAction(null);
     setCalendarPendingId(place.id);
+
     setCalendarFeedback({
       eventId: place.id,
       message: "",
@@ -188,6 +280,8 @@ function DetailsDialog({ place, places = [], onPlaceChange, onClose }) {
         nextIds.add(place.id);
         return nextIds;
       });
+
+      setCalendarLoadedForUserId(calendarUserId);
 
       setCalendarFeedback({
         eventId: place.id,
@@ -208,231 +302,317 @@ function DetailsDialog({ place, places = [], onPlaceChange, onClose }) {
     }
   };
 
+  const handleCalendarFeedbackClose = (_event, reason) => {
+    if (reason === "clickaway") {
+      return;
+    }
+
+    clearCalendarFeedback();
+  };
+
+  const handleViewCalendar = () => {
+    clearCalendarFeedback();
+    onClose();
+    navigate("/user?tab=calendar");
+  };
+
   return (
-    <Dialog
-      open={isOpen}
-      onClose={onClose}
-      fullWidth
-      maxWidth="md"
-      aria-labelledby="details-dialog-title"
-      slotProps={{
-        backdrop: {
-          className: "details-dialog-backdrop",
-        },
-        paper: {
-          className: "details-dialog-paper",
-        },
-      }}
-    >
-      <DialogTitle id="details-dialog-title" className="details-dialog-title">
-        <Box className="details-dialog-title-copy">
-          <Typography component="p" className="details-dialog-category">
-            {categoryLabel}
-          </Typography>
+    <>
+      <Dialog
+        open={isOpen}
+        onClose={handleClose}
+        fullWidth
+        maxWidth="md"
+        aria-labelledby="details-dialog-title"
+        slotProps={{
+          backdrop: {
+            className: "details-dialog-backdrop",
+          },
+          paper: {
+            className: "details-dialog-paper",
+          },
+        }}
+      >
+        <DialogTitle id="details-dialog-title" className="details-dialog-title">
+          <Box className="details-dialog-title-copy">
+            <Typography component="p" className="details-dialog-category">
+              {categoryLabel}
+            </Typography>
 
-          <Typography component="h2" className="details-dialog-name">
-            {itemName}
-          </Typography>
-        </Box>
+            <Typography component="h2" className="details-dialog-name">
+              {itemName}
+            </Typography>
+          </Box>
 
-        <IconButton
-          type="button"
-          className="details-dialog-favorite"
-          aria-label={
-            isFavorite
-              ? `Remove ${itemName} from favorites`
-              : `Add ${itemName} to favorites`
-          }
-          aria-pressed={isFavorite}
-          onClick={handleFavorite}
-        >
-          {isFavorite ? <FavoriteRoundedIcon /> : <FavoriteBorderRoundedIcon />}
-        </IconButton>
+          <IconButton
+            type="button"
+            className="details-dialog-favorite"
+            aria-label={
+              isFavorite
+                ? `Remove ${itemName} from favorites`
+                : `Add ${itemName} to favorites`
+            }
+            disabled={authLoading}
+            aria-pressed={isFavorite}
+            onClick={handleFavorite}
+          >
+            {isFavorite ? (
+              <FavoriteRoundedIcon />
+            ) : (
+              <FavoriteBorderRoundedIcon />
+            )}
+          </IconButton>
 
-        <IconButton
-          type="button"
-          className="details-dialog-close"
-          aria-label="Close details"
-          onClick={onClose}
-        >
-          ×
-        </IconButton>
-      </DialogTitle>
+          <IconButton
+            type="button"
+            className="details-dialog-close"
+            aria-label="Close details"
+            onClick={handleClose}
+          >
+            ×
+          </IconButton>
+        </DialogTitle>
 
-      <DialogContent dividers className="details-dialog-content">
-        <Box className="details-dialog-layout">
-          <Stack spacing={3} className="details-dialog-information">
-            {place.description && (
-              <Box className="details-dialog-field">
-                <Typography variant="subtitle2" component="h3">
-                  About
-                </Typography>
+        <DialogContent dividers className="details-dialog-content">
+          {authPromptAction && !user && (
+            <Box
+              role="status"
+              aria-live="polite"
+              sx={{
+                marginBottom: 3,
+                padding: 2,
+                backgroundColor: "rgba(122, 166, 100, 0.12)",
+                border: "1px solid var(--rooted-green)",
+                borderRadius: 2,
+              }}
+            >
+              <Typography variant="subtitle1" sx={{ fontWeight: 700 }}>
+                {authPromptAction === "favorite"
+                  ? "Save this to your favorites"
+                  : "Add this event to your calendar"}
+              </Typography>
 
-                <Typography variant="body1">{place.description}</Typography>
-              </Box>
+              <Typography variant="body2" sx={{ marginTop: 0.5 }}>
+                Log in or create an account to continue.
+              </Typography>
+
+              <Stack
+                direction={{ xs: "column", sm: "row" }}
+                spacing={1}
+                sx={{ marginTop: 2 }}
+              >
+                <Button
+                  type="button"
+                  onClick={() => setAuthPromptAction(null)}
+                >
+                  Not now
+                </Button>
+
+                <Button
+                  type="button"
+                  variant="outlined"
+                  onClick={() => handleAuthNavigation("/login")}
+                >
+                  Log in
+                </Button>
+
+                <Button
+                  type="button"
+                  variant="contained"
+                  onClick={() => handleAuthNavigation("/register")}
+                >
+                  Create account
+                </Button>
+              </Stack>
+            </Box>
+          )}
+
+          <Box className="details-dialog-layout">
+            <Stack spacing={3} className="details-dialog-information">
+              {place.description && (
+                <Box className="details-dialog-field">
+                  <Typography variant="subtitle2" component="h3">
+                    About
+                  </Typography>
+
+                  <Typography variant="body1">{place.description}</Typography>
+                </Box>
+              )}
+
+              {eventDateLabel && (
+                <Box className="details-dialog-field">
+                  <Typography variant="subtitle2" component="h3">
+                    Date
+                  </Typography>
+
+                  <Typography variant="body1">{eventDateLabel}</Typography>
+                </Box>
+              )}
+
+              {eventTimeLabel && (
+                <Box className="details-dialog-field">
+                  <Typography variant="subtitle2" component="h3">
+                    Time
+                  </Typography>
+
+                  <Typography variant="body1">
+                    {eventTimeLabel}
+                    {place.timeZone ? ` · ${place.timeZone}` : ""}
+                  </Typography>
+                </Box>
+              )}
+
+              {place.venue && (
+                <Box className="details-dialog-field">
+                  <Typography variant="subtitle2" component="h3">
+                    Venue
+                  </Typography>
+
+                  <Typography variant="body1">{place.venue}</Typography>
+                </Box>
+              )}
+
+              {place.address && (
+                <Box className="details-dialog-field">
+                  <Typography variant="subtitle2" component="h3">
+                    Address
+                  </Typography>
+
+                  <Typography variant="body1">{place.address}</Typography>
+                </Box>
+              )}
+
+              {place.rating != null && (
+                <Box className="details-dialog-field">
+                  <Typography variant="subtitle2" component="h3">
+                    Rating
+                  </Typography>
+
+                  <Typography variant="body1">
+                    {place.rating} out of 5
+                  </Typography>
+                </Box>
+              )}
+            </Stack>
+
+            <Box
+              className="details-dialog-map-panel"
+              aria-label={`Map showing ${itemName}`}
+            >
+              {mapPlace ? (
+                <MapCard place={mapPlace} />
+              ) : (
+                <Box className="details-dialog-map-fallback">
+                  <Typography>Map unavailable</Typography>
+                </Box>
+              )}
+            </Box>
+          </Box>
+        </DialogContent>
+
+        <DialogActions className="details-dialog-actions">
+          <Box
+            className="details-dialog-carousel"
+            aria-label="Browse listings in this category"
+          >
+            <IconButton
+              type="button"
+              aria-label="View previous listing"
+              onClick={handlePrevious}
+              disabled={!canNavigate}
+            >
+              <ChevronLeftRoundedIcon />
+            </IconButton>
+
+            <Typography component="span">
+              {currentPosition} of {carouselTotal}
+            </Typography>
+
+            <IconButton
+              type="button"
+              aria-label="View next listing"
+              onClick={handleNext}
+              disabled={!canNavigate}
+            >
+              <ChevronRightRoundedIcon />
+            </IconButton>
+          </Box>
+
+          <Stack
+            direction="row"
+            spacing={1}
+            className="details-dialog-action-buttons"
+          >
+            <Button type="button" onClick={handleClose}>
+              Close
+            </Button>
+
+            {isEvent && (
+              <Button
+                type="button"
+                variant="contained"
+                startIcon={<EventAvailableRoundedIcon />}
+                onClick={handleAddToCalendar}
+                disabled={authLoading || isCalendarPending || isOnCalendar}
+                aria-pressed={isOnCalendar}
+              >
+                {calendarButtonLabel}
+              </Button>
             )}
 
-            {eventDateLabel && (
-              <Box className="details-dialog-field">
-                <Typography variant="subtitle2" component="h3">
-                  Date
-                </Typography>
-
-                <Typography variant="body1">{eventDateLabel}</Typography>
-              </Box>
+            {directionsUrl && (
+              <Button
+                component="a"
+                href={directionsUrl}
+                target="_blank"
+                rel="noreferrer"
+                variant="outlined"
+              >
+                Directions
+              </Button>
             )}
 
-            {eventTimeLabel && (
-              <Box className="details-dialog-field">
-                <Typography variant="subtitle2" component="h3">
-                  Time
-                </Typography>
-
-                <Typography variant="body1">
-                  {eventTimeLabel}
-                  {place.timeZone ? ` · ${place.timeZone}` : ""}
-                </Typography>
-              </Box>
-            )}
-
-            {place.venue && (
-              <Box className="details-dialog-field">
-                <Typography variant="subtitle2" component="h3">
-                  Venue
-                </Typography>
-
-                <Typography variant="body1">{place.venue}</Typography>
-              </Box>
-            )}
-
-            {place.address && (
-              <Box className="details-dialog-field">
-                <Typography variant="subtitle2" component="h3">
-                  Address
-                </Typography>
-
-                <Typography variant="body1">{place.address}</Typography>
-              </Box>
-            )}
-
-            {place.rating != null && (
-              <Box className="details-dialog-field">
-                <Typography variant="subtitle2" component="h3">
-                  Rating
-                </Typography>
-
-                <Typography variant="body1">{place.rating} out of 5</Typography>
-              </Box>
+            {place.website && (
+              <Button
+                component="a"
+                href={place.website}
+                target="_blank"
+                rel="noreferrer"
+                variant="contained"
+              >
+                Visit website
+              </Button>
             )}
           </Stack>
+        </DialogActions>
+      </Dialog>
 
-          <Box
-            className="details-dialog-map-panel"
-            aria-label={`Map showing ${itemName}`}
-          >
-            {mapPlace ? (
-              <MapCard place={mapPlace} />
-            ) : (
-              <Box className="details-dialog-map-fallback">
-                <Typography>Map unavailable</Typography>
-              </Box>
-            )}
-          </Box>
-        </Box>
-
-        {visibleCalendarFeedback?.message && (
-          <Typography
-            component="p"
-            role={visibleCalendarFeedback.isError ? "alert" : "status"}
-            sx={{
-              marginTop: 2,
-              color: visibleCalendarFeedback.isError
-                ? "error.main"
-                : "var(--rooted-dark-green)",
-              fontWeight: 700,
-            }}
-          >
-            {visibleCalendarFeedback.message}
-          </Typography>
-        )}
-      </DialogContent>
-
-      <DialogActions className="details-dialog-actions">
-        <Box
-          className="details-dialog-carousel"
-          aria-label="Browse listings in this category"
-        >
-          <IconButton
-            type="button"
-            aria-label="View previous listing"
-            onClick={handlePrevious}
-            disabled={!canNavigate}
-          >
-            <ChevronLeftRoundedIcon />
-          </IconButton>
-
-          <Typography component="span">
-            {currentPosition} of {carouselTotal}
-          </Typography>
-
-          <IconButton
-            type="button"
-            aria-label="View next listing"
-            onClick={handleNext}
-            disabled={!canNavigate}
-          >
-            <ChevronRightRoundedIcon />
-          </IconButton>
-        </Box>
-
-        <Stack
-          direction="row"
-          spacing={1}
-          className="details-dialog-action-buttons"
-        >
-          <Button type="button" onClick={onClose}>
-            Close
-          </Button>
-
-          {isEvent && (
+      <Snackbar
+        key={`${visibleCalendarFeedback?.eventId ?? "event"}-${
+          visibleCalendarFeedback?.message ?? ""
+        }`}
+        open={Boolean(visibleCalendarFeedback?.message)}
+        message={visibleCalendarFeedback?.message ?? ""}
+        autoHideDuration={5000}
+        onClose={handleCalendarFeedbackClose}
+        anchorOrigin={{
+          vertical: "bottom",
+          horizontal: "center",
+        }}
+        action={
+          visibleCalendarFeedback &&
+          !visibleCalendarFeedback.isError ? (
             <Button
-              type="button"
-              variant="contained"
-              startIcon={<EventAvailableRoundedIcon />}
-              onClick={handleAddToCalendar}
-              disabled={authLoading || isCalendarPending || isOnCalendar}
-              aria-pressed={isOnCalendar}
+              color="inherit"
+              size="small"
+              onClick={handleViewCalendar}
             >
-              {calendarButtonLabel}
+              View Calendar
             </Button>
-          )}
-
-          {directionsUrl && (
-            <Button
-              component="a"
-              href={directionsUrl}
-              target="_blank"
-              rel="noreferrer"
-              variant="outlined"
-            >
-              Directions
-            </Button>
-          )}
-
-          {place.website && (
-            <Button
-              component="a"
-              href={place.website}
-              target="_blank"
-              rel="noreferrer"
-              variant="contained"
-            >
-              Visit website
-            </Button>
-          )}
-        </Stack>
-      </DialogActions>
-    </Dialog>
+          ) : null
+        }
+      />
+    </>
   );
 }
 
