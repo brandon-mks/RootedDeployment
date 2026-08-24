@@ -329,22 +329,9 @@ a {
   border-radius: 2px;
 
   background-image:
-    radial-gradient(
-      circle at 18% 24%,
-      rgba(255, 255, 255, 0.2) 0 1px,
-      transparent 1.5px
-    ),
-    radial-gradient(
-      circle at 72% 68%,
-      rgba(60, 53, 70, 0.06) 0 1px,
-      transparent 1.5px
-    ),
-    linear-gradient(
-      115deg,
-      rgba(255, 255, 255, 0.12),
-      transparent 35%,
-      rgba(60, 53, 70, 0.035)
-    );
+    radial-gradient(circle at 18% 24%, rgba(255, 255, 255, 0.2) 0 1px, transparent 1.5px),
+    radial-gradient(circle at 72% 68%, rgba(60, 53, 70, 0.06) 0 1px, transparent 1.5px),
+    linear-gradient(115deg, rgba(255, 255, 255, 0.12), transparent 35%, rgba(60, 53, 70, 0.035));
 
   background-size:
     17px 17px,
@@ -1071,10 +1058,7 @@ a {
   border-width: 1.5px !important;
 }
 
-.support-dialog-paper
-  .support-field
-  .MuiOutlinedInput-root:hover
-  .MuiOutlinedInput-notchedOutline {
+.support-dialog-paper .support-field .MuiOutlinedInput-root:hover .MuiOutlinedInput-notchedOutline {
   border-color: var(--rooted-dark-green) !important;
 }
 
@@ -1495,11 +1479,7 @@ a {
   align-items: center;
   justify-content: space-between;
 
-  background: linear-gradient(
-    120deg,
-    var(--rooted-green) 0%,
-    var(--rooted-plum) 130%
-  );
+  background: linear-gradient(120deg, var(--rooted-green) 0%, var(--rooted-plum) 130%);
   color: #fff;
   font-weight: 700;
   letter-spacing: 0.3px;
@@ -1579,11 +1559,7 @@ a {
   overflow-y: auto;
 
   background-color: var(--rooted-page-background);
-  background-image: radial-gradient(
-    circle at 100% 0%,
-    rgba(47, 107, 58, 0.05) 0%,
-    transparent 40%
-  );
+  background-image: radial-gradient(circle at 100% 0%, rgba(47, 107, 58, 0.05) 0%, transparent 40%);
 }
 
 .chat-loading-indicator {
@@ -1762,9 +1738,7 @@ a {
   margin-bottom: 16px !important;
 }
 
-.auth-input-field
-  .MuiOutlinedInput-root.Mui-focused
-  .MuiOutlinedInput-notchedOutline {
+.auth-input-field .MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline {
   border-color: var(--rooted-green) !important;
 }
 
@@ -2137,9 +2111,7 @@ a {
   border-color: var(--rooted-green);
 }
 
-.event-form
-  .MuiOutlinedInput-root.Mui-focused
-  .MuiOutlinedInput-notchedOutline {
+.event-form .MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline {
   border-color: var(--rooted-green);
   border-width: 2px;
 }
@@ -2257,4 +2229,11 @@ a {
   font-size: 0.9rem;
   font-weight: 500;
   white-space: nowrap;
+}
+
+/* ==============================
+   DynamicMap Styles
+============================== */
+.MuiSvgIcon-root {
+  color: var(--rooted-dark-green);
 }
