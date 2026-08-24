@@ -8,7 +8,7 @@ const Login = () => {
     const username = formData.get("username");
     const password = formData.get("password");
     attemptLogin({ username, password });
-    navigate("/");
+    navigate("/user", { replace: true });
   };
   return (
     <div>

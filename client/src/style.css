@@ -2237,3 +2237,182 @@ a {
 .MuiSvgIcon-root {
   color: var(--rooted-dark-green);
 }
+
+/* ==============================
+   Dashboard Calendar Overview
+============================== */
+
+.calendar-overview {
+  margin: 28px 0 32px;
+  display: grid;
+  grid-template-columns: minmax(320px, 430px) minmax(0, 1fr);
+  align-items: stretch;
+  gap: 28px;
+}
+
+.calendar-overview .calendar-wrapper {
+  width: 100%;
+  margin: 0;
+}
+
+.calendar-overview .react-calendar {
+  width: 100%;
+  height: 100%;
+}
+
+.calendar-overview .react-calendar__tile {
+  position: relative;
+}
+
+.calendar-event-marker {
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  width: 17px;
+  height: 17px;
+  display: inline-grid;
+  place-items: center;
+  color: #ffffff;
+  font-size: 10px;
+  font-weight: 800;
+  line-height: 1;
+  background: var(--rooted-orange);
+  border-radius: 50%;
+  box-shadow: 0 1px 3px rgba(60, 53, 70, 0.22);
+}
+
+.react-calendar__tile--active .calendar-event-marker {
+  color: var(--rooted-plum);
+  background: #fff7ea;
+}
+
+.upcoming-events-panel {
+  min-width: 0;
+  padding: 24px;
+  background: #fffdf8;
+  border: 1px solid rgba(122, 166, 100, 0.35);
+  border-radius: 12px;
+  box-shadow: 0 5px 16px rgba(52, 71, 53, 0.1);
+}
+
+.upcoming-events-eyebrow {
+  color: var(--rooted-green);
+  font-size: 13px !important;
+  font-weight: 800 !important;
+  letter-spacing: 0.11em !important;
+}
+
+.upcoming-events-title {
+  margin: 4px 0 18px !important;
+  color: var(--rooted-plum);
+  font-size: 26px !important;
+  font-weight: 750 !important;
+}
+
+.upcoming-events-list {
+  max-height: 330px;
+  padding-right: 5px;
+  overflow-y: auto;
+}
+
+.upcoming-event-button.MuiButton-root {
+  width: 100%;
+  padding: 13px 15px;
+  justify-content: flex-start;
+  color: var(--rooted-plum);
+  text-align: left;
+  text-transform: none;
+  background: #ffffff;
+  border: 1px solid rgba(60, 53, 70, 0.12);
+  border-left: 5px solid transparent;
+  border-radius: 8px;
+  box-shadow: 0 2px 6px rgba(60, 53, 70, 0.07);
+  transition:
+    border-color 160ms ease,
+    background-color 160ms ease,
+    transform 160ms ease;
+}
+
+.upcoming-event-button.MuiButton-root:hover,
+.upcoming-event-button.MuiButton-root:focus-visible {
+  background: rgba(122, 166, 100, 0.1);
+  border-color: var(--rooted-green);
+  border-left-color: var(--rooted-orange);
+  transform: translateX(3px);
+}
+
+.upcoming-event-button.MuiButton-root.is-selected {
+  background: #fff7dc;
+  border-color: rgba(185, 111, 19, 0.38);
+  border-left-color: var(--rooted-orange);
+}
+
+.upcoming-event-copy {
+  min-width: 0;
+}
+
+.upcoming-event-date {
+  color: var(--rooted-green);
+  font-size: 12px !important;
+  font-weight: 800 !important;
+  letter-spacing: 0.04em !important;
+}
+
+.upcoming-event-name {
+  margin-top: 3px !important;
+  color: var(--rooted-plum);
+  font-size: 17px !important;
+  font-weight: 750 !important;
+  line-height: 1.25 !important;
+}
+
+.upcoming-event-location {
+  margin-top: 3px !important;
+  overflow: hidden;
+  color: rgba(60, 53, 70, 0.76);
+  font-size: 13px !important;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.upcoming-events-status,
+.upcoming-events-empty {
+  color: rgba(60, 53, 70, 0.78);
+}
+
+.selected-date {
+  scroll-margin-top: 100px;
+}
+
+@media (max-width: 900px) {
+  .calendar-overview {
+    grid-template-columns: 1fr;
+  }
+
+  .upcoming-events-list {
+    max-height: 360px;
+  }
+}
+
+@media (max-width: 600px) {
+  .calendar-overview {
+    margin-top: 22px;
+    gap: 18px;
+  }
+
+  .upcoming-events-panel {
+    padding: 18px;
+  }
+
+  .upcoming-events-title {
+    font-size: 22px !important;
+  }
+
+  .calendar-event-marker {
+    top: 2px;
+    right: 2px;
+    width: 15px;
+    height: 15px;
+    font-size: 9px;
+  }
+}

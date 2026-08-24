@@ -70,7 +70,7 @@ function RegisterPage() {
 
     try {
       await register(formData.username, formData.email, formData.password);
-      navigate("/login");
+      navigate("/user", { replace: true });
     } catch (error) {
       setError(error.message || "Unable to create your account.");
     } finally {
