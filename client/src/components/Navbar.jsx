@@ -1,6 +1,13 @@
-import { Link, useLocation, useNavigate } from "react-router";
-import { useAuth } from "../context/AuthContext";
 import { Avatar } from "@mui/material";
+import { Link, NavLink, useLocation, useNavigate } from "react-router";
+
+import { useAuth } from "../context/AuthContext";
+
+function getNavLinkClass({ isActive }) {
+  return isActive
+    ? "site-nav-link site-nav-link--active"
+    : "site-nav-link";
+}
 
 function Navbar() {
   const { user, logout } = useAuth();
@@ -16,29 +23,50 @@ function Navbar() {
 
   return (
     <nav className="site-nav" aria-label="Main navigation">
-      {!isLandingPage && <Link to="/">Home</Link>}
+      {!isLandingPage && (
+        <NavLink to="/" end className={getNavLinkClass}>
+          Home
+        </NavLink>
+      )}
 
       {user ? (
         <div className="navbar-user">
           <Link to="/user" className="navbar-profile-link">
             <Avatar
-              src={user?.avatar_url || ""}
-              alt={user?.username || "Profile"}
+              src={user.avatar_url || ""}
+              alt={user.username || "Profile"}
               className="navbar-avatar"
             />
-            <span className="navbar-username">{user?.username}</span>
+
+            <span className="navbar-username">{user.username}</span>
           </Link>
-          <button type="button" className="navbar-login" onClick={handleLogout}>
+
+          <button
+            type="button"
+            className="navbar-login"
+            onClick={handleLogout}
+          >
             Log out
           </button>
         </div>
       ) : (
-        <Link to="/login" className="navbar-login">
+        <NavLink
+          to="/login"
+          className={({ isActive }) =>
+            `navbar-login ${getNavLinkClass({ isActive })}`
+          }
+        >
           Log in
-        </Link>
+        </NavLink>
       )}
-      <Link to="/discover">Discover</Link>
-      <Link to="/connect">Connect</Link>
+
+      <NavLink to="/discover" className={getNavLinkClass}>
+        Discover
+      </NavLink>
+
+      <NavLink to="/connect" className={getNavLinkClass}>
+        Connect
+      </NavLink>
     </nav>
   );
 }

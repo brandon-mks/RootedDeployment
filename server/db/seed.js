@@ -20,7 +20,7 @@ const seed = async () => {
     DROP TABLE IF EXISTS users CASCADE;
 
     CREATE TABLE businesses (
-      id UUID NOT NULL,
+      id UUID UNIQUE NOT NULL,
       business_id VARCHAR(100) PRIMARY KEY,
       business_name VARCHAR(100) NOT NULL,
       address VARCHAR(500),
@@ -32,7 +32,7 @@ const seed = async () => {
       types VARCHAR(150)[] NOT NULL DEFAULT '{}',
       primary_type VARCHAR(150)
     );
-  
+
     CREATE TABLE users (
       id UUID PRIMARY KEY,
       username VARCHAR(50) UNIQUE NOT NULL,
@@ -52,11 +52,11 @@ const seed = async () => {
       start_time TIME,
       end_time TIME
     );
-    
+
     CREATE TABLE favorite_businesses (
      id UUID PRIMARY KEY,
      user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
-     business_id UUID NOT NULL REFERENCES businesses(id) ON DELETE CASCADE, 
+     business_id UUID NOT NULL REFERENCES businesses(id) ON DELETE CASCADE,
 
      UNIQUE(user_id, business_id)
     );
@@ -73,7 +73,7 @@ const seed = async () => {
       id UUID PRIMARY KEY,
       user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
       business_id UUID NOT NULL REFERENCES businesses(id) ON DELETE CASCADE,
-      
+
       UNIQUE(user_id, business_id)
     );
 
@@ -81,7 +81,7 @@ const seed = async () => {
       id UUID PRIMARY KEY,
       user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
       event_id UUID NOT NULL REFERENCES events(id) ON DELETE CASCADE,
-      
+
       UNIQUE(user_id, event_id)
     );
   `;

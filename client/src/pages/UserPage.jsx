@@ -24,7 +24,7 @@ import {
 import { useAuth } from "../context/AuthContext.jsx";
 
 function UserPage() {
-  const { user, logout } = useAuth();
+  const { user } = useAuth();
   const navigate = useNavigate();
 
   const [activeTab, setActiveTab] = useState(0);
@@ -56,11 +56,6 @@ function UserPage() {
   });
 
   const [eventMessage, setEventMessage] = useState("");
-
-  const handleLogout = async () => {
-    await logout();
-    navigate("/");
-  };
 
   const handleEventChange = (event) => {
     const { name, value } = event.target;
@@ -158,14 +153,6 @@ function UserPage() {
               special.
             </Typography>
           </Box>
-
-          <Button
-            variant="outlined"
-            className="rooted-outline-button"
-            onClick={handleLogout}
-          >
-            Log out
-          </Button>
         </section>
 
         {/* Activity badges */}

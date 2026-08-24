@@ -17,14 +17,9 @@ import FavoriteRoundedIcon from "@mui/icons-material/FavoriteRounded";
 
 import { MapCard } from "./MapCard.jsx";
 
-function DetailsDialog({
-  place,
-  places = [],
-  onPlaceChange,
-  onClose,
-}) {
+function DetailsDialog({ place, places = [], onPlaceChange, onClose }) {
   // Temporary visual state until the favorites POST request is connected.
-  const [favoritePlaceIds, setFavoritePlaceIds] = useState(() => new Set());
+  const [favoriteItemIds, setFavoriteItemIds] = useState(() => new Set());
 
   const isOpen = Boolean(place);
 
@@ -32,19 +27,35 @@ function DetailsDialog({
     return null;
   }
 
-  const categoryLabel = place.category
-    ? place.category.replaceAll("_", " ")
-    : "Place";
+  // Businesses use name/category while events use title/kind.
+  const itemName = place.name ?? place.title ?? "Details";
+  const categoryValue = place.category ?? place.kind;
+
+  const categoryLabel = categoryValue
+    ? categoryValue.replaceAll("_", " ")
+    : "Details";
+
+  const eventDate = place.eventDate
+    ? new Date(`${place.eventDate}T12:00:00`)
+    : null;
+
+  const eventDateLabel =
+    eventDate && !Number.isNaN(eventDate.getTime())
+      ? new Intl.DateTimeFormat(undefined, {
+          dateStyle: "long",
+        }).format(eventDate)
+      : null;
+
+  const eventTimeLabel = [place.startTime, place.endTime]
+    .filter(Boolean)
+    .join(" – ");
 
   /*
-   * The backend currently passes Google Places-style coordinates through
-   * unchanged. Normalize either supported coordinate shape for MapCard.
+   * Normalize either supported coordinate shape for MapCard:
+   * { lat, lng } or { latitude, longitude }.
    */
-  const latitude =
-    place.location?.lat ?? place.location?.latitude;
-
-  const longitude =
-    place.location?.lng ?? place.location?.longitude;
+  const latitude = place.location?.lat ?? place.location?.latitude;
+  const longitude = place.location?.lng ?? place.location?.longitude;
 
   const hasCoordinates =
     latitude != null &&
@@ -83,17 +94,14 @@ function DetailsDialog({
 
   const currentPosition = currentIndex >= 0 ? currentIndex + 1 : 1;
   const carouselTotal = Math.max(places.length, 1);
-
-  const isFavorite = favoritePlaceIds.has(place.id);
+  const isFavorite = favoriteItemIds.has(place.id);
 
   const handlePrevious = () => {
     if (!canNavigate) {
       return;
     }
 
-    const previousIndex =
-      (currentIndex - 1 + places.length) % places.length;
-
+    const previousIndex = (currentIndex - 1 + places.length) % places.length;
     onPlaceChange(places[previousIndex]);
   };
 
@@ -103,12 +111,11 @@ function DetailsDialog({
     }
 
     const nextIndex = (currentIndex + 1) % places.length;
-
     onPlaceChange(places[nextIndex]);
   };
 
   const handleFavorite = () => {
-    setFavoritePlaceIds((currentFavorites) => {
+    setFavoriteItemIds((currentFavorites) => {
       const nextFavorites = new Set(currentFavorites);
 
       if (nextFavorites.has(place.id)) {
@@ -137,23 +144,14 @@ function DetailsDialog({
         },
       }}
     >
-      <DialogTitle
-        id="details-dialog-title"
-        className="details-dialog-title"
-      >
+      <DialogTitle id="details-dialog-title" className="details-dialog-title">
         <Box className="details-dialog-title-copy">
-          <Typography
-            component="p"
-            className="details-dialog-category"
-          >
+          <Typography component="p" className="details-dialog-category">
             {categoryLabel}
           </Typography>
 
-          <Typography
-            component="h2"
-            className="details-dialog-name"
-          >
-            {place.name}
+          <Typography component="h2" className="details-dialog-name">
+            {itemName}
           </Typography>
         </Box>
 
@@ -162,23 +160,19 @@ function DetailsDialog({
           className="details-dialog-favorite"
           aria-label={
             isFavorite
-              ? `Remove ${place.name} from favorites`
-              : `Add ${place.name} to favorites`
+              ? `Remove ${itemName} from favorites`
+              : `Add ${itemName} to favorites`
           }
           aria-pressed={isFavorite}
           onClick={handleFavorite}
         >
-          {isFavorite ? (
-            <FavoriteRoundedIcon />
-          ) : (
-            <FavoriteBorderRoundedIcon />
-          )}
+          {isFavorite ? <FavoriteRoundedIcon /> : <FavoriteBorderRoundedIcon />}
         </IconButton>
 
         <IconButton
           type="button"
           className="details-dialog-close"
-          aria-label="Close place details"
+          aria-label="Close details"
           onClick={onClose}
         >
           ×
@@ -188,15 +182,60 @@ function DetailsDialog({
       <DialogContent dividers className="details-dialog-content">
         <Box className="details-dialog-layout">
           <Stack spacing={3} className="details-dialog-information">
+            {place.description && (
+              <Box className="details-dialog-field">
+                <Typography variant="subtitle2" component="h3">
+                  About
+                </Typography>
+
+                <Typography variant="body1">
+                  {place.description}
+                </Typography>
+              </Box>
+            )}
+
+            {eventDateLabel && (
+              <Box className="details-dialog-field">
+                <Typography variant="subtitle2" component="h3">
+                  Date
+                </Typography>
+
+                <Typography variant="body1">
+                  {eventDateLabel}
+                </Typography>
+              </Box>
+            )}
+
+            {eventTimeLabel && (
+              <Box className="details-dialog-field">
+                <Typography variant="subtitle2" component="h3">
+                  Time
+                </Typography>
+
+                <Typography variant="body1">
+                  {eventTimeLabel}
+                  {place.timeZone ? ` · ${place.timeZone}` : ""}
+                </Typography>
+              </Box>
+            )}
+
+            {place.venue && (
+              <Box className="details-dialog-field">
+                <Typography variant="subtitle2" component="h3">
+                  Venue
+                </Typography>
+
+                <Typography variant="body1">{place.venue}</Typography>
+              </Box>
+            )}
+
             {place.address && (
               <Box className="details-dialog-field">
                 <Typography variant="subtitle2" component="h3">
                   Address
                 </Typography>
 
-                <Typography variant="body1">
-                  {place.address}
-                </Typography>
+                <Typography variant="body1">{place.address}</Typography>
               </Box>
             )}
 
@@ -215,7 +254,7 @@ function DetailsDialog({
 
           <Box
             className="details-dialog-map-panel"
-            aria-label={`Map showing ${place.name}`}
+            aria-label={`Map showing ${itemName}`}
           >
             {mapPlace ? (
               <MapCard place={mapPlace} />
@@ -231,11 +270,11 @@ function DetailsDialog({
       <DialogActions className="details-dialog-actions">
         <Box
           className="details-dialog-carousel"
-          aria-label="Browse places in this category"
+          aria-label="Browse listings in this category"
         >
           <IconButton
             type="button"
-            aria-label="View previous place"
+            aria-label="View previous listing"
             onClick={handlePrevious}
             disabled={!canNavigate}
           >
@@ -248,7 +287,7 @@ function DetailsDialog({
 
           <IconButton
             type="button"
-            aria-label="View next place"
+            aria-label="View next listing"
             onClick={handleNext}
             disabled={!canNavigate}
           >
