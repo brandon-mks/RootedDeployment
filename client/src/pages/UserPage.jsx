@@ -6,6 +6,7 @@ import "react-calendar/dist/Calendar.css";
 import {
   Alert,
   Avatar,
+  Badge,
   Box,
   Button,
   Card,
@@ -37,6 +38,7 @@ import {
   addEventToCalendar,
   createEvent,
   getCalendarEvents,
+  getModerationEvents,
   removeEventFromCalendar,
 } from "../services/events.js";
 
@@ -129,14 +131,51 @@ function UserPage() {
   const { user, loading: authLoading, fetchMe } = useAuth();
   const [searchParams, setSearchParams] = useSearchParams();
 
-  const [activeTab, setActiveTab] = useState(() =>
+    const [activeTab, setActiveTab] = useState(() =>
     getInitialTab(searchParams.get("tab")),
   );
 
+  const [pendingReviewCount, setPendingReviewCount] = useState(0);
+
+  useEffect(() => {
+    if (user?.role !== "admin") {
+      return undefined;
+    }
+
+    let isCurrent = true;
+
+    getModerationEvents("pending")
+      .then((data) => {
+        if (!isCurrent) {
+          return;
+        }
+
+        setPendingReviewCount(
+          Array.isArray(data.events) ? data.events.length : 0,
+        );
+      })
+      .catch((error) => {
+        if (!isCurrent) {
+          return;
+        }
+
+        console.error(
+          "Unable to load the pending event count:",
+          error,
+        );
+      });
+
+    return () => {
+      isCurrent = false;
+    };
+  }, [user?.id, user?.role]);
+
   const [selectedDate, setSelectedDate] = useState(new Date());
+
   const [calendarActiveStartDate, setCalendarActiveStartDate] = useState(
     () => new Date(),
   );
+
   const selectedDateSectionRef = useRef(null);
 
   const [calendarEvents, setCalendarEvents] = useState([]);
@@ -1005,7 +1044,28 @@ function UserPage() {
             <Tab label="My Events" />
             <Tab label="Create Event" />
 
-            {user?.role === "admin" && <Tab label="Event Review" value={5} />}
+            {user?.role === "admin" && (
+                <Tab
+                  value={5}
+                  label={
+                    <Badge
+                      badgeContent={pendingReviewCount}
+                      max={99}
+                      sx={{
+                        "& .MuiBadge-badge": {
+                          top: -2,
+                          right: -16,
+                          color: "#ffffff",
+                          fontWeight: 800,
+                          backgroundColor: "var(--rooted-orange)",
+                        },
+                      }}
+                    >
+                      <Box component="span">Event Review</Box>
+                    </Badge>
+                  }
+                />
+              )}
           </Tabs>
 
           <Divider />

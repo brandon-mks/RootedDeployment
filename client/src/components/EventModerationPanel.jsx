@@ -53,7 +53,7 @@ function getEventTime(event) {
     .join(" – ");
 }
 
-function EventModerationPanel() {
+function EventModerationPanel({ onPendingCountChange }) {
   const [statusFilter, setStatusFilter] = useState("pending");
   const [events, setEvents] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -75,11 +75,15 @@ function EventModerationPanel() {
           return;
         }
 
-        setEvents(
-          Array.isArray(data.events)
-            ? data.events
-            : [],
-        );
+        const loadedEvents = Array.isArray(data.events)
+          ? data.events
+          : [];
+
+        setEvents(loadedEvents);
+
+        if (statusFilter === "pending") {
+          onPendingCountChange?.(loadedEvents.length);
+        }
       })
       .catch((error) => {
         if (!isCurrent) {
@@ -101,7 +105,7 @@ function EventModerationPanel() {
     return () => {
       isCurrent = false;
     };
-  }, [statusFilter]);
+  }, [statusFilter, onPendingCountChange]);
 
   const handleStatusFilterChange = (event) => {
     setStatusFilter(event.target.value);
@@ -154,11 +158,17 @@ function EventModerationPanel() {
     setReviewError("");
 
     try {
-      const data = await reviewEvent(
+       const data = await reviewEvent(
         reviewingEvent.id,
         reviewDecision,
         moderationNote.trim(),
       );
+
+      if (reviewingEvent.moderationStatus === "pending") {
+        onPendingCountChange?.((currentCount) =>
+          Math.max(0, currentCount - 1),
+        );
+      }
 
       setEvents((currentEvents) => {
         if (
