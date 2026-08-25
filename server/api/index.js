@@ -9,6 +9,7 @@ import businessesRouter from "./businesses.js";
 import favoritesRouter from "./favorites.js";
 import eventsRouter from "./events.js";
 import profileRouter from "./profile.js";
+import visitedRouter from "./visited.js";
 
 const router = express.Router();
 
@@ -18,6 +19,7 @@ router.use("/businesses", businessesRouter);
 router.use("/places", placesRouter);
 router.use("/chatbot", chatbotRouter);
 router.use("/favorites", favoritesRouter);
+router.use("/visited", visitedRouter);
 router.use("/events", eventsRouter);
 router.use("/profile", profileRouter);
 

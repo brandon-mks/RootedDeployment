@@ -14,7 +14,7 @@ import { IconButton, Tooltip } from "@mui/material";
 
 export const DynamicMap = () => {
   const { coords } = useMapContext();
-  const [markers, setMarkers] = useState([]);
+  const [ markers ] = useState([]);
 
   const map = useMap();
   console.log(coords);

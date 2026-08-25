@@ -150,4 +150,49 @@ usersRouter.get("/me", requireAuth, async (req, res, next) => {
   }
 });
 
+// PATCH /api/users/me  — updates the current user's profile
+usersRouter.patch("/me", requireAuth, async (req, res, next) => {
+  const { username, email, avatar_url } = req.body;
+
+  if (
+    username === undefined &&
+    email === undefined &&
+    avatar_url === undefined
+  ) {
+    return res.status(400).json({ error: "Nothing to update." });
+  }
+
+  try {
+    if (username || email) {
+      const conflict = await client.query(
+        `SELECT id FROM users WHERE (username = $1 OR email = $2) AND id != $3`,
+        [username || null, email || null, req.user.id],
+      );
+      if (conflict.rows.length > 0) {
+        return res
+          .status(409)
+          .json({ error: "Username or email already in use." });
+      }
+    }
+
+    const result = await client.query(
+      `UPDATE users
+       SET username = COALESCE($1, username),
+           email = COALESCE($2, email),
+           avatar_url = COALESCE($3, avatar_url)
+       WHERE id = $4
+       RETURNING id, username, email, avatar_url`,
+      [username || null, email || null, avatar_url ?? null, req.user.id],
+    );
+
+    if (result.rows.length === 0) {
+      return res.status(404).json({ error: "User not found." });
+    }
+
+    res.json({ user: result.rows[0] });
+  } catch (err) {
+    next(err);
+  }
+});
+
 export default usersRouter;

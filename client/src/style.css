@@ -329,9 +329,22 @@ a {
   border-radius: 2px;
 
   background-image:
-    radial-gradient(circle at 18% 24%, rgba(255, 255, 255, 0.2) 0 1px, transparent 1.5px),
-    radial-gradient(circle at 72% 68%, rgba(60, 53, 70, 0.06) 0 1px, transparent 1.5px),
-    linear-gradient(115deg, rgba(255, 255, 255, 0.12), transparent 35%, rgba(60, 53, 70, 0.035));
+    radial-gradient(
+      circle at 18% 24%,
+      rgba(255, 255, 255, 0.2) 0 1px,
+      transparent 1.5px
+    ),
+    radial-gradient(
+      circle at 72% 68%,
+      rgba(60, 53, 70, 0.06) 0 1px,
+      transparent 1.5px
+    ),
+    linear-gradient(
+      115deg,
+      rgba(255, 255, 255, 0.12),
+      transparent 35%,
+      rgba(60, 53, 70, 0.035)
+    );
 
   background-size:
     17px 17px,
@@ -1058,7 +1071,10 @@ a {
   border-width: 1.5px !important;
 }
 
-.support-dialog-paper .support-field .MuiOutlinedInput-root:hover .MuiOutlinedInput-notchedOutline {
+.support-dialog-paper
+  .support-field
+  .MuiOutlinedInput-root:hover
+  .MuiOutlinedInput-notchedOutline {
   border-color: var(--rooted-dark-green) !important;
 }
 
@@ -1147,6 +1163,28 @@ a {
   width: auto;
   height: 22px;
   object-fit: contain;
+}
+
+.details-dialog-visited {
+  color: var(--rooted-plum) !important;
+}
+
+.details-dialog-visited[aria-pressed="true"] {
+  color: var(--rooted-green) !important;
+}
+
+.details-dialog-visited:hover {
+  background-color: rgba(122, 166, 100, 0.14) !important;
+}
+
+.details-dialog-visited.Mui-disabled {
+  color: rgba(52, 71, 53, 0.35) !important;
+}
+
+.details-dialog-visited {
+  position: absolute !important;
+  top: 22px;
+  right: 136px;
 }
 
 /* ==============================
@@ -1479,7 +1517,11 @@ a {
   align-items: center;
   justify-content: space-between;
 
-  background: linear-gradient(120deg, var(--rooted-green) 0%, var(--rooted-plum) 130%);
+  background: linear-gradient(
+    120deg,
+    var(--rooted-green) 0%,
+    var(--rooted-plum) 130%
+  );
   color: #fff;
   font-weight: 700;
   letter-spacing: 0.3px;
@@ -1559,7 +1601,11 @@ a {
   overflow-y: auto;
 
   background-color: var(--rooted-page-background);
-  background-image: radial-gradient(circle at 100% 0%, rgba(47, 107, 58, 0.05) 0%, transparent 40%);
+  background-image: radial-gradient(
+    circle at 100% 0%,
+    rgba(47, 107, 58, 0.05) 0%,
+    transparent 40%
+  );
 }
 
 .chat-loading-indicator {
@@ -1738,7 +1784,9 @@ a {
   margin-bottom: 16px !important;
 }
 
-.auth-input-field .MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline {
+.auth-input-field
+  .MuiOutlinedInput-root.Mui-focused
+  .MuiOutlinedInput-notchedOutline {
   border-color: var(--rooted-green) !important;
 }
 
@@ -1804,10 +1852,18 @@ a {
 
 .user-header {
   display: flex;
+  flex-direction: column;
+  margin-bottom: 44px;
+  padding-bottom: 36px;
+  border-bottom: 1px solid rgba(185, 111, 19, 0.16);
+}
+
+.user-header-top {
+  display: flex;
   justify-content: space-between;
   align-items: flex-start;
-  gap: 32px;
-  margin-bottom: 36px;
+  gap: 16px;
+  width: 100%;
 }
 
 .user-eyebrow,
@@ -1837,6 +1893,18 @@ a {
 }
 
 /* ==============================
+   Shared surface card
+   (activity cards, favorite cards)
+============================== */
+
+.surface-card {
+  background: #ffffff !important;
+  border: 1px solid rgba(122, 166, 100, 0.3);
+  border-radius: 14px !important;
+  box-shadow: none !important;
+}
+
+/* ==============================
    User Activity
 ============================== */
 
@@ -1844,7 +1912,7 @@ a {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   gap: 16px;
-  margin-bottom: 28px;
+  margin-bottom: 36px;
 }
 
 .activity-card {
@@ -1886,6 +1954,7 @@ a {
 
 .rooted-tabs .MuiTab-root,
 .favorite-tabs .MuiTab-root {
+  min-height: 52px;
   color: var(--rooted-plum);
   font-family: "Bahnschrift", "Arial Narrow", Arial, sans-serif;
   font-weight: 600;
@@ -1907,11 +1976,29 @@ a {
 }
 
 .section-title {
-  margin: 0 0 20px !important;
+  margin: 0 0 6px !important;
 
   color: var(--rooted-plum);
   font-size: 30px !important;
   font-weight: 700 !important;
+}
+
+.section-subtitle {
+  margin: 0 0 28px !important;
+
+  color: #5c5861;
+  font-size: 15px !important;
+  line-height: 1.5 !important;
+}
+
+.subsection-title {
+  margin: 0 !important;
+
+  color: var(--rooted-dark-green);
+  font-size: 15px !important;
+  font-weight: 700 !important;
+  letter-spacing: 0.6px;
+  text-transform: uppercase;
 }
 
 .favorite-tabs {
@@ -1919,8 +2006,32 @@ a {
 }
 
 /* ==============================
+   Settings Icon
+============================== */
+
+.settings-icon-button {
+  color: var(--rooted-plum) !important;
+  border: 1px solid rgba(122, 166, 100, 0.3);
+  border-radius: 10px !important;
+  transition:
+    color 0.15s ease,
+    border-color 0.15s ease,
+    background 0.15s ease;
+}
+
+.settings-icon-button:hover {
+  color: var(--rooted-orange) !important;
+  border-color: var(--rooted-orange);
+  background: rgba(242, 168, 64, 0.08) !important;
+}
+
+/* ==============================
    Favorites
 ============================== */
+
+.favorite-section-group + .favorite-section-group {
+  margin-top: 40px;
+}
 
 .favorite-grid {
   display: grid;
@@ -1929,10 +2040,11 @@ a {
 }
 
 .favorite-card {
-  background: #ffffff !important;
-  border: 1px solid rgba(122, 166, 100, 0.3);
   border-radius: 12px !important;
-  box-shadow: none !important;
+}
+
+.favorite-card .MuiCardContent-root {
+  padding: 20px;
 }
 
 .favorite-card h3 {
@@ -2091,10 +2203,10 @@ a {
 }
 
 /* ==============================
-   Create Event
+   Forms (Create Event + settings)
 ============================== */
 
-.event-form {
+.rooted-form {
   display: flex;
   flex-direction: column;
   gap: 20px;
@@ -2103,49 +2215,131 @@ a {
   margin-top: 28px;
 }
 
-.event-form .MuiTextField-root {
+.rooted-form .MuiTextField-root {
   background: #ffffff;
 }
 
-.event-form .MuiOutlinedInput-root:hover .MuiOutlinedInput-notchedOutline {
+.rooted-form .MuiOutlinedInput-root:hover .MuiOutlinedInput-notchedOutline {
   border-color: var(--rooted-green);
 }
 
-.event-form .MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline {
+.rooted-form
+  .MuiOutlinedInput-root.Mui-focused
+  .MuiOutlinedInput-notchedOutline {
   border-color: var(--rooted-green);
   border-width: 2px;
 }
 
-.event-form .MuiInputLabel-root.Mui-focused {
+.rooted-form .MuiInputLabel-root.Mui-focused {
   color: var(--rooted-green);
 }
 
-.event-alert {
+.event-alert,
+.settings-alert {
   max-width: 800px;
-  margin-top: 20px;
+  margin-bottom: 20px;
 }
 
 /* ==============================
-   User Footer
+   Settings Modal
 ============================== */
 
-.user-footer {
-  margin-top: 40px;
-  padding: 40px 0;
+.settings-dialog .MuiDialog-paper {
+  border-radius: 16px;
+  background: var(--rooted-header-background);
+}
 
+.settings-dialog-title {
+  display: flex !important;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 16px;
+
+  padding: 28px 28px 20px !important;
+}
+
+.settings-dialog-heading {
+  margin: 0 !important;
+
+  color: var(--rooted-plum);
+  font-size: 26px !important;
+  font-weight: 700 !important;
+}
+
+.settings-close-button {
+  color: var(--rooted-plum) !important;
+  margin-top: -4px !important;
+}
+
+.settings-close-button:hover {
+  color: var(--rooted-orange) !important;
+}
+
+.settings-dialog-content {
+  padding: 8px 28px 28px !important;
+  border-color: rgba(185, 111, 19, 0.2) !important;
+}
+
+.settings-dialog-content .rooted-form {
+  max-width: none;
+}
+
+.settings-row {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  gap: 24px;
+  gap: 20px;
 
+  padding: 14px 0;
+  border-bottom: 1px solid rgba(122, 166, 100, 0.18);
+}
+
+.settings-row:last-of-type {
+  border-bottom: none;
+  padding-bottom: 0;
+}
+
+.settings-row-text {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.settings-row-label {
+  color: var(--rooted-plum);
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.settings-row-description {
+  color: #8a8590;
+  font-size: 13px;
+}
+
+.settings-dialog-content .MuiSwitch-root .MuiSwitch-switchBase.Mui-checked {
+  color: var(--rooted-green) !important;
+}
+
+.settings-dialog-content
+  .MuiSwitch-root
+  .MuiSwitch-switchBase.Mui-checked
+  + .MuiSwitch-track {
+  background-color: var(--rooted-green) !important;
+  opacity: 0.5;
+}
+
+.settings-dialog-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+
+  padding: 20px 28px;
   border-top: 1px solid rgba(185, 111, 19, 0.2);
 }
 
-.user-footer h2 {
-  margin: 0;
-
-  color: var(--rooted-plum);
-  font-size: 28px;
+.settings-dialog-actions .rooted-button,
+.settings-dialog-actions .rooted-outline-button {
+  margin-top: 0 !important;
 }
 
 /* ==============================
@@ -2153,10 +2347,6 @@ a {
 ============================== */
 
 @media (max-width: 800px) {
-  .user-header {
-    flex-direction: column;
-  }
-
   .activity-grid,
   .favorite-grid,
   .reviews-grid {
@@ -2178,6 +2368,15 @@ a {
     padding: 36px 16px 60px;
   }
 
+  .user-header {
+    padding-bottom: 24px;
+    margin-bottom: 32px;
+  }
+
+  .user-header-top {
+    align-items: center;
+  }
+
   .activity-grid {
     gap: 10px;
   }
@@ -2197,6 +2396,17 @@ a {
 
   .calendar-wrapper .react-calendar {
     width: 100%;
+  }
+
+  .settings-dialog-title,
+  .settings-dialog-content,
+  .settings-dialog-actions {
+    padding-left: 18px !important;
+    padding-right: 18px !important;
+  }
+
+  .settings-row {
+    align-items: flex-start;
   }
 }
 
@@ -2414,5 +2624,121 @@ a {
     width: 15px;
     height: 15px;
     font-size: 9px;
+  }
+}
+
+/* ==============================
+   User Dashboard Integration
+============================== */
+
+.user-page .activity-card .MuiCardActionArea-root {
+  min-height: 100%;
+  border-radius: inherit;
+}
+
+.user-page .favorite-grid {
+  align-items: stretch;
+}
+
+.user-page .favorite-card {
+  background: #ffffff !important;
+  border: 1px solid rgba(122, 166, 100, 0.3);
+  border-radius: 12px !important;
+  box-shadow: 0 3px 10px rgba(52, 71, 53, 0.1) !important;
+}
+
+.user-page .favorite-card .MuiCardContent-root {
+  height: 100%;
+  padding: 24px;
+}
+
+.user-page .remove-button.MuiButton-root {
+  margin-top: 20px !important;
+  padding: 7px 13px !important;
+
+  align-self: flex-start;
+
+  color: var(--rooted-plum) !important;
+  font-size: 13px !important;
+  font-weight: 700 !important;
+  text-transform: none !important;
+
+  background: #fffaf8 !important;
+  border: 1px solid rgba(201, 120, 104, 0.72);
+  border-radius: 7px;
+
+  transition:
+    color 150ms ease,
+    background-color 150ms ease,
+    border-color 150ms ease,
+    transform 150ms ease;
+}
+
+.user-page .remove-button.MuiButton-root:hover {
+  color: var(--rooted-plum) !important;
+  background: #f7e7e3 !important;
+  border-color: #c97868;
+  transform: translateY(-1px);
+}
+
+.user-page .remove-button.MuiButton-root:focus-visible {
+  outline: 3px solid rgba(201, 120, 104, 0.28);
+  outline-offset: 2px;
+}
+
+.user-page .remove-button.MuiButton-root.Mui-disabled {
+  color: rgba(60, 53, 70, 0.5) !important;
+  background: rgba(247, 231, 227, 0.55) !important;
+  border-color: rgba(201, 120, 104, 0.35);
+}
+
+.user-page .selected-date h3 {
+  margin: 0 !important;
+  color: var(--rooted-plum);
+  font-size: clamp(28px, 3.5vw, 44px) !important;
+  font-weight: 500 !important;
+  line-height: 1.15 !important;
+}
+
+.user-page .event-form {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+
+  width: 100%;
+  max-width: 800px;
+  margin-top: 28px;
+}
+
+.user-page .event-form .MuiTextField-root {
+  background: #ffffff;
+}
+
+.user-page
+  .event-form
+  .MuiOutlinedInput-root:hover
+  .MuiOutlinedInput-notchedOutline {
+  border-color: var(--rooted-green);
+}
+
+.user-page
+  .event-form
+  .MuiOutlinedInput-root.Mui-focused
+  .MuiOutlinedInput-notchedOutline {
+  border-color: var(--rooted-green);
+  border-width: 2px;
+}
+
+.user-page .event-form .MuiInputLabel-root.Mui-focused {
+  color: var(--rooted-green);
+}
+
+@media (max-width: 600px) {
+  .user-page .favorite-card .MuiCardContent-root {
+    padding: 20px;
+  }
+
+  .user-page .selected-date h3 {
+    font-size: clamp(26px, 9vw, 36px) !important;
   }
 }

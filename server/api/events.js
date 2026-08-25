@@ -59,9 +59,7 @@ function formatEvent(event) {
         }
       : null,
     imageUrl: event.image_url,
-    imageAlt: event.city
-      ? `${event.title} in ${event.city}`
-      : event.title,
+    imageAlt: event.city ? `${event.title} in ${event.city}` : event.title,
     isFree: event.is_free,
     isDemo: event.is_demo,
     createdAt: event.created_at,

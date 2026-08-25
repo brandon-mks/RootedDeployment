@@ -9,16 +9,24 @@ import {
   Box,
   Button,
   Card,
+  CardActionArea,
   CardContent,
   Chip,
+  Dialog,
+  DialogContent,
+  DialogTitle,
   Divider,
+  IconButton,
   Snackbar,
   Stack,
   Tab,
   Tabs,
   TextField,
+  Tooltip,
   Typography,
 } from "@mui/material";
+import CloseIcon from "@mui/icons-material/Close";
+import SettingsIcon from "@mui/icons-material/Settings";
 
 import Header from "../components/Header.jsx";
 import Footer from "../components/Footer.jsx";
@@ -28,8 +36,14 @@ import {
   getCalendarEvents,
   removeEventFromCalendar,
 } from "../services/events.js";
+import {
+  addFavorite as addFavoriteRequest,
+  getFavorites,
+  removeFavorite as removeFavoriteRequest,
+} from "../services/favorites.js";
+import { getVisited, toggleVisited } from "../services/visited.js";
 
-const dashboardTabs = ["favorites", "calendar", "create-event"];
+const dashboardTabs = ["favorites", "calendar", "visited", "create-event"];
 
 function getInitialTab(tabName) {
   const tabIndex = dashboardTabs.indexOf(tabName);
@@ -67,8 +81,40 @@ function getEventDate(event) {
   return Number.isNaN(date.getTime()) ? null : date;
 }
 
+async function getBusinessDetails(businessId) {
+  const response = await fetch(
+    `/api/businesses/${encodeURIComponent(businessId)}`,
+    {
+      credentials: "include",
+    },
+  );
+
+  if (!response.ok) {
+    return null;
+  }
+
+  const data = await response.json();
+  return data.business ?? null;
+}
+
+function formatFavoriteEventDate(value) {
+  if (!value) {
+    return "";
+  }
+
+  const date = new Date(`${value}T12:00:00`);
+
+  if (Number.isNaN(date.getTime())) {
+    return value;
+  }
+
+  return new Intl.DateTimeFormat(undefined, {
+    dateStyle: "medium",
+  }).format(date);
+}
+
 function UserPage() {
-  const { user, loading: authLoading } = useAuth();
+  const { user, loading: authLoading, fetchMe } = useAuth();
   const [searchParams, setSearchParams] = useSearchParams();
 
   const [activeTab, setActiveTab] = useState(() =>
@@ -88,13 +134,28 @@ function UserPage() {
   const [calendarRemovingId, setCalendarRemovingId] = useState(null);
   const [pendingCalendarRemoval, setPendingCalendarRemoval] = useState(null);
 
-  const [favorites, setFavorites] = useState({
+  const [favoriteData, setFavoriteData] = useState({
+    userId: null,
     businesses: [],
     events: [],
+    error: "",
   });
 
-  const [activity] = useState({
-    businessesSupported: 0,
+  const [visitedData, setVisitedData] = useState({
+    userId: null,
+    businesses: [],
+    error: "",
+  });
+
+  const [favoriteRemovingKey, setFavoriteRemovingKey] = useState(null);
+  const [favoriteNotice, setFavoriteNotice] = useState({
+    message: "",
+    removal: null,
+  });
+  const [visitedRemovingId, setVisitedRemovingId] = useState(null);
+  const [visitedNotice, setVisitedNotice] = useState({
+    message: "",
+    removal: null,
   });
 
   const [eventForm, setEventForm] = useState({
@@ -108,14 +169,39 @@ function UserPage() {
 
   const [eventMessage, setEventMessage] = useState("");
 
-  const calendarUserId = user?.id ?? user?.username ?? null;
+  const [settingsOpen, setSettingsOpen] = useState(false);
+  const [settingsForm, setSettingsForm] = useState({
+    username: "",
+    email: "",
+    avatarUrl: "",
+  });
+  const [settingsMessage, setSettingsMessage] = useState(null);
+  const [savingSettings, setSavingSettings] = useState(false);
+
+  const currentUserId = user?.id ?? user?.username ?? null;
+
+  const favorites =
+    favoriteData.userId === currentUserId
+      ? favoriteData
+      : { businesses: [], events: [], error: "" };
+
+  const visitedBusinesses =
+    visitedData.userId === currentUserId ? visitedData.businesses : [];
+
+  const favoritesLoading =
+    authLoading ||
+    Boolean(currentUserId && favoriteData.userId !== currentUserId);
+
+  const visitedLoading =
+    authLoading ||
+    Boolean(currentUserId && visitedData.userId !== currentUserId);
 
   const displayName = user?.username
     ? `${user.username.charAt(0).toUpperCase()}${user.username.slice(1)}`
     : "there";
 
   useEffect(() => {
-    if (!calendarUserId) {
+    if (!currentUserId) {
       return undefined;
     }
 
@@ -132,7 +218,7 @@ function UserPage() {
 
         setCalendarError("");
         setCalendarEvents(events);
-        setCalendarLoadedForUserId(calendarUserId);
+        setCalendarLoadedForUserId(currentUserId);
 
         if (events[0]?.eventDate) {
           const firstEventDate = getEventDate(events[0]);
@@ -154,7 +240,7 @@ function UserPage() {
         }
 
         setCalendarEvents([]);
-        setCalendarLoadedForUserId(calendarUserId);
+        setCalendarLoadedForUserId(currentUserId);
         setCalendarError(
           error instanceof Error
             ? error.message
@@ -168,12 +254,107 @@ function UserPage() {
     return () => {
       isCurrent = false;
     };
-  }, [calendarUserId]);
+  }, [currentUserId]);
+
+  useEffect(() => {
+    if (!currentUserId) {
+      return undefined;
+    }
+
+    let isCurrent = true;
+
+    async function loadFavorites() {
+      try {
+        const data = await getFavorites();
+
+        if (!isCurrent) {
+          return;
+        }
+
+        setFavoriteData({
+          userId: currentUserId,
+          businesses: Array.isArray(data.businesses) ? data.businesses : [],
+          events: Array.isArray(data.events) ? data.events : [],
+          error: "",
+        });
+      } catch (error) {
+        if (!isCurrent) {
+          return;
+        }
+
+        setFavoriteData({
+          userId: currentUserId,
+          businesses: [],
+          events: [],
+          error:
+            error instanceof Error
+              ? error.message
+              : "Unable to load your favorites.",
+        });
+      }
+    }
+
+    loadFavorites();
+
+    return () => {
+      isCurrent = false;
+    };
+  }, [currentUserId]);
+
+  useEffect(() => {
+    if (!currentUserId) {
+      return undefined;
+    }
+
+    let isCurrent = true;
+
+    async function loadVisitedBusinesses() {
+      try {
+        const data = await getVisited();
+        const businessIds = Array.isArray(data.businesses)
+          ? data.businesses
+          : [];
+
+        const businessDetails = (
+          await Promise.all(businessIds.map(getBusinessDetails))
+        ).filter(Boolean);
+
+        if (!isCurrent) {
+          return;
+        }
+
+        setVisitedData({
+          userId: currentUserId,
+          businesses: businessDetails,
+          error: "",
+        });
+      } catch (error) {
+        if (!isCurrent) {
+          return;
+        }
+
+        setVisitedData({
+          userId: currentUserId,
+          businesses: [],
+          error:
+            error instanceof Error
+              ? error.message
+              : "Unable to load your visited businesses.",
+        });
+      }
+    }
+
+    loadVisitedBusinesses();
+
+    return () => {
+      isCurrent = false;
+    };
+  }, [currentUserId]);
 
   const showCalendarLoading =
     authLoading ||
     Boolean(
-      calendarUserId && calendarLoadedForUserId !== calendarUserId,
+      currentUserId && calendarLoadedForUserId !== currentUserId,
     );
 
   const selectedDateKey = getLocalDateKey(selectedDate);
@@ -385,19 +566,340 @@ function UserPage() {
     }
   };
 
-  const removeFavorite = async (type, id) => {
+  const handleRemoveFavorite = async (type, item) => {
+    const itemId =
+      type === "business" ? item.business_id ?? item.id : item.id;
+    const itemKey = `${type}:${itemId}`;
+    const collection = type === "business" ? "businesses" : "events";
+    const originalIndex = favorites[collection].findIndex(
+      (candidate) => candidate.id === item.id,
+    );
+    const itemName =
+      type === "business" ? item.business_name : item.title;
+
+    setFavoriteRemovingKey(itemKey);
+    setFavoriteNotice({
+      message: "",
+      removal: null,
+    });
+
     try {
-      await fetch(`/api/favorites/${type}/${id}`, {
-        method: "DELETE",
-        credentials: "include",
+      await removeFavoriteRequest(type, itemId);
+
+      setFavoriteData((previous) => {
+        if (previous.userId !== currentUserId) {
+          return previous;
+        }
+
+        return {
+          ...previous,
+          [collection]: previous[collection].filter(
+            (candidate) => candidate.id !== item.id,
+          ),
+          error: "",
+        };
       });
 
-      setFavorites((previous) => ({
-        ...previous,
-        [type]: previous[type].filter((item) => item.id !== id),
-      }));
+      setFavoriteNotice({
+        message: `${itemName || "Favorite"} removed from your favorites.`,
+        removal: {
+          type,
+          item,
+          itemId,
+          collection,
+          originalIndex,
+        },
+      });
     } catch (error) {
-      console.error("Unable to remove favorite:", error);
+      setFavoriteData((previous) => ({
+        ...previous,
+        error:
+          error instanceof Error
+            ? error.message
+            : "Unable to remove this favorite.",
+      }));
+    } finally {
+      setFavoriteRemovingKey(null);
+    }
+  };
+
+  const handleUndoFavoriteRemoval = async () => {
+    const removal = favoriteNotice.removal;
+
+    if (!removal) {
+      return;
+    }
+
+    const { type, item, itemId, collection, originalIndex } = removal;
+    const itemKey = `${type}:${itemId}`;
+
+    setFavoriteNotice({
+      message: "",
+      removal: null,
+    });
+    setFavoriteRemovingKey(itemKey);
+
+    try {
+      await addFavoriteRequest(type, itemId);
+
+      setFavoriteData((previous) => {
+        if (previous.userId !== currentUserId) {
+          return previous;
+        }
+
+        if (previous[collection].some((candidate) => candidate.id === item.id)) {
+          return {
+            ...previous,
+            error: "",
+          };
+        }
+
+        const restoredItems = [...previous[collection]];
+        const insertionIndex = Math.min(
+          Math.max(originalIndex, 0),
+          restoredItems.length,
+        );
+
+        restoredItems.splice(insertionIndex, 0, item);
+
+        return {
+          ...previous,
+          [collection]: restoredItems,
+          error: "",
+        };
+      });
+
+      setFavoriteNotice({
+        message: "Favorite restored.",
+        removal: null,
+      });
+    } catch (error) {
+      setFavoriteData((previous) => ({
+        ...previous,
+        error:
+          error instanceof Error
+            ? error.message
+            : "Unable to restore this favorite.",
+      }));
+    } finally {
+      setFavoriteRemovingKey(null);
+    }
+  };
+
+  const handleFavoriteSnackbarClose = (_event, reason) => {
+    if (reason === "clickaway") {
+      return;
+    }
+
+    setFavoriteNotice({
+      message: "",
+      removal: null,
+    });
+  };
+
+  const handleRemoveVisitedBusiness = async (business) => {
+    const businessId = business.business_id ?? business.id;
+    const originalIndex = visitedBusinesses.findIndex(
+      (candidate) =>
+        (candidate.business_id ?? candidate.id) === businessId,
+    );
+
+    setVisitedRemovingId(businessId);
+    setVisitedNotice({
+      message: "",
+      removal: null,
+    });
+
+    try {
+      const result = await toggleVisited(businessId, "business");
+
+      if (!result.visited) {
+        setVisitedData((previous) => {
+          if (previous.userId !== currentUserId) {
+            return previous;
+          }
+
+          return {
+            ...previous,
+            businesses: previous.businesses.filter(
+              (candidate) =>
+                (candidate.business_id ?? candidate.id) !== businessId,
+            ),
+            error: "",
+          };
+        });
+
+        setVisitedNotice({
+          message: `${
+            business.business_name || "Business"
+          } removed from your visited places.`,
+          removal: {
+            business,
+            businessId,
+            originalIndex,
+          },
+        });
+      }
+    } catch (error) {
+      setVisitedData((previous) => ({
+        ...previous,
+        error:
+          error instanceof Error
+            ? error.message
+            : "Unable to update this visited business.",
+      }));
+    } finally {
+      setVisitedRemovingId(null);
+    }
+  };
+
+  const handleUndoVisitedRemoval = async () => {
+    const removal = visitedNotice.removal;
+
+    if (!removal) {
+      return;
+    }
+
+    const { business, businessId, originalIndex } = removal;
+
+    setVisitedNotice({
+      message: "",
+      removal: null,
+    });
+    setVisitedRemovingId(businessId);
+
+    try {
+      const result = await toggleVisited(businessId, "business");
+
+      if (!result.visited) {
+        throw new Error("Unable to restore this visited business.");
+      }
+
+      setVisitedData((previous) => {
+        if (previous.userId !== currentUserId) {
+          return previous;
+        }
+
+        if (
+          previous.businesses.some(
+            (candidate) =>
+              (candidate.business_id ?? candidate.id) === businessId,
+          )
+        ) {
+          return {
+            ...previous,
+            error: "",
+          };
+        }
+
+        const restoredBusinesses = [...previous.businesses];
+        const insertionIndex = Math.min(
+          Math.max(originalIndex, 0),
+          restoredBusinesses.length,
+        );
+
+        restoredBusinesses.splice(insertionIndex, 0, business);
+
+        return {
+          ...previous,
+          businesses: restoredBusinesses,
+          error: "",
+        };
+      });
+
+      setVisitedNotice({
+        message: "Visited business restored.",
+        removal: null,
+      });
+    } catch (error) {
+      setVisitedData((previous) => ({
+        ...previous,
+        error:
+          error instanceof Error
+            ? error.message
+            : "Unable to restore this visited business.",
+      }));
+    } finally {
+      setVisitedRemovingId(null);
+    }
+  };
+
+  const handleVisitedSnackbarClose = (_event, reason) => {
+    if (reason === "clickaway") {
+      return;
+    }
+
+    setVisitedNotice({
+      message: "",
+      removal: null,
+    });
+  };
+
+  const handleOpenSettings = () => {
+    setSettingsForm({
+      username: user?.username ?? "",
+      email: user?.email ?? "",
+      avatarUrl: user?.avatar_url ?? "",
+    });
+    setSettingsMessage(null);
+    setSettingsOpen(true);
+  };
+
+  const handleCloseSettings = () => {
+    if (!savingSettings) {
+      setSettingsOpen(false);
+    }
+  };
+
+  const handleSettingsChange = (event) => {
+    const { name, value } = event.target;
+
+    setSettingsForm((previous) => ({
+      ...previous,
+      [name]: value,
+    }));
+  };
+
+  const handleSaveSettings = async (event) => {
+    event.preventDefault();
+    setSettingsMessage(null);
+    setSavingSettings(true);
+
+    try {
+      const response = await fetch("/api/users/me", {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        credentials: "include",
+        body: JSON.stringify({
+          username: settingsForm.username.trim(),
+          email: settingsForm.email.trim(),
+          avatar_url: settingsForm.avatarUrl.trim(),
+        }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error ?? "Unable to save settings.");
+      }
+
+      await fetchMe();
+      setSettingsMessage({
+        severity: "success",
+        text: "Profile settings saved.",
+      });
+    } catch (error) {
+      setSettingsMessage({
+        severity: "error",
+        text:
+          error instanceof Error
+            ? error.message
+            : "Unable to save settings.",
+      });
+    } finally {
+      setSavingSettings(false);
     }
   };
 
@@ -414,7 +916,7 @@ function UserPage() {
 
       <main className="user-page">
         <section className="user-header">
-          <Box>
+          <Box className="user-header-top">
             <Avatar
               src={user?.avatar_url || ""}
               alt={user?.username || "Profile"}
@@ -423,56 +925,88 @@ function UserPage() {
               {user?.username?.charAt(0).toUpperCase()}
             </Avatar>
 
-            <Typography className="user-eyebrow">
-              YOUR ROOTED PROFILE
-            </Typography>
-
-            <Typography variant="h1" className="user-title">
-              Welcome back, {displayName}.
-            </Typography>
-
-            <Typography className="user-description">
-              Keep track of the local places and events that make your community
-              special.
-            </Typography>
+            <Tooltip title="Settings">
+              <IconButton
+                type="button"
+                aria-label="Open profile settings"
+                className="settings-icon-button"
+                onClick={handleOpenSettings}
+                disabled={!user || authLoading}
+              >
+                <SettingsIcon />
+              </IconButton>
+            </Tooltip>
           </Box>
+
+          <Typography className="user-eyebrow">
+            YOUR ROOTED PROFILE
+          </Typography>
+
+          <Typography variant="h1" className="user-title">
+            Welcome back, {displayName}.
+          </Typography>
+
+          <Typography className="user-description">
+            Keep track of the local places and events that make your community
+            special.
+          </Typography>
         </section>
 
         <section className="activity-grid">
           <Card className="activity-card">
-            <CardContent>
-              <Typography className="activity-number">
-                {activity.businessesSupported}
-              </Typography>
+            <CardActionArea
+              type="button"
+              onClick={() => handleTabChange(null, 2)}
+              aria-label="View visited businesses"
+            >
+              <CardContent>
+                <Typography className="activity-number">
+                  {visitedLoading ? "—" : visitedBusinesses.length}
+                </Typography>
 
-              <Typography className="activity-label">
-                Local businesses supported
-              </Typography>
-            </CardContent>
+                <Typography className="activity-label">
+                  Local businesses visited
+                </Typography>
+              </CardContent>
+            </CardActionArea>
           </Card>
 
           <Card className="activity-card">
-            <CardContent>
-              <Typography className="activity-number">
-                {calendarEvents.length}
-              </Typography>
+            <CardActionArea
+              type="button"
+              onClick={() => handleTabChange(null, 1)}
+              aria-label="View your calendar"
+            >
+              <CardContent>
+                <Typography className="activity-number">
+                  {showCalendarLoading ? "—" : calendarEvents.length}
+                </Typography>
 
-              <Typography className="activity-label">
-                Events on your calendar
-              </Typography>
-            </CardContent>
+                <Typography className="activity-label">
+                  Events on your calendar
+                </Typography>
+              </CardContent>
+            </CardActionArea>
           </Card>
 
           <Card className="activity-card">
-            <CardContent>
-              <Typography className="activity-number">
-                {favorites.businesses.length + favorites.events.length}
-              </Typography>
+            <CardActionArea
+              type="button"
+              onClick={() => handleTabChange(null, 0)}
+              aria-label="View your favorites"
+            >
+              <CardContent>
+                <Typography className="activity-number">
+                  {favoritesLoading
+                    ? "—"
+                    : favorites.businesses.length + favorites.events.length}
+                </Typography>
 
-              <Typography className="activity-label">
-                Favorites saved
-              </Typography>
-            </CardContent>
+                <Typography className="activity-label">
+                  Favorites saved
+                </Typography>
+              </CardContent>
+            </CardActionArea>
           </Card>
         </section>
 
@@ -486,6 +1020,7 @@ function UserPage() {
           >
             <Tab label="Favorites" />
             <Tab label="Calendar" />
+            <Tab label="Visited" />
             <Tab label="Create Event" />
           </Tabs>
 
@@ -502,6 +1037,13 @@ function UserPage() {
                   Your Favorites
                 </Typography>
 
+                {favoriteData.userId === currentUserId &&
+                  favoriteData.error && (
+                    <Alert severity="error" className="event-alert">
+                      {favoriteData.error}
+                    </Alert>
+                  )}
+
                 <Box className="favorite-section-group" sx={{ mb: 6 }}>
                   <Typography
                     variant="h3"
@@ -512,7 +1054,11 @@ function UserPage() {
                   </Typography>
 
                   <Box className="favorite-grid">
-                    {favorites.businesses.length === 0 ? (
+                    {favoritesLoading ? (
+                      <Box className="empty-state">
+                        <Typography>Loading saved businesses…</Typography>
+                      </Box>
+                    ) : favorites.businesses.length === 0 ? (
                       <Box className="empty-state">
                         <Typography variant="h4">
                           No saved businesses yet
@@ -547,12 +1093,24 @@ function UserPage() {
                             <Typography>&nbsp;</Typography>
 
                             <Button
+                              type="button"
                               onClick={() =>
-                                removeFavorite("businesses", business.id)
+                                handleRemoveFavorite("business", business)
+                              }
+                              disabled={
+                                favoriteRemovingKey ===
+                                `business:${
+                                  business.business_id ?? business.id
+                                }`
                               }
                               className="remove-button"
                             >
-                              Remove Favorite
+                              {favoriteRemovingKey ===
+                              `business:${
+                                business.business_id ?? business.id
+                              }`
+                                ? "Removing…"
+                                : "Remove Favorite"}
                             </Button>
                           </CardContent>
                         </Card>
@@ -571,7 +1129,11 @@ function UserPage() {
                   </Typography>
 
                   <Box className="favorite-grid">
-                    {favorites.events.length === 0 ? (
+                    {favoritesLoading ? (
+                      <Box className="empty-state">
+                        <Typography>Loading saved events…</Typography>
+                      </Box>
+                    ) : favorites.events.length === 0 ? (
                       <Box className="empty-state">
                         <Typography variant="h4">
                           No saved events yet
@@ -599,17 +1161,31 @@ function UserPage() {
 
                             <Typography variant="h3">{event.title}</Typography>
 
-                            <Typography>{event.location}</Typography>
+                            <Typography>
+                              {event.venue ?? event.location}
+                              {event.city ? `, ${event.city}` : ""}
+                            </Typography>
 
-                            <Typography>{event.event_date}</Typography>
+                            <Typography>
+                              {formatFavoriteEventDate(event.event_date)}
+                              {event.start_time
+                                ? ` · ${event.start_time}`
+                                : ""}
+                            </Typography>
 
                             <Button
+                              type="button"
                               onClick={() =>
-                                removeFavorite("events", event.id)
+                                handleRemoveFavorite("event", event)
+                              }
+                              disabled={
+                                favoriteRemovingKey === `event:${event.id}`
                               }
                               className="remove-button"
                             >
-                              Remove Favorite
+                              {favoriteRemovingKey === `event:${event.id}`
+                                ? "Removing…"
+                                : "Remove Favorite"}
                             </Button>
                           </CardContent>
                         </Card>
@@ -827,25 +1403,11 @@ function UserPage() {
 
                           <Button
                             type="button"
-                            variant="outlined"
-                            onClick={() => handleRemoveCalendarEvent(event.id)}
+                            onClick={() =>
+                              handleRemoveCalendarEvent(event.id)
+                            }
                             disabled={calendarRemovingId === event.id}
-                            sx={{
-                              marginTop: 2,
-                              alignSelf: "flex-start",
-                              color: "#984f45",
-                              backgroundColor: "#fff8f6",
-                              borderColor: "#c97868",
-                              borderWidth: "2px",
-                              fontWeight: 700,
-                              textTransform: "none",
-                              "&:hover": {
-                                color: "#ffffff",
-                                backgroundColor: "#984f45",
-                                borderColor: "#984f45",
-                                borderWidth: "2px",
-                              },
-                            }}
+                            className="remove-button"
                           >
                             {calendarRemovingId === event.id
                               ? "Removing…"
@@ -860,6 +1422,96 @@ function UserPage() {
             )}
 
             {activeTab === 2 && (
+              <>
+                <Typography className="section-eyebrow">
+                  YOUR LOCAL HISTORY
+                </Typography>
+
+                <Typography variant="h2" className="section-title">
+                  Visited Businesses
+                </Typography>
+
+                <Typography className="calendar-description">
+                  A record of the local places you’ve marked as visited.
+                </Typography>
+
+                {visitedData.userId === currentUserId && visitedData.error && (
+                  <Alert severity="error" className="event-alert">
+                    {visitedData.error}
+                  </Alert>
+                )}
+
+                {visitedLoading ? (
+                  <Box className="empty-state">
+                    <Typography>Loading visited businesses…</Typography>
+                  </Box>
+                ) : visitedBusinesses.length === 0 ? (
+                  <Box className="empty-state">
+                    <Typography variant="h4">
+                      No visited businesses yet
+                    </Typography>
+
+                    <Typography>
+                      Open a business in Discover and mark it as visited to
+                      build your local history.
+                    </Typography>
+
+                    <Button
+                      component={Link}
+                      to="/discover"
+                      variant="contained"
+                      className="rooted-button"
+                    >
+                      Explore Businesses
+                    </Button>
+                  </Box>
+                ) : (
+                  <Box className="favorite-grid">
+                    {visitedBusinesses.map((business) => {
+                      const businessId =
+                        business.business_id ?? business.id;
+
+                      return (
+                        <Card className="favorite-card" key={businessId}>
+                          <CardContent>
+                            <Chip label="Visited" className="rooted-chip" />
+
+                            <Typography variant="h3">
+                              {business.business_name}
+                            </Typography>
+
+                            {business.address && (
+                              <Typography>{business.address}</Typography>
+                            )}
+
+                            {business.rating != null && (
+                              <Typography>
+                                Rating: {business.rating} out of 5
+                              </Typography>
+                            )}
+
+                            <Button
+                              type="button"
+                              onClick={() =>
+                                handleRemoveVisitedBusiness(business)
+                              }
+                              disabled={visitedRemovingId === businessId}
+                              className="remove-button"
+                            >
+                              {visitedRemovingId === businessId
+                                ? "Removing…"
+                                : "Remove from Visited"}
+                            </Button>
+                          </CardContent>
+                        </Card>
+                      );
+                    })}
+                  </Box>
+                )}
+              </>
+            )}
+
+            {activeTab === 3 && (
               <>
                 <Typography className="section-eyebrow">
                   BRING PEOPLE TOGETHER
@@ -981,6 +1633,110 @@ function UserPage() {
         <section className="user-footer" />
       </main>
 
+      <Dialog
+        open={settingsOpen}
+        onClose={handleCloseSettings}
+        fullWidth
+        maxWidth="sm"
+        className="settings-dialog"
+      >
+        <DialogTitle className="settings-dialog-title">
+          <Box>
+            <Typography className="section-eyebrow">YOUR ACCOUNT</Typography>
+
+            <Typography variant="h2" className="settings-dialog-heading">
+              Profile Settings
+            </Typography>
+          </Box>
+
+          <IconButton
+            type="button"
+            aria-label="Close settings"
+            onClick={handleCloseSettings}
+            className="settings-close-button"
+            disabled={savingSettings}
+          >
+            <CloseIcon />
+          </IconButton>
+        </DialogTitle>
+
+        <DialogContent className="settings-dialog-content" dividers>
+          {settingsMessage && (
+            <Alert
+              severity={settingsMessage.severity}
+              className="settings-alert"
+            >
+              {settingsMessage.text}
+            </Alert>
+          )}
+
+          <Box
+            component="form"
+            id="settings-form"
+            onSubmit={handleSaveSettings}
+          >
+            <Typography variant="h3" className="subsection-title">
+              Edit Profile
+            </Typography>
+
+            <Stack spacing={2} sx={{ marginTop: 2 }}>
+              <TextField
+                label="Username"
+                name="username"
+                value={settingsForm.username}
+                onChange={handleSettingsChange}
+                required
+                fullWidth
+                autoComplete="username"
+              />
+
+              <TextField
+                label="Email"
+                name="email"
+                type="email"
+                value={settingsForm.email}
+                onChange={handleSettingsChange}
+                required
+                fullWidth
+                autoComplete="email"
+              />
+
+              <TextField
+                label="Avatar URL"
+                name="avatarUrl"
+                type="url"
+                value={settingsForm.avatarUrl}
+                onChange={handleSettingsChange}
+                fullWidth
+                helperText="Paste a direct image URL for your profile picture."
+              />
+            </Stack>
+          </Box>
+        </DialogContent>
+
+        <Box className="settings-dialog-actions">
+          <Button
+            type="button"
+            onClick={handleCloseSettings}
+            className="rooted-outline-button"
+            variant="outlined"
+            disabled={savingSettings}
+          >
+            Cancel
+          </Button>
+
+          <Button
+            type="submit"
+            form="settings-form"
+            variant="contained"
+            className="rooted-button"
+            disabled={savingSettings}
+          >
+            {savingSettings ? "Saving…" : "Save Settings"}
+          </Button>
+        </Box>
+      </Dialog>
+
       <Snackbar
         key={`${pendingCalendarRemoval?.id ?? "calendar"}-${calendarMessage}`}
         open={Boolean(calendarMessage)}
@@ -1033,6 +1789,136 @@ function UserPage() {
               : "var(--rooted-green)",
             borderLeft: "6px solid",
             borderLeftColor: pendingCalendarRemoval
+              ? "#c97868"
+              : "var(--rooted-green)",
+            borderRadius: "10px",
+            boxShadow: "0 6px 18px rgba(25, 20, 32, 0.22)",
+          },
+
+          "& .MuiSnackbarContent-message": {
+            fontSize: "15px",
+            fontWeight: 700,
+          },
+        }}
+      />
+
+      <Snackbar
+        key={`${favoriteNotice.removal?.itemId ?? "favorite"}-${
+          favoriteNotice.message
+        }`}
+        open={Boolean(favoriteNotice.message)}
+        message={favoriteNotice.message}
+        autoHideDuration={favoriteNotice.removal ? 6000 : 3500}
+        onClose={handleFavoriteSnackbarClose}
+        anchorOrigin={{
+          vertical: "bottom",
+          horizontal: "center",
+        }}
+        action={
+          favoriteNotice.removal ? (
+            <Button
+              type="button"
+              size="small"
+              onClick={handleUndoFavoriteRemoval}
+              sx={{
+                color: "#ffffff",
+                fontWeight: 800,
+                backgroundColor: "var(--rooted-plum)",
+                borderRadius: "6px",
+                paddingInline: 2,
+                "&:hover": {
+                  backgroundColor: "var(--rooted-dark-green)",
+                },
+              }}
+            >
+              Undo
+            </Button>
+          ) : null
+        }
+        sx={{
+          bottom: { xs: 20, sm: 28 },
+
+          "& .MuiSnackbarContent-root": {
+            minWidth: {
+              xs: "calc(100vw - 32px)",
+              sm: "440px",
+            },
+            padding: "10px 14px",
+            color: favoriteNotice.removal
+              ? "var(--rooted-plum)"
+              : "var(--rooted-dark-green)",
+            backgroundColor: favoriteNotice.removal ? "#f7e7e3" : "#e7efe2",
+            border: "1px solid",
+            borderColor: favoriteNotice.removal
+              ? "#c97868"
+              : "var(--rooted-green)",
+            borderLeft: "6px solid",
+            borderLeftColor: favoriteNotice.removal
+              ? "#c97868"
+              : "var(--rooted-green)",
+            borderRadius: "10px",
+            boxShadow: "0 6px 18px rgba(25, 20, 32, 0.22)",
+          },
+
+          "& .MuiSnackbarContent-message": {
+            fontSize: "15px",
+            fontWeight: 700,
+          },
+        }}
+      />
+
+      <Snackbar
+        key={`${visitedNotice.removal?.businessId ?? "visited"}-${
+          visitedNotice.message
+        }`}
+        open={Boolean(visitedNotice.message)}
+        message={visitedNotice.message}
+        autoHideDuration={visitedNotice.removal ? 6000 : 3500}
+        onClose={handleVisitedSnackbarClose}
+        anchorOrigin={{
+          vertical: "bottom",
+          horizontal: "center",
+        }}
+        action={
+          visitedNotice.removal ? (
+            <Button
+              type="button"
+              size="small"
+              onClick={handleUndoVisitedRemoval}
+              sx={{
+                color: "#ffffff",
+                fontWeight: 800,
+                backgroundColor: "var(--rooted-plum)",
+                borderRadius: "6px",
+                paddingInline: 2,
+                "&:hover": {
+                  backgroundColor: "var(--rooted-dark-green)",
+                },
+              }}
+            >
+              Undo
+            </Button>
+          ) : null
+        }
+        sx={{
+          bottom: { xs: 20, sm: 28 },
+
+          "& .MuiSnackbarContent-root": {
+            minWidth: {
+              xs: "calc(100vw - 32px)",
+              sm: "440px",
+            },
+            padding: "10px 14px",
+            color: visitedNotice.removal
+              ? "var(--rooted-plum)"
+              : "var(--rooted-dark-green)",
+            backgroundColor: visitedNotice.removal ? "#f7e7e3" : "#e7efe2",
+            border: "1px solid",
+            borderColor: visitedNotice.removal
+              ? "#c97868"
+              : "var(--rooted-green)",
+            borderLeft: "6px solid",
+            borderLeftColor: visitedNotice.removal
               ? "#c97868"
               : "var(--rooted-green)",
             borderRadius: "10px",

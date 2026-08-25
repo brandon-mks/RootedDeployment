@@ -1,7 +1,12 @@
 import { Avatar } from "@mui/material";
-import { Link, NavLink, useLocation, useNavigate } from "react-router";
+import {
+  Link,
+  NavLink,
+  useLocation,
+  useNavigate,
+} from "react-router";
 
-import { useAuth } from "../context/AuthContext";
+import { useAuth } from "../context/AuthContext.jsx";
 
 function getNavLinkClass({ isActive }) {
   return isActive
@@ -28,6 +33,14 @@ function Navbar() {
           Home
         </NavLink>
       )}
+
+      <NavLink to="/discover" className={getNavLinkClass}>
+        Discover
+      </NavLink>
+
+      <NavLink to="/connect" className={getNavLinkClass}>
+        Connect
+      </NavLink>
 
       {user ? (
         <div className="navbar-user">
@@ -59,14 +72,6 @@ function Navbar() {
           Log in
         </NavLink>
       )}
-
-      <NavLink to="/discover" className={getNavLinkClass}>
-        Discover
-      </NavLink>
-
-      <NavLink to="/connect" className={getNavLinkClass}>
-        Connect
-      </NavLink>
     </nav>
   );
 }

@@ -16,6 +16,7 @@ import ChevronRightRoundedIcon from "@mui/icons-material/ChevronRightRounded";
 import EventAvailableRoundedIcon from "@mui/icons-material/EventAvailableRounded";
 import FavoriteBorderRoundedIcon from "@mui/icons-material/FavoriteBorderRounded";
 import FavoriteRoundedIcon from "@mui/icons-material/FavoriteRounded";
+import CheckCircleRoundedIcon from "@mui/icons-material/CheckCircleRounded";
 import { useLocation, useNavigate } from "react-router";
 
 import { useAuth } from "../context/AuthContext.jsx";
@@ -23,6 +24,12 @@ import {
   addEventToCalendar,
   getCalendarEvents,
 } from "../services/events.js";
+import {
+  addFavorite,
+  getFavorites,
+  removeFavorite,
+} from "../services/favorites.js";
+import { getVisited, toggleVisited } from "../services/visited.js";
 import { MapCard } from "./MapCard.jsx";
 
 function DetailsDialog({ place, places = [], onPlaceChange, onClose }) {
@@ -32,23 +39,46 @@ function DetailsDialog({ place, places = [], onPlaceChange, onClose }) {
 
   const [authPromptAction, setAuthPromptAction] = useState(null);
 
-  // Temporary visual state until the favorites API is connected.
-  const [favoriteItemIds, setFavoriteItemIds] = useState(() => new Set());
+  const [favoriteItemIds, setFavoriteItemIds] = useState(
+    () => new Set(),
+  );
+  const [favoritesLoadedForUserId, setFavoritesLoadedForUserId] =
+    useState(null);
+  const [favoritePendingId, setFavoritePendingId] = useState(null);
+  const [favoriteFeedback, setFavoriteFeedback] = useState({
+    itemKey: null,
+    message: "",
+    isError: false,
+  });
 
-  const [calendarEventIds, setCalendarEventIds] = useState(() => new Set());
-  const [calendarLoadedForUserId, setCalendarLoadedForUserId] = useState(null);
+  const [visitedBusinessIds, setVisitedBusinessIds] = useState(
+    () => new Set(),
+  );
+  const [visitedLoadedForUserId, setVisitedLoadedForUserId] =
+    useState(null);
+  const [visitedPendingId, setVisitedPendingId] = useState(null);
+  const [visitedFeedback, setVisitedFeedback] = useState({
+    itemId: null,
+    message: "",
+    isError: false,
+  });
+
+  const [calendarEventIds, setCalendarEventIds] = useState(
+    () => new Set(),
+  );
+  const [calendarLoadedForUserId, setCalendarLoadedForUserId] =
+    useState(null);
   const [calendarPendingId, setCalendarPendingId] = useState(null);
-
   const [calendarFeedback, setCalendarFeedback] = useState({
     eventId: null,
     message: "",
     isError: false,
   });
 
-  const calendarUserId = user?.id ?? user?.username ?? null;
+  const currentUserId = user?.id ?? user?.username ?? null;
 
   useEffect(() => {
-    if (!calendarUserId) {
+    if (!currentUserId) {
       return undefined;
     }
 
@@ -63,13 +93,10 @@ function DetailsDialog({ place, places = [], onPlaceChange, onClose }) {
           return;
         }
 
-        setCalendarEventIds(
-          new Set(events.map((event) => event.id)),
-        );
-
-        setCalendarLoadedForUserId(calendarUserId);
+        setCalendarEventIds(new Set(events.map((event) => event.id)));
+        setCalendarLoadedForUserId(currentUserId);
       } catch {
-        // Calendar status should not prevent the details dialog from opening.
+        // Calendar status should not prevent the dialog from opening.
       }
     }
 
@@ -78,7 +105,108 @@ function DetailsDialog({ place, places = [], onPlaceChange, onClose }) {
     return () => {
       isCurrent = false;
     };
-  }, [calendarUserId]);
+  }, [currentUserId]);
+
+  useEffect(() => {
+    if (!currentUserId) {
+      return undefined;
+    }
+
+    let isCurrent = true;
+
+    async function loadFavoriteStatus() {
+      try {
+        const data = await getFavorites();
+
+        if (!isCurrent) {
+          return;
+        }
+
+        const businesses = Array.isArray(data.businesses)
+          ? data.businesses
+          : [];
+
+        const events = Array.isArray(data.events) ? data.events : [];
+
+        const businessKeys = businesses.map(
+          (business) =>
+            `business:${business.business_id ?? business.id}`,
+        );
+
+        const eventKeys = events.map(
+          (event) => `event:${event.id}`,
+        );
+
+        setFavoriteItemIds(
+          new Set([...businessKeys, ...eventKeys]),
+        );
+        setFavoritesLoadedForUserId(currentUserId);
+      } catch (error) {
+        if (!isCurrent) {
+          return;
+        }
+
+        setFavoriteFeedback({
+          itemKey: null,
+          message:
+            error instanceof Error
+              ? error.message
+              : "Unable to load your favorites.",
+          isError: true,
+        });
+      }
+    }
+
+    loadFavoriteStatus();
+
+    return () => {
+      isCurrent = false;
+    };
+  }, [currentUserId]);
+
+  useEffect(() => {
+    if (!currentUserId) {
+      return undefined;
+    }
+
+    let isCurrent = true;
+
+    async function loadVisitedStatus() {
+      try {
+        const data = await getVisited();
+
+        if (!isCurrent) {
+          return;
+        }
+
+        setVisitedBusinessIds(
+          new Set(
+            Array.isArray(data.businesses) ? data.businesses : [],
+          ),
+        );
+        setVisitedLoadedForUserId(currentUserId);
+      } catch (error) {
+        if (!isCurrent) {
+          return;
+        }
+
+        setVisitedFeedback({
+          itemId: null,
+          message:
+            error instanceof Error
+              ? error.message
+              : "Unable to load visited businesses.",
+          isError: true,
+        });
+      }
+    }
+
+    loadVisitedStatus();
+
+    return () => {
+      isCurrent = false;
+    };
+  }, [currentUserId]);
 
   const isOpen = Boolean(place);
 
@@ -88,15 +216,50 @@ function DetailsDialog({ place, places = [], onPlaceChange, onClose }) {
 
   const isEvent = Boolean(place.kind || place.eventDate);
 
+  const favoriteType = isEvent ? "event" : "business";
+  const favoriteIdentifier = isEvent
+    ? place.id
+    : place.business_id ?? place.id;
+  const favoriteKey = `${favoriteType}:${favoriteIdentifier}`;
+
+  const isFavorite =
+    Boolean(user) &&
+    favoritesLoadedForUserId === currentUserId &&
+    favoriteItemIds.has(favoriteKey);
+
+  const isFavoritePending = favoritePendingId === favoriteKey;
+
+  const visibleFavoriteFeedback =
+    favoriteFeedback.itemKey === null ||
+    favoriteFeedback.itemKey === favoriteKey
+      ? favoriteFeedback
+      : null;
+
+  const isVisited =
+    Boolean(user) &&
+    !isEvent &&
+    visitedLoadedForUserId === currentUserId &&
+    visitedBusinessIds.has(place.id);
+
+  const isVisitedPending = visitedPendingId === place.id;
+
+  const visibleVisitedFeedback =
+    visitedFeedback.itemId === null ||
+    visitedFeedback.itemId === place.id
+      ? visitedFeedback
+      : null;
+
   const isOnCalendar =
     Boolean(user) &&
-    calendarLoadedForUserId === calendarUserId &&
+    calendarLoadedForUserId === currentUserId &&
     calendarEventIds.has(place.id);
 
   const isCalendarPending = calendarPendingId === place.id;
 
   const visibleCalendarFeedback =
-    calendarFeedback.eventId === place.id ? calendarFeedback : null;
+    calendarFeedback.eventId === place.id
+      ? calendarFeedback
+      : null;
 
   let calendarButtonLabel = "Add to Calendar";
 
@@ -106,7 +269,6 @@ function DetailsDialog({ place, places = [], onPlaceChange, onClose }) {
     calendarButtonLabel = "Added to Calendar";
   }
 
-  // Businesses use name/category while events use title/kind.
   const itemName = place.name ?? place.title ?? "Details";
   const categoryValue = place.category ?? place.kind;
 
@@ -129,12 +291,10 @@ function DetailsDialog({ place, places = [], onPlaceChange, onClose }) {
     .filter(Boolean)
     .join(" – ");
 
-  /*
-   * Normalize either supported coordinate shape for MapCard:
-   * { lat, lng } or { latitude, longitude }.
-   */
-  const latitude = place.location?.lat ?? place.location?.latitude;
-  const longitude = place.location?.lng ?? place.location?.longitude;
+  const latitude =
+    place.location?.lat ?? place.location?.latitude;
+  const longitude =
+    place.location?.lng ?? place.location?.longitude;
 
   const hasCoordinates =
     latitude != null &&
@@ -173,7 +333,22 @@ function DetailsDialog({ place, places = [], onPlaceChange, onClose }) {
 
   const currentPosition = currentIndex >= 0 ? currentIndex + 1 : 1;
   const carouselTotal = Math.max(places.length, 1);
-  const isFavorite = favoriteItemIds.has(place.id);
+
+  const clearFavoriteFeedback = () => {
+    setFavoriteFeedback({
+      itemKey: null,
+      message: "",
+      isError: false,
+    });
+  };
+
+  const clearVisitedFeedback = () => {
+    setVisitedFeedback({
+      itemId: null,
+      message: "",
+      isError: false,
+    });
+  };
 
   const clearCalendarFeedback = () => {
     setCalendarFeedback({
@@ -183,9 +358,15 @@ function DetailsDialog({ place, places = [], onPlaceChange, onClose }) {
     });
   };
 
+  const clearDialogFeedback = () => {
+    clearFavoriteFeedback();
+    clearVisitedFeedback();
+    clearCalendarFeedback();
+  };
+
   const handleClose = () => {
     setAuthPromptAction(null);
-    clearCalendarFeedback();
+    clearDialogFeedback();
     onClose();
   };
 
@@ -210,9 +391,11 @@ function DetailsDialog({ place, places = [], onPlaceChange, onClose }) {
     }
 
     setAuthPromptAction(null);
-    clearCalendarFeedback();
+    clearDialogFeedback();
 
-    const previousIndex = (currentIndex - 1 + places.length) % places.length;
+    const previousIndex =
+      (currentIndex - 1 + places.length) % places.length;
+
     onPlaceChange(places[previousIndex]);
   };
 
@@ -222,14 +405,15 @@ function DetailsDialog({ place, places = [], onPlaceChange, onClose }) {
     }
 
     setAuthPromptAction(null);
-    clearCalendarFeedback();
+    clearDialogFeedback();
 
     const nextIndex = (currentIndex + 1) % places.length;
+
     onPlaceChange(places[nextIndex]);
   };
 
-  const handleFavorite = () => {
-    if (authLoading) {
+  const handleFavorite = async () => {
+    if (authLoading || isFavoritePending) {
       return;
     }
 
@@ -239,18 +423,110 @@ function DetailsDialog({ place, places = [], onPlaceChange, onClose }) {
     }
 
     setAuthPromptAction(null);
-
-    setFavoriteItemIds((currentFavorites) => {
-      const nextFavorites = new Set(currentFavorites);
-
-      if (nextFavorites.has(place.id)) {
-        nextFavorites.delete(place.id);
-      } else {
-        nextFavorites.add(place.id);
-      }
-
-      return nextFavorites;
+    setFavoritePendingId(favoriteKey);
+    setFavoriteFeedback({
+      itemKey: favoriteKey,
+      message: "",
+      isError: false,
     });
+
+    try {
+      const result = isFavorite
+        ? await removeFavorite(favoriteType, favoriteIdentifier)
+        : await addFavorite(favoriteType, favoriteIdentifier);
+
+      setFavoriteItemIds((currentFavorites) => {
+        const nextFavorites = new Set(currentFavorites);
+
+        if (isFavorite) {
+          nextFavorites.delete(favoriteKey);
+        } else {
+          nextFavorites.add(favoriteKey);
+        }
+
+        return nextFavorites;
+      });
+
+      setFavoritesLoadedForUserId(currentUserId);
+
+      setFavoriteFeedback({
+        itemKey: favoriteKey,
+        message:
+          result.message ??
+          (isFavorite
+            ? "Removed from your favorites."
+            : "Added to your favorites."),
+        isError: false,
+      });
+    } catch (error) {
+      setFavoriteFeedback({
+        itemKey: favoriteKey,
+        message:
+          error instanceof Error
+            ? error.message
+            : "Unable to update your favorites.",
+        isError: true,
+      });
+    } finally {
+      setFavoritePendingId(null);
+    }
+  };
+
+  const handleVisited = async () => {
+    if (authLoading || isVisitedPending || isEvent) {
+      return;
+    }
+
+    if (!user) {
+      setAuthPromptAction("visited");
+      return;
+    }
+
+    setAuthPromptAction(null);
+    setVisitedPendingId(place.id);
+    setVisitedFeedback({
+      itemId: place.id,
+      message: "",
+      isError: false,
+    });
+
+    try {
+      const result = await toggleVisited(place.id, "business");
+
+      setVisitedBusinessIds((currentIds) => {
+        const nextIds = new Set(currentIds);
+
+        if (result.visited) {
+          nextIds.add(place.id);
+        } else {
+          nextIds.delete(place.id);
+        }
+
+        return nextIds;
+      });
+
+      setVisitedLoadedForUserId(currentUserId);
+      setVisitedFeedback({
+        itemId: place.id,
+        message:
+          result.message ??
+          (result.visited
+            ? "Marked as visited."
+            : "Removed from visited."),
+        isError: false,
+      });
+    } catch (error) {
+      setVisitedFeedback({
+        itemId: place.id,
+        message:
+          error instanceof Error
+            ? error.message
+            : "Unable to update visited status.",
+        isError: true,
+      });
+    } finally {
+      setVisitedPendingId(null);
+    }
   };
 
   const handleAddToCalendar = async () => {
@@ -265,7 +541,6 @@ function DetailsDialog({ place, places = [], onPlaceChange, onClose }) {
 
     setAuthPromptAction(null);
     setCalendarPendingId(place.id);
-
     setCalendarFeedback({
       eventId: place.id,
       message: "",
@@ -281,11 +556,11 @@ function DetailsDialog({ place, places = [], onPlaceChange, onClose }) {
         return nextIds;
       });
 
-      setCalendarLoadedForUserId(calendarUserId);
-
+      setCalendarLoadedForUserId(currentUserId);
       setCalendarFeedback({
         eventId: place.id,
-        message: result.message ?? "Event added to your calendar.",
+        message:
+          result.message ?? "Event added to your calendar.",
         isError: false,
       });
     } catch (error) {
@@ -333,13 +608,22 @@ function DetailsDialog({ place, places = [], onPlaceChange, onClose }) {
           },
         }}
       >
-        <DialogTitle id="details-dialog-title" className="details-dialog-title">
+        <DialogTitle
+          id="details-dialog-title"
+          className="details-dialog-title"
+        >
           <Box className="details-dialog-title-copy">
-            <Typography component="p" className="details-dialog-category">
+            <Typography
+              component="p"
+              className="details-dialog-category"
+            >
               {categoryLabel}
             </Typography>
 
-            <Typography component="h2" className="details-dialog-name">
+            <Typography
+              component="h2"
+              className="details-dialog-name"
+            >
               {itemName}
             </Typography>
           </Box>
@@ -352,7 +636,7 @@ function DetailsDialog({ place, places = [], onPlaceChange, onClose }) {
                 ? `Remove ${itemName} from favorites`
                 : `Add ${itemName} to favorites`
             }
-            disabled={authLoading}
+            disabled={authLoading || isFavoritePending}
             aria-pressed={isFavorite}
             onClick={handleFavorite}
           >
@@ -362,6 +646,23 @@ function DetailsDialog({ place, places = [], onPlaceChange, onClose }) {
               <FavoriteBorderRoundedIcon />
             )}
           </IconButton>
+
+          {!isEvent && (
+            <IconButton
+              type="button"
+              className="details-dialog-visited"
+              aria-label={
+                isVisited
+                  ? `Remove ${itemName} from visited`
+                  : `Mark ${itemName} as visited`
+              }
+              disabled={authLoading || isVisitedPending}
+              aria-pressed={isVisited}
+              onClick={handleVisited}
+            >
+              <CheckCircleRoundedIcon />
+            </IconButton>
+          )}
 
           <IconButton
             type="button"
@@ -373,7 +674,70 @@ function DetailsDialog({ place, places = [], onPlaceChange, onClose }) {
           </IconButton>
         </DialogTitle>
 
-        <DialogContent dividers className="details-dialog-content">
+        <DialogContent
+          dividers
+          className="details-dialog-content"
+        >
+          {visibleFavoriteFeedback?.message && (
+            <Box
+              role={
+                visibleFavoriteFeedback.isError
+                  ? "alert"
+                  : "status"
+              }
+              aria-live="polite"
+              sx={{
+                marginBottom: 2,
+                padding: 1.5,
+                color: visibleFavoriteFeedback.isError
+                  ? "#6f3028"
+                  : "var(--rooted-dark-green)",
+                backgroundColor: visibleFavoriteFeedback.isError
+                  ? "#f7e7e3"
+                  : "#e7efe2",
+                border: "1px solid",
+                borderColor: visibleFavoriteFeedback.isError
+                  ? "#c97868"
+                  : "var(--rooted-green)",
+                borderRadius: 2,
+              }}
+            >
+              <Typography sx={{ fontWeight: 700 }}>
+                {visibleFavoriteFeedback.message}
+              </Typography>
+            </Box>
+          )}
+
+          {visibleVisitedFeedback?.message && (
+            <Box
+              role={
+                visibleVisitedFeedback.isError
+                  ? "alert"
+                  : "status"
+              }
+              aria-live="polite"
+              sx={{
+                marginBottom: 2,
+                padding: 1.5,
+                color: visibleVisitedFeedback.isError
+                  ? "#6f3028"
+                  : "var(--rooted-dark-green)",
+                backgroundColor: visibleVisitedFeedback.isError
+                  ? "#f7e7e3"
+                  : "#e7efe2",
+                border: "1px solid",
+                borderColor: visibleVisitedFeedback.isError
+                  ? "#c97868"
+                  : "var(--rooted-green)",
+                borderRadius: 2,
+              }}
+            >
+              <Typography sx={{ fontWeight: 700 }}>
+                {visibleVisitedFeedback.message}
+              </Typography>
+            </Box>
+          )}
+
           {authPromptAction && !user && (
             <Box
               role="status"
@@ -386,10 +750,15 @@ function DetailsDialog({ place, places = [], onPlaceChange, onClose }) {
                 borderRadius: 2,
               }}
             >
-              <Typography variant="subtitle1" sx={{ fontWeight: 700 }}>
+              <Typography
+                variant="subtitle1"
+                sx={{ fontWeight: 700 }}
+              >
                 {authPromptAction === "favorite"
                   ? "Save this to your favorites"
-                  : "Add this event to your calendar"}
+                  : authPromptAction === "visited"
+                    ? "Mark this as visited"
+                    : "Add this event to your calendar"}
               </Typography>
 
               <Typography variant="body2" sx={{ marginTop: 0.5 }}>
@@ -428,63 +797,94 @@ function DetailsDialog({ place, places = [], onPlaceChange, onClose }) {
           )}
 
           <Box className="details-dialog-layout">
-            <Stack spacing={3} className="details-dialog-information">
+            <Stack
+              spacing={3}
+              className="details-dialog-information"
+            >
               {place.description && (
                 <Box className="details-dialog-field">
-                  <Typography variant="subtitle2" component="h3">
+                  <Typography
+                    variant="subtitle2"
+                    component="h3"
+                  >
                     About
                   </Typography>
 
-                  <Typography variant="body1">{place.description}</Typography>
+                  <Typography variant="body1">
+                    {place.description}
+                  </Typography>
                 </Box>
               )}
 
               {eventDateLabel && (
                 <Box className="details-dialog-field">
-                  <Typography variant="subtitle2" component="h3">
+                  <Typography
+                    variant="subtitle2"
+                    component="h3"
+                  >
                     Date
                   </Typography>
 
-                  <Typography variant="body1">{eventDateLabel}</Typography>
+                  <Typography variant="body1">
+                    {eventDateLabel}
+                  </Typography>
                 </Box>
               )}
 
               {eventTimeLabel && (
                 <Box className="details-dialog-field">
-                  <Typography variant="subtitle2" component="h3">
+                  <Typography
+                    variant="subtitle2"
+                    component="h3"
+                  >
                     Time
                   </Typography>
 
                   <Typography variant="body1">
                     {eventTimeLabel}
-                    {place.timeZone ? ` · ${place.timeZone}` : ""}
+                    {place.timeZone
+                      ? ` · ${place.timeZone}`
+                      : ""}
                   </Typography>
                 </Box>
               )}
 
               {place.venue && (
                 <Box className="details-dialog-field">
-                  <Typography variant="subtitle2" component="h3">
+                  <Typography
+                    variant="subtitle2"
+                    component="h3"
+                  >
                     Venue
                   </Typography>
 
-                  <Typography variant="body1">{place.venue}</Typography>
+                  <Typography variant="body1">
+                    {place.venue}
+                  </Typography>
                 </Box>
               )}
 
               {place.address && (
                 <Box className="details-dialog-field">
-                  <Typography variant="subtitle2" component="h3">
+                  <Typography
+                    variant="subtitle2"
+                    component="h3"
+                  >
                     Address
                   </Typography>
 
-                  <Typography variant="body1">{place.address}</Typography>
+                  <Typography variant="body1">
+                    {place.address}
+                  </Typography>
                 </Box>
               )}
 
               {place.rating != null && (
                 <Box className="details-dialog-field">
-                  <Typography variant="subtitle2" component="h3">
+                  <Typography
+                    variant="subtitle2"
+                    component="h3"
+                  >
                     Rating
                   </Typography>
 
@@ -553,7 +953,11 @@ function DetailsDialog({ place, places = [], onPlaceChange, onClose }) {
                 variant="contained"
                 startIcon={<EventAvailableRoundedIcon />}
                 onClick={handleAddToCalendar}
-                disabled={authLoading || isCalendarPending || isOnCalendar}
+                disabled={
+                  authLoading ||
+                  isCalendarPending ||
+                  isOnCalendar
+                }
                 aria-pressed={isOnCalendar}
               >
                 {calendarButtonLabel}
@@ -600,7 +1004,8 @@ function DetailsDialog({ place, places = [], onPlaceChange, onClose }) {
           horizontal: "center",
         }}
         action={
-          visibleCalendarFeedback && !visibleCalendarFeedback.isError ? (
+          visibleCalendarFeedback &&
+          !visibleCalendarFeedback.isError ? (
             <Button
               type="button"
               size="small"
