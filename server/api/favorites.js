@@ -34,6 +34,21 @@ async function resolveEventId(identifier) {
   return result.rows[0]?.id ?? null;
 }
 
+async function resolveApprovedEventId(identifier) {
+  const result = await client.query(
+    `
+      SELECT id
+      FROM events
+      WHERE id::text = $1
+        AND moderation_status = 'approved'
+      LIMIT 1
+    `,
+    [identifier],
+  );
+
+  return result.rows[0]?.id ?? null;
+}
+
 /*
   GET /api/favorites
 
@@ -83,6 +98,7 @@ favoritesRouter.get("/", requireAuth, async (req, res, next) => {
           JOIN events e
             ON e.id = f.event_id
           WHERE f.user_id = $1
+            AND e.moderation_status = 'approved'
           ORDER BY e.event_date, e.start_time
         `,
         [req.user.id],
@@ -156,11 +172,13 @@ favoritesRouter.post(
   requireAuth,
   async (req, res, next) => {
     try {
-      const eventId = await resolveEventId(req.params.eventId);
+      const eventId = await resolveApprovedEventId(
+        req.params.eventId,
+      );
 
       if (!eventId) {
         return res.status(404).json({
-          error: "Event not found.",
+          error: "Approved event not found.",
         });
       }
 
@@ -249,7 +267,7 @@ favoritesRouter.delete(
 
       if (!eventId) {
         return res.status(404).json({
-          error: "Event not found.",
+          error: "Approved event not found.",
         });
       }
 

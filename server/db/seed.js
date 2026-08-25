@@ -39,7 +39,11 @@ const seed = async () => {
       username VARCHAR(50) UNIQUE NOT NULL,
       email VARCHAR(100) UNIQUE NOT NULL,
       password_hash VARCHAR(255) NOT NULL,
-      avatar_url TEXT
+      avatar_url TEXT,
+      role VARCHAR(20) NOT NULL DEFAULT 'member',
+
+      CONSTRAINT users_role_check
+        CHECK (role IN ('member', 'admin'))
     );
 
     CREATE TABLE events (
@@ -63,15 +67,31 @@ const seed = async () => {
       image_url TEXT,
       is_free BOOLEAN NOT NULL DEFAULT FALSE,
       is_demo BOOLEAN NOT NULL DEFAULT FALSE,
-      created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+
+      moderation_status VARCHAR(20) NOT NULL DEFAULT 'pending',
+      moderation_note TEXT,
+      moderated_by UUID REFERENCES users(id) ON DELETE SET NULL,
+      moderated_at TIMESTAMPTZ,
+
+      created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+      updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+
+      CONSTRAINT events_moderation_status_check
+        CHECK (
+          moderation_status IN (
+            'pending',
+            'approved',
+            'rejected'
+          )
+        )
     );
 
     CREATE TABLE favorite_businesses (
-     id UUID PRIMARY KEY,
-     user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
-     business_id UUID NOT NULL REFERENCES businesses(id) ON DELETE CASCADE,
+      id UUID PRIMARY KEY,
+      user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+      business_id UUID NOT NULL REFERENCES businesses(id) ON DELETE CASCADE,
 
-     UNIQUE(user_id, business_id)
+      UNIQUE(user_id, business_id)
     );
 
     CREATE TABLE favorite_events (
@@ -98,11 +118,28 @@ const seed = async () => {
       UNIQUE(user_id, event_id)
     );
   `;
+
   await client.query(schemaSQL);
   console.log("table/schema created");
 
   await seedDummyData();
   await seedConnectOpportunities();
+
+  /*
+   * Rooted-controlled demo events are trusted fixture records.
+   * User-created events retain the default pending status.
+   */
+  
+  await client.query(`
+    UPDATE events
+    SET
+      moderation_status = 'approved',
+      moderated_at = NOW(),
+      updated_at = NOW()
+    WHERE is_demo = TRUE;
+  `);
+
+  console.log("demo events marked as approved");
 };
 
 export default seed;
@@ -110,8 +147,7 @@ export default seed;
 /**
  * Planned schema additions:
  * - Rooted tags and business/event tag relationships
- * - Events and saved user events
- * - User comments and moderation fields
+ * - User comments and expanded moderation history
  *
  * External calendar integration will be implemented through event data
  * and calendar exports/links, not as a standalone calendar table.
