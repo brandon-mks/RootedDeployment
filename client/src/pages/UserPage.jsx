@@ -6,6 +6,7 @@ import "react-calendar/dist/Calendar.css";
 import {
   Alert,
   Avatar,
+  Badge,
   Box,
   Button,
   Card,
@@ -28,20 +29,35 @@ import CloseIcon from "@mui/icons-material/Close";
 
 import Header from "../components/Header.jsx";
 import Footer from "../components/Footer.jsx";
+import MyEventsPanel from "../components/MyEventsPanel.jsx";
+import EventModerationPanel from "../components/EventModerationPanel.jsx";
+
 import { useAuth } from "../context/AuthContext.jsx";
+
 import {
   addEventToCalendar,
+  createEvent,
   getCalendarEvents,
+  getModerationEvents,
   removeEventFromCalendar,
 } from "../services/events.js";
+
 import {
   addFavorite as addFavoriteRequest,
   getFavorites,
   removeFavorite as removeFavoriteRequest,
 } from "../services/favorites.js";
+
 import { getVisited, toggleVisited } from "../services/visited.js";
 
-const dashboardTabs = ["favorites", "calendar", "visited", "create-event"];
+const dashboardTabs = [
+  "favorites",
+  "calendar",
+  "visited",
+  "my-events",
+  "create-event",
+  "event-review",
+];
 
 function getInitialTab(tabName) {
   const tabIndex = dashboardTabs.indexOf(tabName);
@@ -115,14 +131,51 @@ function UserPage() {
   const { user, loading: authLoading, fetchMe } = useAuth();
   const [searchParams, setSearchParams] = useSearchParams();
 
-  const [activeTab, setActiveTab] = useState(() =>
+    const [activeTab, setActiveTab] = useState(() =>
     getInitialTab(searchParams.get("tab")),
   );
 
+  const [pendingReviewCount, setPendingReviewCount] = useState(0);
+
+  useEffect(() => {
+    if (user?.role !== "admin") {
+      return undefined;
+    }
+
+    let isCurrent = true;
+
+    getModerationEvents("pending")
+      .then((data) => {
+        if (!isCurrent) {
+          return;
+        }
+
+        setPendingReviewCount(
+          Array.isArray(data.events) ? data.events.length : 0,
+        );
+      })
+      .catch((error) => {
+        if (!isCurrent) {
+          return;
+        }
+
+        console.error(
+          "Unable to load the pending event count:",
+          error,
+        );
+      });
+
+    return () => {
+      isCurrent = false;
+    };
+  }, [user?.id, user?.role]);
+
   const [selectedDate, setSelectedDate] = useState(new Date());
+
   const [calendarActiveStartDate, setCalendarActiveStartDate] = useState(
     () => new Date(),
   );
+
   const selectedDateSectionRef = useRef(null);
 
   const [calendarEvents, setCalendarEvents] = useState([]);
@@ -523,22 +576,9 @@ function UserPage() {
     setEventMessage("");
 
     try {
-      const response = await fetch("/api/events", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        credentials: "include",
-        body: JSON.stringify(eventForm),
-      });
+      const data = await createEvent(eventForm);
 
-      const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(data.error || "Unable to create event.");
-      }
-
-      setEventMessage("Your event was added to Rooted.");
+      setEventMessage(data.message ?? "Your event was submitted for review.");
 
       setEventForm({
         title: "",
@@ -548,9 +588,11 @@ function UserPage() {
         startTime: "",
         endTime: "",
       });
+
+      handleTabChange(null, 3);
     } catch (error) {
       setEventMessage(
-        error instanceof Error ? error.message : "Unable to create event.",
+        error instanceof Error ? error.message : "Unable to submit this event.",
       );
     }
   };
@@ -999,7 +1041,31 @@ function UserPage() {
             <Tab label="Favorites" />
             <Tab label="Calendar" />
             <Tab label="Visited" />
+            <Tab label="My Events" />
             <Tab label="Create Event" />
+
+            {user?.role === "admin" && (
+                <Tab
+                  value={5}
+                  label={
+                    <Badge
+                      badgeContent={pendingReviewCount}
+                      max={99}
+                      sx={{
+                        "& .MuiBadge-badge": {
+                          top: -2,
+                          right: -16,
+                          color: "#ffffff",
+                          fontWeight: 800,
+                          backgroundColor: "var(--rooted-orange)",
+                        },
+                      }}
+                    >
+                      <Box component="span">Event Review</Box>
+                    </Badge>
+                  }
+                />
+              )}
           </Tabs>
 
           <Divider />
@@ -1475,6 +1541,16 @@ function UserPage() {
             )}
 
             {activeTab === 3 && (
+              <MyEventsPanel
+                submissionMessage={eventMessage}
+                onCreateEvent={() => {
+                  setEventMessage("");
+                  handleTabChange(null, 4);
+                }}
+              />
+            )}
+
+            {activeTab === 4 && (
               <>
                 <Typography className="section-eyebrow">
                   BRING PEOPLE TOGETHER
@@ -1485,8 +1561,8 @@ function UserPage() {
                 </Typography>
 
                 <Typography className="calendar-description">
-                  Add an event directly to Rooted so your community can discover
-                  it.
+                  Submit a local event for review. Approved events will appear
+                  publicly in Connect.
                 </Typography>
 
                 {eventMessage && (
@@ -1585,10 +1661,14 @@ function UserPage() {
                     variant="contained"
                     className="rooted-button"
                   >
-                    Add Event to Rooted
+                    Submit Event for Review
                   </Button>
                 </Box>
               </>
+            )}
+
+            {activeTab === 5 && user?.role === "admin" && (
+              <EventModerationPanel />
             )}
           </Box>
         </Card>

@@ -3513,3 +3513,80 @@ a {
     font-size: clamp(26px, 9vw, 36px) !important;
   }
 }
+
+/* ==============================
+   Event Ownership and Moderation
+============================== */
+
+.my-event-card,
+.moderation-event-card {
+  overflow: hidden;
+  background: #ffffff !important;
+  border: 1px solid rgba(122, 166, 100, 0.3);
+  border-left: 6px solid var(--rooted-green);
+  border-radius: 12px !important;
+  box-shadow: 0 4px 14px rgba(52, 71, 53, 0.1) !important;
+}
+
+.my-event-card .MuiCardContent-root,
+.moderation-event-card .MuiCardContent-root {
+  padding: 24px;
+}
+
+.my-event-card--pending,
+.moderation-event-card--pending {
+  border-left-color: var(--rooted-orange);
+}
+
+.my-event-card--approved,
+.moderation-event-card--approved {
+  border-left-color: var(--rooted-green);
+}
+
+.my-event-card--rejected,
+.moderation-event-card--rejected {
+  border-left-color: #c97868;
+}
+
+.event-status-chip.MuiChip-root {
+  height: 30px;
+  font-weight: 800;
+  border: 1px solid transparent;
+}
+
+.event-status-chip--pending.MuiChip-root {
+  color: #725014;
+  background: #fff4cf;
+  border-color: rgba(185, 111, 19, 0.34);
+}
+
+.event-status-chip--approved.MuiChip-root {
+  color: var(--rooted-dark-green);
+  background: #e7efe2;
+  border-color: rgba(122, 166, 100, 0.48);
+}
+
+.event-status-chip--rejected.MuiChip-root {
+  color: var(--rooted-plum);
+  background: #f7e7e3;
+  border-color: rgba(201, 120, 104, 0.62);
+}
+
+.moderation-event-card {
+  transition:
+    border-color 160ms ease,
+    box-shadow 160ms ease,
+    transform 160ms ease;
+}
+
+.moderation-event-card:hover {
+  box-shadow: 0 7px 20px rgba(52, 71, 53, 0.14) !important;
+  transform: translateY(-1px);
+}
+
+@media (max-width: 600px) {
+  .my-event-card .MuiCardContent-root,
+  .moderation-event-card .MuiCardContent-root {
+    padding: 20px;
+  }
+}
