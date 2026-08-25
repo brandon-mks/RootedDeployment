@@ -988,6 +988,372 @@ a {
 }
 
 /* ==============================
+   About Page
+============================== */
+
+.about-page {
+  width: 100%;
+  color: var(--rooted-plum);
+}
+
+.about-hero,
+.about-mission,
+.about-story,
+.about-pillars,
+.about-beliefs,
+.about-creators,
+.about-closing {
+  width: min(100%, 1100px);
+  margin-inline: auto;
+}
+
+.about-hero {
+  padding: 72px 24px 58px;
+  text-align: center;
+}
+
+.about-hero h1 {
+  max-width: 850px;
+  margin: 14px auto 0;
+
+  color: var(--rooted-dark-green);
+  font-size: clamp(40px, 6vw, 68px);
+  line-height: 1.02;
+}
+
+.about-hero-description {
+  max-width: 720px;
+  margin: 24px auto 0;
+
+  color: #5c5861;
+  font-size: 19px;
+  line-height: 1.7;
+}
+
+.about-creators-featured {
+  padding-top: 20px;
+  padding-bottom: 72px;
+}
+
+.about-section-label {
+  margin: 0 0 12px;
+
+  color: var(--rooted-green);
+  font-size: 13px;
+  font-weight: 800;
+  letter-spacing: 1.7px;
+  text-transform: uppercase;
+}
+
+.about-mission {
+  padding: 52px clamp(28px, 6vw, 76px);
+
+  border: 1px solid rgba(60, 53, 70, 0.12);
+  border-radius: 18px;
+  background: #fffaf0;
+
+  box-shadow: 0 14px 35px rgba(60, 53, 70, 0.1);
+  text-align: center;
+}
+
+.about-mission h2 {
+  max-width: 760px;
+  margin: 0 auto;
+
+  color: var(--rooted-dark-green);
+  font-size: clamp(30px, 4vw, 46px);
+  line-height: 1.12;
+}
+
+.about-mission > p:last-child {
+  max-width: 760px;
+  margin: 22px auto 0;
+
+  font-size: 18px;
+  line-height: 1.7;
+}
+
+.about-story,
+.about-beliefs {
+  padding: 80px 24px;
+
+  display: grid;
+  grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
+  gap: clamp(40px, 8vw, 100px);
+}
+
+.about-story h2,
+.about-beliefs h2,
+.about-section-heading h2,
+.about-closing h2 {
+  margin: 0;
+
+  color: var(--rooted-dark-green);
+  font-size: clamp(30px, 4vw, 44px);
+  line-height: 1.15;
+}
+
+.about-story-copy p,
+.about-beliefs > div:last-child p {
+  margin: 0 0 20px;
+
+  color: #5c5861;
+  font-size: 17px;
+  line-height: 1.75;
+}
+
+.about-pillars {
+  padding: 64px 24px;
+}
+
+.about-section-heading {
+  max-width: 720px;
+  margin: 0 auto 38px;
+  text-align: center;
+}
+
+.about-section-heading > p:last-child {
+  margin: 18px auto 0;
+
+  color: #5c5861;
+  font-size: 17px;
+  line-height: 1.7;
+}
+
+.about-pillar-grid,
+.creator-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 24px;
+}
+
+.about-pillar-card {
+  min-height: 250px;
+  padding: 30px;
+
+  border: 1px solid rgba(60, 53, 70, 0.12);
+  border-radius: 14px;
+  background: white;
+
+  box-shadow: 0 10px 26px rgba(60, 53, 70, 0.08);
+}
+
+.about-pillar-number {
+  color: var(--rooted-orange);
+  font-size: 13px;
+  font-weight: 800;
+  letter-spacing: 1.5px;
+}
+
+.about-pillar-card h3 {
+  margin: 40px 0 12px;
+
+  color: var(--rooted-dark-green);
+  font-size: 27px;
+}
+
+.about-pillar-card p {
+  margin: 0;
+
+  color: #5c5861;
+  line-height: 1.65;
+}
+
+.about-beliefs {
+  margin-top: 30px;
+
+  border-radius: 18px;
+  background: rgba(122, 166, 100, 0.12);
+}
+
+.about-creators {
+  padding: 88px 24px;
+}
+
+.creator-card {
+  min-height: 300px;
+  padding: 30px;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+
+  border: 1px solid rgba(60, 53, 70, 0.12);
+  border-radius: 16px;
+  background: #fffdf8;
+
+  box-shadow: 0 12px 28px rgba(60, 53, 70, 0.1);
+  text-align: center;
+
+  transition:
+    transform 180ms ease,
+    box-shadow 180ms ease;
+}
+
+.creator-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 18px 36px rgba(60, 53, 70, 0.15);
+}
+
+.creator-avatar {
+  width: 84px;
+  height: 84px;
+
+  display: grid;
+  place-items: center;
+
+  border: 4px solid rgba(122, 166, 100, 0.22);
+  border-radius: 50%;
+  background: var(--rooted-green);
+
+  color: white;
+  font-size: 32px;
+  font-weight: 800;
+}
+
+.creator-card-content {
+  flex: 1;
+}
+
+.creator-card h3 {
+  margin: 22px 0 7px;
+
+  color: var(--rooted-dark-green);
+  font-size: 25px;
+}
+
+.creator-card-content p {
+  margin: 0;
+
+  color: #5c5861;
+  font-size: 16px;
+}
+
+.creator-github-link,
+.creator-github-placeholder {
+  min-height: 42px;
+  margin-top: 26px;
+  padding: 9px 18px;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 9px;
+
+  border-radius: 999px;
+  font-size: 14px;
+  font-weight: 750;
+}
+
+.creator-github-link {
+  border: 1px solid var(--rooted-green);
+  color: var(--rooted-dark-green);
+  text-decoration: none;
+
+  transition:
+    color 160ms ease,
+    background-color 160ms ease,
+    transform 160ms ease;
+}
+
+.creator-github-link:hover {
+  color: white;
+  background: var(--rooted-green);
+  transform: translateY(-2px);
+}
+
+.creator-github-link:focus-visible {
+  outline: 3px solid rgba(122, 166, 100, 0.35);
+  outline-offset: 3px;
+}
+
+.creator-github-placeholder {
+  color: #7a747d;
+  background: rgba(60, 53, 70, 0.06);
+}
+
+.about-closing {
+  margin-bottom: 70px;
+  padding: 68px clamp(28px, 7vw, 90px);
+
+  border-radius: 18px;
+  background: var(--rooted-dark-green);
+
+  color: white;
+  text-align: center;
+}
+
+.about-closing .about-section-label {
+  color: #b9d5a9;
+}
+
+.about-closing h2 {
+  max-width: 780px;
+  margin-inline: auto;
+  color: white;
+}
+
+.about-closing > p:last-child {
+  margin: 20px 0 0;
+
+  font-size: 18px;
+  line-height: 1.65;
+}
+
+/* ==============================
+   About Page Responsive
+============================== */
+
+@media (max-width: 800px) {
+  .about-hero {
+    padding-top: 48px;
+  }
+
+  .about-story,
+  .about-beliefs {
+    grid-template-columns: 1fr;
+    gap: 28px;
+  }
+
+  .about-pillar-grid,
+  .creator-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .about-pillar-card,
+  .creator-card {
+    min-height: auto;
+  }
+}
+
+@media (max-width: 520px) {
+  .about-hero,
+  .about-story,
+  .about-pillars,
+  .about-beliefs,
+  .about-creators {
+    padding-inline: 18px;
+  }
+
+  .about-mission,
+  .about-closing {
+    border-radius: 12px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .creator-card,
+  .creator-github-link {
+    transition: none;
+  }
+
+  .creator-card:hover,
+  .creator-github-link:hover {
+    transform: none;
+  }
+}
+
+/* ==============================
    Support Dialog — Pinned Note
 ============================== */
 
