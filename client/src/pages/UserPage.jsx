@@ -22,11 +22,9 @@ import {
   Tab,
   Tabs,
   TextField,
-  Tooltip,
   Typography,
 } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
-import SettingsIcon from "@mui/icons-material/Settings";
 
 import Header from "../components/Header.jsx";
 import Footer from "../components/Footer.jsx";
@@ -169,14 +167,18 @@ function UserPage() {
 
   const [eventMessage, setEventMessage] = useState("");
 
-  const [settingsOpen, setSettingsOpen] = useState(false);
-  const [settingsForm, setSettingsForm] = useState({
-    username: "",
-    email: "",
-    avatarUrl: "",
-  });
+  const [settingsDraft, setSettingsDraft] = useState(null);
   const [settingsMessage, setSettingsMessage] = useState(null);
   const [savingSettings, setSavingSettings] = useState(false);
+
+  const settingsRequested = searchParams.get("settings") === "open";
+  const settingsOpen = Boolean(user && settingsRequested);
+
+  const settingsForm = settingsDraft ?? {
+    username: user?.username ?? "",
+    email: user?.email ?? "",
+    avatarUrl: user?.avatar_url ?? "",
+  };
 
   const currentUserId = user?.id ?? user?.username ?? null;
 
@@ -353,9 +355,7 @@ function UserPage() {
 
   const showCalendarLoading =
     authLoading ||
-    Boolean(
-      currentUserId && calendarLoadedForUserId !== currentUserId,
-    );
+    Boolean(currentUserId && calendarLoadedForUserId !== currentUserId);
 
   const selectedDateKey = getLocalDateKey(selectedDate);
 
@@ -435,9 +435,7 @@ function UserPage() {
   };
 
   const handleRemoveCalendarEvent = async (eventId) => {
-    const eventToRemove = calendarEvents.find(
-      (event) => event.id === eventId,
-    );
+    const eventToRemove = calendarEvents.find((event) => event.id === eventId);
 
     if (!eventToRemove) {
       return;
@@ -456,14 +454,10 @@ function UserPage() {
       );
 
       setPendingCalendarRemoval(eventToRemove);
-      setCalendarMessage(
-        result.message ?? "Event removed from your calendar.",
-      );
+      setCalendarMessage(result.message ?? "Event removed from your calendar.");
     } catch (error) {
       setCalendarError(
-        error instanceof Error
-          ? error.message
-          : "Unable to remove this event.",
+        error instanceof Error ? error.message : "Unable to remove this event.",
       );
     } finally {
       setCalendarRemovingId(null);
@@ -493,10 +487,7 @@ function UserPage() {
           return currentEvents;
         }
 
-        return sortCalendarEvents([
-          ...currentEvents,
-          eventToRestore,
-        ]);
+        return sortCalendarEvents([...currentEvents, eventToRestore]);
       });
 
       setCalendarMessage("Removal undone. Event restored to your calendar.");
@@ -559,23 +550,20 @@ function UserPage() {
       });
     } catch (error) {
       setEventMessage(
-        error instanceof Error
-          ? error.message
-          : "Unable to create event.",
+        error instanceof Error ? error.message : "Unable to create event.",
       );
     }
   };
 
   const handleRemoveFavorite = async (type, item) => {
     const itemId =
-      type === "business" ? item.business_id ?? item.id : item.id;
+      type === "business" ? (item.business_id ?? item.id) : item.id;
     const itemKey = `${type}:${itemId}`;
     const collection = type === "business" ? "businesses" : "events";
     const originalIndex = favorites[collection].findIndex(
       (candidate) => candidate.id === item.id,
     );
-    const itemName =
-      type === "business" ? item.business_name : item.title;
+    const itemName = type === "business" ? item.business_name : item.title;
 
     setFavoriteRemovingKey(itemKey);
     setFavoriteNotice({
@@ -647,7 +635,9 @@ function UserPage() {
           return previous;
         }
 
-        if (previous[collection].some((candidate) => candidate.id === item.id)) {
+        if (
+          previous[collection].some((candidate) => candidate.id === item.id)
+        ) {
           return {
             ...previous,
             error: "",
@@ -700,8 +690,7 @@ function UserPage() {
   const handleRemoveVisitedBusiness = async (business) => {
     const businessId = business.business_id ?? business.id;
     const originalIndex = visitedBusinesses.findIndex(
-      (candidate) =>
-        (candidate.business_id ?? candidate.id) === businessId,
+      (candidate) => (candidate.business_id ?? candidate.id) === businessId,
     );
 
     setVisitedRemovingId(businessId);
@@ -835,27 +824,28 @@ function UserPage() {
     });
   };
 
-  const handleOpenSettings = () => {
-    setSettingsForm({
-      username: user?.username ?? "",
-      email: user?.email ?? "",
-      avatarUrl: user?.avatar_url ?? "",
-    });
-    setSettingsMessage(null);
-    setSettingsOpen(true);
-  };
-
   const handleCloseSettings = () => {
-    if (!savingSettings) {
-      setSettingsOpen(false);
+    if (savingSettings) {
+      return;
     }
+
+    const nextSearchParams = new URLSearchParams(searchParams);
+    nextSearchParams.delete("settings");
+
+    setSettingsDraft(null);
+    setSettingsMessage(null);
+    setSearchParams(nextSearchParams, { replace: true });
   };
 
   const handleSettingsChange = (event) => {
     const { name, value } = event.target;
 
-    setSettingsForm((previous) => ({
-      ...previous,
+    setSettingsDraft((previous) => ({
+      ...(previous ?? {
+        username: user?.username ?? "",
+        email: user?.email ?? "",
+        avatarUrl: user?.avatar_url ?? "",
+      }),
       [name]: value,
     }));
   };
@@ -894,9 +884,7 @@ function UserPage() {
       setSettingsMessage({
         severity: "error",
         text:
-          error instanceof Error
-            ? error.message
-            : "Unable to save settings.",
+          error instanceof Error ? error.message : "Unable to save settings.",
       });
     } finally {
       setSavingSettings(false);
@@ -916,40 +904,30 @@ function UserPage() {
 
       <main className="user-page">
         <section className="user-header">
-          <Box className="user-header-top">
+          <Box className="user-header-profile">
             <Avatar
-              src={user?.avatar_url || ""}
-              alt={user?.username || "Profile"}
+              src={user?.avatar_url || undefined}
+              alt={`${displayName}'s profile`}
               className="profile-avatar"
             >
-              {user?.username?.charAt(0).toUpperCase()}
+              {displayName.charAt(0)}
             </Avatar>
 
-            <Tooltip title="Settings">
-              <IconButton
-                type="button"
-                aria-label="Open profile settings"
-                className="settings-icon-button"
-                onClick={handleOpenSettings}
-                disabled={!user || authLoading}
-              >
-                <SettingsIcon />
-              </IconButton>
-            </Tooltip>
+            <Box className="user-header-copy">
+              <Typography className="user-eyebrow">
+                YOUR ROOTED PROFILE
+              </Typography>
+
+              <Typography variant="h1" className="user-title">
+                Welcome back, {displayName}.
+              </Typography>
+
+              <Typography className="user-description">
+                Keep track of the local places and events that make your
+                community special.
+              </Typography>
+            </Box>
           </Box>
-
-          <Typography className="user-eyebrow">
-            YOUR ROOTED PROFILE
-          </Typography>
-
-          <Typography variant="h1" className="user-title">
-            Welcome back, {displayName}.
-          </Typography>
-
-          <Typography className="user-description">
-            Keep track of the local places and events that make your community
-            special.
-          </Typography>
         </section>
 
         <section className="activity-grid">
@@ -1106,9 +1084,7 @@ function UserPage() {
                               className="remove-button"
                             >
                               {favoriteRemovingKey ===
-                              `business:${
-                                business.business_id ?? business.id
-                              }`
+                              `business:${business.business_id ?? business.id}`
                                 ? "Removing…"
                                 : "Remove Favorite"}
                             </Button>
@@ -1168,9 +1144,7 @@ function UserPage() {
 
                             <Typography>
                               {formatFavoriteEventDate(event.event_date)}
-                              {event.start_time
-                                ? ` · ${event.start_time}`
-                                : ""}
+                              {event.start_time ? ` · ${event.start_time}` : ""}
                             </Typography>
 
                             <Button
@@ -1310,16 +1284,12 @@ function UserPage() {
                               className={`upcoming-event-button${
                                 isSelected ? " is-selected" : ""
                               }`}
-                              onClick={() =>
-                                handleUpcomingEventSelect(event)
-                              }
+                              onClick={() => handleUpcomingEventSelect(event)}
                             >
                               <Box className="upcoming-event-copy">
                                 <Typography className="upcoming-event-date">
                                   {eventDateLabel}
-                                  {eventTimeLabel
-                                    ? ` · ${eventTimeLabel}`
-                                    : ""}
+                                  {eventTimeLabel ? ` · ${eventTimeLabel}` : ""}
                                 </Typography>
 
                                 <Typography className="upcoming-event-name">
@@ -1377,15 +1347,11 @@ function UserPage() {
                       <Card className="favorite-card" key={event.id}>
                         <CardContent>
                           <Chip
-                            label={
-                              event.kind?.replaceAll("_", " ") ?? "Event"
-                            }
+                            label={event.kind?.replaceAll("_", " ") ?? "Event"}
                             className="rooted-chip"
                           />
 
-                          <Typography variant="h3">
-                            {event.title}
-                          </Typography>
+                          <Typography variant="h3">{event.title}</Typography>
 
                           {event.description && (
                             <Typography>{event.description}</Typography>
@@ -1403,9 +1369,7 @@ function UserPage() {
 
                           <Button
                             type="button"
-                            onClick={() =>
-                              handleRemoveCalendarEvent(event.id)
-                            }
+                            onClick={() => handleRemoveCalendarEvent(event.id)}
                             disabled={calendarRemovingId === event.id}
                             className="remove-button"
                           >
@@ -1468,8 +1432,7 @@ function UserPage() {
                 ) : (
                   <Box className="favorite-grid">
                     {visitedBusinesses.map((business) => {
-                      const businessId =
-                        business.business_id ?? business.id;
+                      const businessId = business.business_id ?? business.id;
 
                       return (
                         <Card className="favorite-card" key={businessId}>
@@ -1673,44 +1636,71 @@ function UserPage() {
           <Box
             component="form"
             id="settings-form"
+            className="settings-form"
             onSubmit={handleSaveSettings}
           >
-            <Typography variant="h3" className="subsection-title">
-              Edit Profile
-            </Typography>
+            <Box className="settings-profile-summary">
+              <Avatar
+                src={settingsForm.avatarUrl || undefined}
+                alt="Profile preview"
+                className="settings-preview-avatar"
+              >
+                {settingsForm.username.trim().charAt(0).toUpperCase() ||
+                  displayName.charAt(0)}
+              </Avatar>
 
-            <Stack spacing={2} sx={{ marginTop: 2 }}>
-              <TextField
-                label="Username"
-                name="username"
-                value={settingsForm.username}
-                onChange={handleSettingsChange}
-                required
-                fullWidth
-                autoComplete="username"
-              />
+              <Box>
+                <Typography className="settings-profile-summary-title">
+                  Profile preview
+                </Typography>
 
-              <TextField
-                label="Email"
-                name="email"
-                type="email"
-                value={settingsForm.email}
-                onChange={handleSettingsChange}
-                required
-                fullWidth
-                autoComplete="email"
-              />
+                <Typography className="settings-profile-summary-description">
+                  This is how your name and avatar will appear throughout
+                  Rooted.
+                </Typography>
+              </Box>
+            </Box>
 
-              <TextField
-                label="Avatar URL"
-                name="avatarUrl"
-                type="url"
-                value={settingsForm.avatarUrl}
-                onChange={handleSettingsChange}
-                fullWidth
-                helperText="Paste a direct image URL for your profile picture."
-              />
-            </Stack>
+            <Divider />
+
+            <Box>
+              <Typography variant="h3" className="subsection-title">
+                Account details
+              </Typography>
+
+              <Stack spacing={2.5} sx={{ marginTop: 2 }}>
+                <TextField
+                  label="Username"
+                  name="username"
+                  value={settingsForm.username}
+                  onChange={handleSettingsChange}
+                  required
+                  fullWidth
+                  autoComplete="username"
+                />
+
+                <TextField
+                  label="Email"
+                  name="email"
+                  type="email"
+                  value={settingsForm.email}
+                  onChange={handleSettingsChange}
+                  required
+                  fullWidth
+                  autoComplete="email"
+                />
+
+                <TextField
+                  label="Avatar URL"
+                  name="avatarUrl"
+                  type="url"
+                  value={settingsForm.avatarUrl}
+                  onChange={handleSettingsChange}
+                  fullWidth
+                  helperText="Paste a direct image URL for your profile picture."
+                />
+              </Stack>
+            </Box>
           </Box>
         </DialogContent>
 
@@ -1780,9 +1770,7 @@ function UserPage() {
             color: pendingCalendarRemoval
               ? "var(--rooted-plum)"
               : "var(--rooted-dark-green)",
-            backgroundColor: pendingCalendarRemoval
-              ? "#f7e7e3"
-              : "#e7efe2",
+            backgroundColor: pendingCalendarRemoval ? "#f7e7e3" : "#e7efe2",
             border: "1px solid",
             borderColor: pendingCalendarRemoval
               ? "#c97868"
