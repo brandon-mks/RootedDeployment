@@ -3219,6 +3219,18 @@ a {
   color: var(--rooted-dark-green);
 }
 
+.dynamicMapContainer {
+  margin-bottom: 32px;
+}
+
+.changeCenterInfoWindow > a {
+  color: green;
+}
+
+.changeCenterInfoWindow > a:hover {
+  color: var(--rooted-plum);
+}
+
 /* ==============================
    Dashboard Calendar Overview
 ============================== */
