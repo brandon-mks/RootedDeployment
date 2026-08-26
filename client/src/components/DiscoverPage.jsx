@@ -15,6 +15,7 @@ import Header from "./Header.jsx";
 import Footer from "./Footer.jsx";
 import DetailsDialog from "./DetailsDialog.jsx";
 import { getPlaces } from "../services/places.js";
+import { DynamicMap } from "./DynamicMap.jsx";
 
 //Filter Categories
 // The temporary fixture key remains "restaurants", but the collection
@@ -87,10 +88,10 @@ function DiscoverPage() {
         >
           {categories.map((category) => {
             const isSelected = selectedCategory === category.value;
-
+            
             return (
               <Button
-                key={category.value}
+              key={category.value}
                 type="button"
                 variant={isSelected ? "contained" : "outlined"}
                 onClick={() => {
@@ -107,11 +108,11 @@ function DiscoverPage() {
                   "&:hover": {
                     borderColor: "var(--rooted-green)",
                     backgroundColor: isSelected
-                      ? "var(--rooted-dark-green)"
-                      : "rgba(122, 166, 100, 0.1)",
+                    ? "var(--rooted-dark-green)"
+                    : "rgba(122, 166, 100, 0.1)",
                   },
                 }}
-              >
+                >
                 {category.label}
               </Button>
             );
@@ -121,7 +122,9 @@ function DiscoverPage() {
         {loading && <CircularProgress aria-label="Loading places" />}
 
         {error && <Typography color="error">{error}</Typography>}
-
+        <div className="dynamicMapContainer">
+          <DynamicMap className="mainMap" places={places}/>
+        </div>
         {!loading && !error && (
           <Box>
             <Box
