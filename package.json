@@ -5,7 +5,9 @@
   "main": "index.js",
   "type": "module",
   "scripts": {
-    "start:dev": "nodemon --exec \"node --env-file=.env server\""
+    "start:dev": "nodemon --exec \"node --env-file=.env server\"",
+    "build": "npm install && npm install --prefix client && npm run build --prefix client",
+    "start": "node server"
   },
   "keywords": [],
   "author": "",
