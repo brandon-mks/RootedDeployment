@@ -23,9 +23,7 @@ const router = express.Router();
  *
  * [restaurants, museums, hiking_areas, farmers_markets, live_music_venues]
  */
-const categories = Object.keys(dummyData).filter(
-  (key) => dummyData[key].length > 0,
-);
+const categories = Object.keys(dummyData).filter((key) => dummyData[key].length > 0);
 
 /**
  * Convert a large Google Places-style object into the smaller object
@@ -41,7 +39,7 @@ const formatPlace = (place) => ({
   address: place.formattedAddress ?? "",
   rating: place.rating ?? null,
   website: place.websiteUri ?? null,
-  location: place.location ?? null,
+  location: place.location ? { lat: place.location.latitude, lng: place.location.longitude } : null,
 });
 
 /**
@@ -70,17 +68,13 @@ router.get("/", (req, res) => {
   }
 
   // With no category, combine all five arrays into one list.
-  const source = category
-    ? dummyData[category]
-    : Object.values(dummyData).flat();
+  const source = category ? dummyData[category] : Object.values(dummyData).flat();
 
   const requestedLimit = Number.parseInt(req.query.limit, 10);
   const requestedPage = Number.parseInt(req.query.page, 10);
 
   // Keep each page between 1 and 50 records.
-  const limit = Number.isInteger(requestedLimit)
-    ? Math.min(Math.max(requestedLimit, 1), 50)
-    : 6;
+  const limit = Number.isInteger(requestedLimit) ? Math.min(Math.max(requestedLimit, 1), 50) : 6;
 
   // Default to page one and prevent page numbers below one.
   const page = Number.isInteger(requestedPage) ? Math.max(requestedPage, 1) : 1;

@@ -1,22 +1,22 @@
-import { 
-  AdvancedMarker, 
-  Map, 
-  Pin, 
-  useAdvancedMarkerRef, 
+import {
+  AdvancedMarker,
+  Map,
+  Pin,
+  useAdvancedMarkerRef,
   useMap,
   MapControl,
   ControlPosition,
-  InfoWindow } from "@vis.gl/react-google-maps";
-import { useState, useEffect, useCallback } from "react";
+  InfoWindow,
+} from "@vis.gl/react-google-maps";
+import { useState, useEffect } from "react";
 import { useMapContext } from "../mapContext/useMapContext";
 import MyLocationIcon from "@mui/icons-material/MyLocation";
 import { IconButton, Tooltip } from "@mui/material";
-import { ChangeCenterMarker } from "./ChangeCenterMarker";
 import { PlaceMarker } from "./PlaceMarker";
 
 export const DynamicMap = ({ places }) => {
   //contexts
-  const { coords, setCoords, setLocation } = useMapContext();
+  const { coords, setCoords } = useMapContext();
 
   //internal states
   const [markers, setMarkers] = useState([]);
@@ -39,17 +39,17 @@ export const DynamicMap = ({ places }) => {
     setMarkers(places);
   }, [places]);
 
-  // const handleClick = useCallback((ev) => 
+  // const handleClick = useCallback((ev) =>
   // <ChangeCenterMarker ev={ev} />)
-    
-  const recenter = useCallback(() => {
+
+  const recenter = () => {
     map.panTo(coords);
     setMainMarkerShown(true);
-  })
+  };
 
-  const handleMouseEnter = useCallback(() => setInfoWindowShown(true));
+  //const handleMouseEnter = useCallback(() => setInfoWindowShown(true));
 
-  const handleClose = useCallback(() => setInfoWindowShown(false), []);
+  //const handleClose = useCallback(() => setInfoWindowShown(false), []);
 
   return (
     <div className="mapContainer">
@@ -87,36 +87,40 @@ export const DynamicMap = ({ places }) => {
         </MapControl>
         {/* marker/pin @ user location/coords lat/lng */}
         {mainMarkerShown ? (
-          <AdvancedMarker 
-        position={coords} 
-        title={"Current Center of the map"}
-        ref={markerRef}
-        onMouseEnter={handleMouseEnter}>
-          <Pin
-            background={"#077187"}
-            borderColor={"#074F57"}
-            glyphColor={"#00E8FC"}
-            scale={Number(1.3)}
-          />
-          {infoWindowShown ? (
-        <InfoWindow className="changeCenterInfoWindow"
-        anchor={marker} 
-        onClose={handleClose}>
-          <h2>Map Center</h2>
-          <p>This is the current center of the map!</p>
-          <a onClick={() => setMainMarkerShown(false)}>Click to get rid of this marker for now</a>
-          <br />
-        </InfoWindow>)
-        : null}
-        </AdvancedMarker>
+          <AdvancedMarker
+            position={coords}
+            title={"Current Center of the map"}
+            ref={markerRef}
+            onMouseEnter={() => setInfoWindowShown(true)}
+          >
+            <Pin
+              background={"#077187"}
+              borderColor={"#074F57"}
+              glyphColor={"#00E8FC"}
+              scale={Number(1.3)}
+            />
+            {infoWindowShown ? (
+              <InfoWindow
+                className="changeCenterInfoWindow"
+                anchor={marker}
+                onClose={() => setInfoWindowShown(false)}
+              >
+                <h2>Map Center</h2>
+                <p>This is the current center of the map!</p>
+                <a onClick={() => setMainMarkerShown(false)}>
+                  Click to get rid of this marker for now
+                </a>
+                <br />
+              </InfoWindow>
+            ) : null}
+          </AdvancedMarker>
         ) : null}
 
         {/* only add custom map markers if they exist */}
         {markers.length
-          ? markers.map((placeMarker) => 
-          <PlaceMarker 
-          key={placeMarker.id}
-          placeMarker={placeMarker} />)
+          ? markers.map((placeMarker) => (
+              <PlaceMarker key={placeMarker.id} placeMarker={placeMarker} />
+            ))
           : null}
       </Map>
     </div>
