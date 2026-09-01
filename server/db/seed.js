@@ -9,29 +9,61 @@ import { seedConnectOpportunities } from "./connectOpportunities.js";
  * a controlled import from Google Places or another approved source.
  */
 const seed = async () => {
+  // DROP TABLE IF EXISTS businesses CASCADE;
   const schemaSQL = `
-    DROP TABLE IF EXISTS business_types CASCADE;
-    DROP TABLE IF EXISTS types CASCADE;
-    DROP TABLE IF EXISTS event_attendance CASCADE;
-    DROP TABLE IF EXISTS business_visits CASCADE;
-    DROP TABLE IF EXISTS favorite_events CASCADE;
-    DROP TABLE IF EXISTS favorite_businesses CASCADE;
-    DROP TABLE IF EXISTS events CASCADE;
-    DROP TABLE IF EXISTS businesses CASCADE;
+    DROP TABLE IF EXISTS business_tags CASCADE;
+    DROP TABLE IF EXISTS locations CASCADE;
     DROP TABLE IF EXISTS users CASCADE;
+    DROP TABLE IF EXISTS favorite_businesses CASCADE;
+    DROP TABLE IF EXISTS favorite_events CASCADE;
+    DROP TABLE IF EXISTS business_visits CASCADE;
+    DROP TABLE IF EXISTS events CASCADE;
+    DROP TABLE IF EXISTS event_attendance CASCADE;
 
     CREATE TABLE businesses (
-      id UUID UNIQUE NOT NULL,
+      id UUID UNIQUE DEFAULT gen_random_UUID() NOT NULL,
       business_id VARCHAR(100) PRIMARY KEY,
       business_name VARCHAR(100) NOT NULL,
       address VARCHAR(500),
       phone_number VARCHAR(30),
-      overview VARCHAR(1000),
-      link VARCHAR(500),
+      overview TEXT,
+      link VARCHAR(100),
       email VARCHAR(100),
       rating DECIMAL,
-      types VARCHAR(150)[] NOT NULL DEFAULT '{}',
-      primary_type VARCHAR(150)
+      primary_tag VARCHAR(150) NOT NULL
+    );
+
+    CREATE TABLE business_tags (
+      id UUID UNIQUE PRIMARY KEY REFERENCES businesses(id),
+      business_id VARCHAR(100) REFERENCES businesses(business_id) ON DELETE CASCADE,
+      tags VARCHAR(100) NOT NULL,
+      UNIQUE(business_id, tags)
+    );
+
+    CREATE TABLE locations (
+      id UUID UNIQUE PRIMARY KEY REFERENCES business(id),
+      business_id VARCHAR(100) REFERENCES businesses(business_id) ON DELETE CASCADE,
+      latitude DOUBLE PRECISION NOT NULL, 
+      longitude DOUBLE PRECISION NOT NULL
+    );
+
+    CREATE TABLE hours (
+      id UUID UNIQUE PRIMARY KEY REFERENCES businesses(id),
+      business_id VARCHAR(100) REFERENCES businesses(business_id) ON DELETE CASCADE,
+      mon_open TIME,
+      mon_close TIME,
+      tues_open TIME,
+      tues_close TIME,
+      wed_open TIME,
+      wed_close TIME,
+      thurs_open TIME,
+      thurs_close TIME,
+      fri_open TIME,
+      fri_close TIME,
+      sat_open TIME,
+      sat_close TIME,
+      sun_open TIME,
+      sun_close TIME
     );
 
     CREATE TABLE users (

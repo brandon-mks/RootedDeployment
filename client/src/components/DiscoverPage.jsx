@@ -42,11 +42,19 @@ function DiscoverPage() {
       setLoading(true);
       setError("");
       try {
+        const data = await('/places')
+        /*
+        needs make internal server/api request
+        internal server/api request needs
+        LiveData call from google which passes
+        through filters first before then 
+        returning the array of places
         const data = await getPlaces({
           category: selectedCategory,
           limit: 6,
           page,
         });
+        */
 
         setPlaces(data.places);
         setTotalPages(data.totalPages);
@@ -58,7 +66,7 @@ function DiscoverPage() {
     }
 
     loadPlaces();
-  }, [selectedCategory, page]);
+  }, [selectedCategory]);
 
   return (
     <div className="page-layout">

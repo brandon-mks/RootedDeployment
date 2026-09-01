@@ -7,6 +7,12 @@ const router = express.Router();
  * GET /api/businesses
  *
  * Returns businesses stored in PostgreSQL.
+ * 
+ * Only useful after setting up DB and routes
+ * to check location info internally and not
+ * strictly through the google places API
+ * request ie. including Haversine equations
+ * to find closest places that match
  */
 router.get("/", async (req, res) => {
   const requestedLimit = Number.parseInt(req.query.limit, 10);
@@ -48,8 +54,9 @@ router.get("/", async (req, res) => {
  * Returns one business using its Google Place business ID.
  */
 router.get("/:businessId", async (req, res) => {
+  const businessId = req.params.businessId;
   try {
-    const business = await getBusinessById(req.params.businessId);
+    const business = await getBusinessById(businessId);
 
     if (!business) {
       return res.status(404).json({

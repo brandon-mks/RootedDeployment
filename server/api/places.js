@@ -1,98 +1,37 @@
 import express from "express";
-import { dummyData } from "../db/db_dummy_data.js";
 
 const router = express.Router();
 
-/**
- * Temporary Places API
- *
- * The current place records are hard-coded in db_dummy_data.js.
- * They are not stored in the database and are not fetched live from Google.
- *
- * This route gives the frontend a normal API endpoint to use while the
- * real database or Google Places integration is being developed.
- *
- * Future goal:
- * Replace the dummyData source below with a database query or external
- * API request without changing the response shape expected by the frontend.
- */
+/** "api/places" route 
+ * 
+ * expects body object with the following fields
+ * 
+ * requested google places types:
+ * tags: []
+ * 
+ * user coords or search coords:
+ * location: {
+ *  latitude:
+ *  longitude:
+ * }
+ * 
+ * 
+*/
+router.get("/", async (req, res, next) => {
+    if(!req.body) {
+        res.status(400).send("Request is missing body object.")
+    } else if(!req.body.location || !req.body.tags) {
+        res.status(400).send("Request is missing a location or tags field.")
+    } else if(!req.body.location.latitude || !req.body.location.longitude) {
+        res.status(400).send("Request is missing either latitude or longitude coordinate.")
+    } 
 
-/**
- * IMPORTANT:
- * This category order must match the order used by the dummyData export:
- *
- * [restaurants, museums, hiking_areas, farmers_markets, live_music_venues]
- */
-const categories = Object.keys(dummyData).filter((key) => dummyData[key].length > 0);
+    const { location } = req.body.location;
+    const { tags } = req.body.tags;
 
-/**
- * Convert a large Google Places-style object into the smaller object
- * currently needed by the frontend.
- *
- * This prevents us from sending thousands of unnecessary fields to the
- * browser and gives the frontend a stable data structure.
- */
-const formatPlace = (place) => ({
-  id: place.id,
-  name: place.displayName?.text ?? "Unnamed place",
-  category: place.primaryType ?? "place",
-  address: place.formattedAddress ?? "",
-  rating: place.rating ?? null,
-  website: place.websiteUri ?? null,
-  location: place.location ? { lat: place.location.latitude, lng: place.location.longitude } : null,
-});
-
-/**
- * GET /api/places
- *
- * Optional query parameters:
- *
- * category:
- *   /api/places?category=restaurants
- *
- * limit:
- *   /api/places?limit=6
- *
- * Both:
- *   /api/places?category=museums&limit=6
- */
-router.get("/", (req, res) => {
-  const category = req.query.category?.toLowerCase();
-
-  // Return a helpful message rather than silently returning no records.
-  if (category && !categories.includes(category)) {
-    return res.status(400).json({
-      error: "Invalid category",
-      availableCategories: categories,
-    });
-  }
-
-  // With no category, combine all five arrays into one list.
-  const source = category ? dummyData[category] : Object.values(dummyData).flat();
-
-  const requestedLimit = Number.parseInt(req.query.limit, 10);
-  const requestedPage = Number.parseInt(req.query.page, 10);
-
-  // Keep each page between 1 and 50 records.
-  const limit = Number.isInteger(requestedLimit) ? Math.min(Math.max(requestedLimit, 1), 50) : 6;
-
-  // Default to page one and prevent page numbers below one.
-  const page = Number.isInteger(requestedPage) ? Math.max(requestedPage, 1) : 1;
-
-  const total = source.length;
-  const totalPages = Math.ceil(total / limit);
-  const offset = (page - 1) * limit;
-
-  const places = source.slice(offset, offset + limit).map(formatPlace);
-
-  res.json({
-    places,
-    total,
-    limit,
-    page,
-    totalPages,
-    category: category ?? "all",
-  });
-});
+    const res = await getBusByLocTags(location, tags);
+    const data = res.places;
+    res.status(200).send(data);
+})
 
 export default router;
