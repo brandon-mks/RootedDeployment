@@ -7,25 +7,28 @@ import seed from "./db/seed.js";
 import router from "./api/index.js";
 const app = express();
 //body parsing middleware
-app.use(
-  cors({
-    origin: "http://localhost:5173",
-    credentials: true,
-  }),
-);
+
+const allowedOrigins = ["http://localhost:5173", "https://rooted-portfolio.netlify.app/*"];
+
+const corsOptions = {
+  origin: function (origin, callback) {
+    if (allowedOrigins.indexOf(origin) !== -1) {
+      callback(null, true);
+    } else {
+      callback(new Error("Not allowed by CORS"));
+    }
+  },
+};
+
+app.use(cors(corsOptions));
 app.use(express.json());
 app.use(cookieParser());
 
 //for deployment only
 const __dirname = import.meta.dirname;
 
-app.get("/", (req, res) =>
-  res.sendFile(path.join(__dirname, "../client/dist/index.html")),
-);
-app.use(
-  "/assets",
-  express.static(path.join(__dirname, "../client/dist/assets")),
-);
+app.get("/", (req, res) => res.sendFile(path.join(__dirname, "../client/dist/index.html")));
+app.use("/assets", express.static(path.join(__dirname, "../client/dist/assets")));
 
 //use api routes
 app.use("/api", router);
@@ -38,9 +41,7 @@ app.use("/{*path}", (req, res, next) => {
 //custom error handling route
 app.use((err, req, res, next) => {
   console.log(err);
-  res
-    .status(err.status || 500)
-    .send({ error: err.message ? err.message : err });
+  res.status(err.status || 500).send({ error: err.message ? err.message : err });
 });
 
 const init = async () => {
@@ -52,18 +53,16 @@ const init = async () => {
       await client.connect();
       console.log("connected to database");
       if (process.env.SEED_DATABASE === "true") {
-      await seed();
-      console.log("database seed completed");
-    } else {
-      console.log("database seeding skipped");
-    }
+        await seed();
+        console.log("database seed completed");
+      } else {
+        console.log("database seeding skipped");
+      }
     } catch (err) {
       console.log(err);
     }
   } else {
-    console.log(
-      "DATABASE_URL is not configured; starting without database access",
-    );
+    console.log("DATABASE_URL is not configured; starting without database access");
   }
 
   app.listen(PORT, () => {
