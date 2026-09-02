@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { MapContext } from "./MapContext";
 
 export function MapContextProvider({ children }) {
-  const [coords, setCoords] = useState({ lat: 60.548334, lng: -77.449523 });
+  const [coords, setCoords] = useState({ lat: 22.3193, lng: 114.1694 });
 
   const setLocation = (position) => {
     const userCoords = {

@@ -1,67 +1,45 @@
-import {
-  AdvancedMarker,
-  InfoWindow,
-  useAdvancedMarkerRef,
-} from "@vis.gl/react-google-maps";
-import { useState } from "react";
-
-function isValidPosition(position) {
-  return (
-    Number.isFinite(Number(position?.lat)) &&
-    Number.isFinite(Number(position?.lng))
-  );
-}
+import { useAdvancedMarkerRef, AdvancedMarker, InfoWindow } from "@vis.gl/react-google-maps";
+import { useState, useCallback } from "react";
 
 export function PlaceMarker({ placeMarker }) {
   const [infoWindowShown, setInfoWindowShown] = useState(false);
   const [markerRef, marker] = useAdvancedMarkerRef();
+  const [hoverTime, setHoverTimer] = useState();
 
-  if (!placeMarker || !isValidPosition(placeMarker.location)) {
-    return null;
-  }
+  const handleMouseEnter = useCallback(() => {
+    setHoverTimer(setTimeout(() => setInfoWindowShown(true), 600));
+  }, []);
+  const handleMouseLeave = useCallback(() => {
+    setHoverTimer(clearTimeout(hoverTime));
+  }, [hoverTime]);
 
-  const website =
-    typeof placeMarker.website === "string" &&
-    placeMarker.website.trim().length > 0
-      ? placeMarker.website.trim()
-      : null;
+  const handleClose = useCallback(() => setInfoWindowShown(false), []);
 
-  const placeName = placeMarker.name || "Local place";
+  placeMarker = {
+    ...placeMarker,
+    location: {
+      lat: placeMarker.location.latitude,
+      lng: placeMarker.location.longitude,
+    },
+  };
 
   return (
     <AdvancedMarker
       position={placeMarker.location}
       ref={markerRef}
-      title={placeName}
-      onClick={() => setInfoWindowShown(true)}
-      onMouseEnter={() => setInfoWindowShown(true)}
+      title={placeMarker.displayName.text}
+      onMouseEnter={handleMouseEnter}
+      onMouseLeave={handleMouseLeave}
     >
       {infoWindowShown ? (
-        <InfoWindow
-          className="searchPlaceMarker"
-          anchor={marker}
-          onClose={() => setInfoWindowShown(false)}
-        >
-          <div>
-            <h2>{placeName}</h2>
-
-            {placeMarker.address ? (
-              <p>Address: {placeMarker.address}</p>
-            ) : null}
-
-            {website ? (
-              <p>
-                Website:{" "}
-                <a
-                  href={website}
-                  target="_blank"
-                  rel="noreferrer"
-                >
-                  Visit website
-                </a>
-              </p>
-            ) : null}
-          </div>
+        <InfoWindow className="searchPlaceMarker" anchor={marker} onClose={handleClose}>
+          <h2>{placeMarker.displayName.text}</h2>
+          <p>Address: {placeMarker.formattedAddress}</p>
+          {placeMarker.websiteUri ? (
+            <p>
+              Website: <a href={placeMarker.websiteUri}>{placeMarker.websiteUri}</a>
+            </p>
+          ) : null}
         </InfoWindow>
       ) : null}
     </AdvancedMarker>

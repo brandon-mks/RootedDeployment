@@ -1,5 +1,4 @@
 import client from "../client.js";
-import { v4 as uuidv4 } from "uuid";
 import { fetchPlaces } from "../../googleAPIs/placesAPI.js";
 
 export const createBusiness = async (place) => {
@@ -18,6 +17,7 @@ export const createBusiness = async (place) => {
       primary_tag
       )
       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
+      ON CONFLICT (business_id) DO NOTHING
       RETURNING *;
       `;
   try {
@@ -30,7 +30,7 @@ export const createBusiness = async (place) => {
       place.websiteUri,
       null,
       place.rating,
-      place.primaryType
+      place.primaryType,
     ]);
     return res.rows[0];
   } catch (err) {
@@ -39,13 +39,12 @@ export const createBusiness = async (place) => {
 };
 
 export const getBusinesses = async () => {
-
   let SQL = `
     SELECT *
     FROM businesses
     ORDER BY business_name
     LIMIT 15;
-  `
+  `;
 
   const res = await client.query(SQL);
 
@@ -76,17 +75,17 @@ export const getBusinessById = async (businessId) => {
  * query the DB with saved places data and include
  * internal distance equations.
  */
-export async function getBusByLocTag(location, tags) {
-    try {
-        const res = await fetchPlaces(location, tags);
-        return res;
-    } catch(err) {
-        console.log(err);
-        return err;
-    }
+export async function getBusByLocTags(location, tags) {
+  try {
+    const res = await fetchPlaces(location, tags);
+    return res;
+  } catch (err) {
+    console.log(err);
+    return err;
+  }
 }
 
-/**Early scaffolding for including 
+/**Early scaffolding for including
  * distance calculations internally */
 /*
 export async function getBusByLocTag(location, tags) {

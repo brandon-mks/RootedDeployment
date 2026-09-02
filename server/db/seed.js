@@ -1,5 +1,4 @@
 import client from "./client.js";
-import { seedDummyData } from "./business.js";
 import { seedConnectOpportunities } from "./connectOpportunities.js";
 
 /**
@@ -19,6 +18,8 @@ const seed = async () => {
     DROP TABLE IF EXISTS business_visits CASCADE;
     DROP TABLE IF EXISTS events CASCADE;
     DROP TABLE IF EXISTS event_attendance CASCADE;
+    DROP TABLE IF EXISTS businesses CASCADE;
+    DROP TABLE IF EXISTS hours CASCADE;
 
     CREATE TABLE businesses (
       id UUID UNIQUE DEFAULT gen_random_UUID() NOT NULL,
@@ -41,9 +42,9 @@ const seed = async () => {
     );
 
     CREATE TABLE locations (
-      id UUID UNIQUE PRIMARY KEY REFERENCES business(id),
+      id UUID UNIQUE PRIMARY KEY REFERENCES businesses(id),
       business_id VARCHAR(100) REFERENCES businesses(business_id) ON DELETE CASCADE,
-      latitude DOUBLE PRECISION NOT NULL, 
+      latitude DOUBLE PRECISION NOT NULL,
       longitude DOUBLE PRECISION NOT NULL
     );
 
@@ -154,14 +155,13 @@ const seed = async () => {
   await client.query(schemaSQL);
   console.log("table/schema created");
 
-  await seedDummyData();
   await seedConnectOpportunities();
 
   /*
    * Rooted-controlled demo events are trusted fixture records.
    * User-created events retain the default pending status.
    */
-  
+
   await client.query(`
     UPDATE events
     SET

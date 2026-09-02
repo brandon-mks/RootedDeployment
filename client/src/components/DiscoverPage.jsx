@@ -14,59 +14,69 @@ import {
 import Header from "./Header.jsx";
 import Footer from "./Footer.jsx";
 import DetailsDialog from "./DetailsDialog.jsx";
-import { getPlaces } from "../services/places.js";
 import { DynamicMap } from "./DynamicMap.jsx";
+import { useMapContext } from "../mapContext/useMapContext.js";
 
 //Filter Categories
 // The temporary fixture key remains "restaurants", but the collection
 // includes restaurants, cafés, and coffee shops.
 const categories = [
-  { value: "restaurants", label: "Food & Drink" },
-  { value: "museums", label: "Museums" },
-  { value: "hiking_areas", label: "Hiking" },
-  { value: "farmers_markets", label: "Farmers markets" },
-  { value: "live_music_venues", label: "Live music" },
+  { value: "restaurant", label: "Food & Drink" },
+  { value: "museum", label: "Museums" },
+  { value: "hiking_area", label: "Hiking" },
+  { value: "farmers_market", label: "Farmers markets" },
+  { value: "live_music_venue", label: "Live music" },
 ];
 
 function DiscoverPage() {
   const [places, setPlaces] = useState([]);
-  const [selectedCategory, setSelectedCategory] = useState("restaurants");
+  const [selectedCategory, setSelectedCategory] = useState(["restaurant"]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [selectedPlace, setSelectedPlace] = useState(null);
+  const { coords } = useMapContext();
 
   useEffect(() => {
     async function loadPlaces() {
       setLoading(true);
       setError("");
       try {
-        const data = await('/places')
+        const response = await fetch("/api/places", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            tags: selectedCategory,
+            location: {
+              latitude: coords.lat,
+              longitude: coords.lng,
+            },
+          }),
+        });
         /*
-        needs make internal server/api request
-        internal server/api request needs
-        LiveData call from google which passes
-        through filters first before then 
-        returning the array of places
         const data = await getPlaces({
           category: selectedCategory,
           limit: 6,
           page,
         });
         */
-
-        setPlaces(data.places);
-        setTotalPages(data.totalPages);
-      } catch (requestError) {
-        setError(requestError.message);
+        const data = await response.json();
+        setPlaces(data);
+        //setTotalPages(data.totalPages);
+      } catch (err) {
+        setError(err.message);
+        console.log(err.message);
+        console.log(err);
       } finally {
         setLoading(false);
       }
     }
 
     loadPlaces();
-  }, [selectedCategory]);
+  }, [selectedCategory, coords]);
 
   return (
     <div className="page-layout">
@@ -78,10 +88,7 @@ function DiscoverPage() {
 
           <h1>Find your next favorite spot.</h1>
 
-          <p>
-            Browse restaurants, museums, outdoor spaces, markets, and live music
-            nearby.
-          </p>
+          <p>Browse restaurants, museums, outdoor spaces, markets, and live music nearby.</p>
         </header>
 
         <Stack
@@ -96,10 +103,10 @@ function DiscoverPage() {
         >
           {categories.map((category) => {
             const isSelected = selectedCategory === category.value;
-            
+
             return (
               <Button
-              key={category.value}
+                key={category.value}
                 type="button"
                 variant={isSelected ? "contained" : "outlined"}
                 onClick={() => {
@@ -110,17 +117,15 @@ function DiscoverPage() {
                   flexShrink: 0,
                   borderColor: "var(--rooted-green)",
                   color: isSelected ? "white" : "var(--rooted-plum)",
-                  backgroundColor: isSelected
-                    ? "var(--rooted-green)"
-                    : "transparent",
+                  backgroundColor: isSelected ? "var(--rooted-green)" : "transparent",
                   "&:hover": {
                     borderColor: "var(--rooted-green)",
                     backgroundColor: isSelected
-                    ? "var(--rooted-dark-green)"
-                    : "rgba(122, 166, 100, 0.1)",
+                      ? "var(--rooted-dark-green)"
+                      : "rgba(122, 166, 100, 0.1)",
                   },
                 }}
-                >
+              >
                 {category.label}
               </Button>
             );
@@ -130,9 +135,11 @@ function DiscoverPage() {
         {loading && <CircularProgress aria-label="Loading places" />}
 
         {error && <Typography color="error">{error}</Typography>}
+
         <div className="dynamicMapContainer">
-          <DynamicMap className="mainMap" places={places}/>
+          <DynamicMap className="mainMap" places={places} />
         </div>
+
         {!loading && !error && (
           <Box>
             <Box
@@ -151,20 +158,16 @@ function DiscoverPage() {
                 <Card key={place.id}>
                   <CardActionArea
                     onClick={() => setSelectedPlace(place)}
-                    aria-label={`View details for ${place.name}`}
+                    aria-label={`View details for ${place.displayName.text}`}
                     className="discover-card-action"
                   >
                     <CardContent>
                       <Typography variant="h6" component="h2">
-                        {place.name}
+                        {place.displayName.text}
                       </Typography>
 
-                      <Typography
-                        variant="body2"
-                        color="text.secondary"
-                        sx={{ marginTop: 1 }}
-                      >
-                        {place.address}
+                      <Typography variant="body2" color="text.secondary" sx={{ marginTop: 1 }}>
+                        {place.formattedAddress}
                       </Typography>
 
                       {place.rating != null && (

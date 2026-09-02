@@ -1,5 +1,5 @@
 import "dotenv/config";
-import { getBusinesses } from "../db/business.js";
+import { getBusinesses } from "../db/queries/businesses.js";
 
 export const generateAiResponse = async (messages) => {
   const apiKey = process.env.OPENAI_API_KEY;
@@ -13,9 +13,9 @@ export const generateAiResponse = async (messages) => {
   // 1.Brand Identity
   const systemPrompt = {
     role: "system",
-    content: `You are the official Rooted Community Assistant. 
+    content: `You are the official Rooted Community Assistant.
     Your tone is warm, neighborly, and knowledgable about local business and community events.
-    Keep responses collaboritive, helpful, and organized using bullet points. 
+    Keep responses collaboritive, helpful, and organized using bullet points.
     Answer questions using the Rooted information provided below.
 
     IMPORTANT:
@@ -23,7 +23,7 @@ export const generateAiResponse = async (messages) => {
     - If the Rooted information does not contain an answer, say that you don't have that information.
     - When recommending a business, only recommend businesses found in the Rooted data.
     Reference being apart of the community when fitting.
-    
+
     ROOTED BUSINESSES:
       ${JSON.stringify(businesses)}
     `,

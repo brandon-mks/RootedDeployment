@@ -25,9 +25,7 @@ const formatPlace = (place) => ({
   address: place.formattedAddress ?? "",
   rating: place.rating ?? null,
   website: place.websiteUri ?? null,
-  location: place.location ? { lat: place.location.latitude,
-    lng: place.location.longitude,
-  } : null,
+  location: place.location ? { lat: place.location.latitude, lng: place.location.longitude } : null,
 });
 
 /**
@@ -82,5 +80,3 @@ router.get("/", (req, res) => {
     category: category ?? "all",
   });
 });
-
-export default router;
