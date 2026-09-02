@@ -1,10 +1,9 @@
 import Header from "./Header";
 import Footer from "./Footer";
-import logo from "../assets/Rooted Logo.png";
+import logo from "../assets/rooted-logo.png";
 import FeaturedSection from "./FeaturedSection";
 
 function LandingPage() {
-
   return (
     <div className="page-layout">
       <Header showLogo={false} />
