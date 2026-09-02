@@ -16,7 +16,7 @@ import { PlaceMarker } from "./PlaceMarker";
 
 export const DynamicMap = ({ places }) => {
   //contexts
-  const { coords, setCoords } = useMapContext();
+  const { coords } = useMapContext();
 
   //internal states
   const [markers, setMarkers] = useState([]);
