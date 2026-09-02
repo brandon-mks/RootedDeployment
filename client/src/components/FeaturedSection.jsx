@@ -1,14 +1,8 @@
-import {
-  Box,
-  Card,
-  CardActionArea,
-  CardContent,
-  Typography,
-} from "@mui/material";
+import { Box, Card, CardActionArea, CardContent, Typography } from "@mui/material";
 import { Link } from "react-router";
 
-import discoverImage from "../assets/Discover.jpg";
-import connectImage from "../assets/Connect.jpg";
+import discoverImage from "../assets/discover.jpg";
+import connectImage from "../assets/connect.jpg";
 import communityFlyer from "../assets/community-flyer.png";
 import orangePushpin from "../assets/pushpin-orange.png";
 
@@ -39,17 +33,10 @@ function FeaturedSection() {
   return (
     <Box className="bulletin-board">
       {choices.map((choice) => (
-        <Card
-          key={choice.heading}
-          className={`bulletin-card ${choice.cardClass}`}
-        >
+        <Card key={choice.heading} className={`bulletin-card ${choice.cardClass}`}>
           <span className="pushpin" aria-hidden="true" />
 
-          <CardActionArea
-            component={Link}
-            to={choice.path}
-            className="bulletin-card-action"
-          >
+          <CardActionArea component={Link} to={choice.path} className="bulletin-card-action">
             <img
               src={choice.image}
               alt={choice.imageAlt}
