@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Link } from "react-router";
 
-import logo from "../assets/Rooted Logo.png";
+import logo from "../assets/rooted-logo.png";
 import SupportDialog from "./SupportDialog.jsx";
 
 function Footer() {
@@ -25,10 +25,7 @@ function Footer() {
         </nav>
       </footer>
 
-      <SupportDialog
-        open={supportOpen}
-        onClose={() => setSupportOpen(false)}
-      />
+      <SupportDialog open={supportOpen} onClose={() => setSupportOpen(false)} />
     </>
   );
 }

@@ -8,7 +8,7 @@ import {
   IconButton,
   TextField,
 } from "@mui/material";
-import logo from "../assets/Rooted Logo.png";
+import logo from "../assets/rooted-logo.png";
 
 function SupportDialog({ open, onClose }) {
   const [submitted, setSubmitted] = useState(false);
@@ -47,9 +47,7 @@ function SupportDialog({ open, onClose }) {
           <img src={logo} alt="Rooted" className="support-dialog-logo" />
           Support
         </span>
-        <small>
-          Questions, concerns, or something not working? Let us know.
-        </small>
+        <small>Questions, concerns, or something not working? Let us know.</small>
 
         <IconButton
           aria-label="Close support form"
@@ -70,10 +68,7 @@ function SupportDialog({ open, onClose }) {
           }}
         >
           {submitted ? (
-            <p>
-              Thanks for reaching out! Support delivery will be connected in a
-              future update.
-            </p>
+            <p>Thanks for reaching out! Support delivery will be connected in a future update.</p>
           ) : (
             <>
               <TextField
@@ -107,20 +102,12 @@ function SupportDialog({ open, onClose }) {
         </DialogContent>
 
         <DialogActions className="support-dialog-actions">
-          <Button
-            type="button"
-            className="support-cancel-button"
-            onClick={handleClose}
-          >
+          <Button type="button" className="support-cancel-button" onClick={handleClose}>
             {submitted ? "Close" : "Cancel"}
           </Button>
 
           {!submitted && (
-            <Button
-              type="submit"
-              variant="contained"
-              className="support-submit-button"
-            >
+            <Button type="submit" variant="contained" className="support-submit-button">
               Submit
             </Button>
           )}
