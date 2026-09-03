@@ -39,12 +39,9 @@ function createOpportunity({
 }) {
   const city = cityHubs[cityKey];
 
-  const eventId = uuidv5(
-    `https://rooted.local/events/${id}`,
-    uuidv5.URL,
-  );
+  const eventId = uuidv5(`https://rooted.local/events/${id}`, uuidv5.URL);
 
-    return {
+  return {
     id: eventId,
     kind,
     title,
@@ -75,8 +72,7 @@ export const opportunities = [
     cityKey: "richmond",
     kind: "community_events",
     title: "River City Welcome Picnic",
-    description:
-      "Meet neighbors and enjoy an afternoon of food, games, and conversation.",
+    description: "Meet neighbors and enjoy an afternoon of food, games, and conversation.",
     venue: "Richmond Community Green",
     eventDate: "2026-09-12",
     startTime: "12:00",
@@ -88,8 +84,7 @@ export const opportunities = [
     cityKey: "richmond",
     kind: "volunteer",
     title: "Community Garden Workday",
-    description:
-      "Help prepare garden beds and shared growing spaces for the fall season.",
+    description: "Help prepare garden beds and shared growing spaces for the fall season.",
     venue: "Northside Community Garden",
     eventDate: "2026-09-19",
     startTime: "09:00",
@@ -101,8 +96,7 @@ export const opportunities = [
     cityKey: "richmond",
     kind: "live_music_arts",
     title: "Porchlight Local Music Night",
-    description:
-      "An outdoor evening featuring local musicians and neighborhood artists.",
+    description: "An outdoor evening featuring local musicians and neighborhood artists.",
     venue: "River City Arts Courtyard",
     eventDate: "2026-09-25",
     startTime: "18:30",
@@ -114,8 +108,7 @@ export const opportunities = [
     cityKey: "richmond",
     kind: "markets_popups",
     title: "River City Makers Pop-up",
-    description:
-      "Browse handmade goods, local foods, prints, and neighborhood creations.",
+    description: "Browse handmade goods, local foods, prints, and neighborhood creations.",
     venue: "Downtown Makers Hall",
     eventDate: "2026-10-03",
     startTime: "10:00",
@@ -127,8 +120,7 @@ export const opportunities = [
     cityKey: "richmond",
     kind: "classes_workshops",
     title: "Neighborhood Compost Workshop",
-    description:
-      "Learn practical composting techniques for apartments and small gardens.",
+    description: "Learn practical composting techniques for apartments and small gardens.",
     venue: "Richmond Learning Garden",
     eventDate: "2026-10-10",
     startTime: "11:00",
@@ -141,8 +133,7 @@ export const opportunities = [
     cityKey: "austin",
     kind: "community_events",
     title: "Eastside Community Supper",
-    description:
-      "Bring a dish or simply join neighbors for a relaxed community meal.",
+    description: "Bring a dish or simply join neighbors for a relaxed community meal.",
     venue: "Eastside Gathering Lawn",
     eventDate: "2026-09-13",
     startTime: "17:00",
@@ -154,8 +145,7 @@ export const opportunities = [
     cityKey: "austin",
     kind: "volunteer",
     title: "Creekside Cleanup Crew",
-    description:
-      "Join a volunteer team removing litter and caring for neighborhood trails.",
+    description: "Join a volunteer team removing litter and caring for neighborhood trails.",
     venue: "Austin Creek Trailhead",
     eventDate: "2026-09-20",
     startTime: "08:30",
@@ -167,8 +157,7 @@ export const opportunities = [
     cityKey: "austin",
     kind: "live_music_arts",
     title: "Sunset Songwriters Showcase",
-    description:
-      "Hear original music from emerging Austin performers in an outdoor setting.",
+    description: "Hear original music from emerging Austin performers in an outdoor setting.",
     venue: "East Austin Arts Patio",
     eventDate: "2026-09-26",
     startTime: "19:00",
@@ -180,8 +169,7 @@ export const opportunities = [
     cityKey: "austin",
     kind: "markets_popups",
     title: "Local Makers Night Market",
-    description:
-      "Shop small businesses, food vendors, vintage finds, and handmade goods.",
+    description: "Shop small businesses, food vendors, vintage finds, and handmade goods.",
     venue: "Austin Neighborhood Market Square",
     eventDate: "2026-10-02",
     startTime: "17:00",
@@ -193,8 +181,7 @@ export const opportunities = [
     cityKey: "austin",
     kind: "classes_workshops",
     title: "Beginner Screen-Printing Workshop",
-    description:
-      "Create a one-color print while learning the basics of screen printing.",
+    description: "Create a one-color print while learning the basics of screen printing.",
     venue: "Austin Community Print Studio",
     eventDate: "2026-10-11",
     startTime: "13:00",
@@ -207,8 +194,7 @@ export const opportunities = [
     cityKey: "stuttgart",
     kind: "community_events",
     title: "Neighborhood Culture Picnic",
-    description:
-      "Share food, stories, and traditions during an afternoon in the park.",
+    description: "Share food, stories, and traditions during an afternoon in the park.",
     venue: "Stuttgart Community Meadow",
     eventDate: "2026-09-12",
     startTime: "13:00",
@@ -220,8 +206,7 @@ export const opportunities = [
     cityKey: "stuttgart",
     kind: "volunteer",
     title: "Urban Garden Volunteer Morning",
-    description:
-      "Help maintain shared planting beds and prepare the garden for autumn.",
+    description: "Help maintain shared planting beds and prepare the garden for autumn.",
     venue: "Stuttgart Urban Garden",
     eventDate: "2026-09-19",
     startTime: "09:00",
@@ -233,8 +218,7 @@ export const opportunities = [
     cityKey: "stuttgart",
     kind: "live_music_arts",
     title: "Courtyard Jazz & Art Evening",
-    description:
-      "Enjoy live jazz alongside work from independent Stuttgart artists.",
+    description: "Enjoy live jazz alongside work from independent Stuttgart artists.",
     venue: "Stuttgart Arts Courtyard",
     eventDate: "2026-09-25",
     startTime: "18:00",
@@ -246,8 +230,7 @@ export const opportunities = [
     cityKey: "stuttgart",
     kind: "markets_popups",
     title: "Local Design & Food Pop-up",
-    description:
-      "Discover regional designers, independent makers, and local food vendors.",
+    description: "Discover regional designers, independent makers, and local food vendors.",
     venue: "Stuttgart Community Market Hall",
     eventDate: "2026-10-03",
     startTime: "11:00",
@@ -259,8 +242,7 @@ export const opportunities = [
     cityKey: "stuttgart",
     kind: "classes_workshops",
     title: "Community Bicycle Repair Workshop",
-    description:
-      "Learn basic bicycle maintenance with help from neighborhood volunteers.",
+    description: "Learn basic bicycle maintenance with help from neighborhood volunteers.",
     venue: "Stuttgart Community Workshop",
     eventDate: "2026-10-10",
     startTime: "10:00",

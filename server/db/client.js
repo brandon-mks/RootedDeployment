@@ -11,3 +11,5 @@ const client = new pg.Client({
   connectionString,
   ssl: { rejectUnauthorized: false },
 });
+
+export default client;
