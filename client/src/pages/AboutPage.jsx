@@ -12,7 +12,7 @@ const creators = [
   {
     name: "Brandon",
     initials: "B",
-    github: "",
+    github: "https://github.com/brandon-mks",
   },
   {
     name: "Sara",
