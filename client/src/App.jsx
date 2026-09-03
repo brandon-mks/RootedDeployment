@@ -26,7 +26,6 @@ function App() {
         <Route path="/user" element={<UserPage />} />
         <Route path="/about" element={<AboutPage />} />
         <Route path="/support" element={<SupportDialog />} />
-        <Route path="/mapTesting" element={<DynamicMap />} />
       </Routes>
       <ChatWidget />
     </>
