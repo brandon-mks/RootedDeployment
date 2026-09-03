@@ -8,16 +8,21 @@ import router from "./api/index.js";
 const app = express();
 //body parsing middleware
 
-const allowedOrigins = ["http://localhost:5173", "https://rooted-portfolio.netlify.app/*"];
+const allowedOrigins = [
+  "http://localhost:5173",
+  "https://rooted-portfolio.netlify.app",
+  "https://server-o0qo.onrender.com",
+];
 
 const corsOptions = {
-  origin: function (origin, callback) {
-    if (allowedOrigins.indexOf(origin) !== -1) {
+  origin(origin, callback) {
+    if (!origin || allowedOrigins.indexOf(origin) !== -1) {
       callback(null, true);
     } else {
       callback(new Error("Not allowed by CORS"));
     }
   },
+  credentials: true,
 };
 
 app.use(cors(corsOptions));
