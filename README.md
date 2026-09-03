@@ -6,9 +6,9 @@ Rooted is a community discovery application for finding local businesses, restau
 
 Install these before starting:
 
-* Node.js and npm
-* PostgreSQL
-* Git
+- Node.js and npm
+- PostgreSQL
+- Git
 
 ## 1. Clone and install
 
@@ -103,7 +103,7 @@ The frontend proxies `/api` requests to the backend on port `3000`. If the ports
 With the backend running:
 
 ```bash
-curl "http://localhost:3000/api/places?category=restaurants&limit=2"
+curl "https://rooteddeployment.onrender.com/api/places?category=restaurants&limit=2"
 ```
 
 The response should contain JSON place records.
@@ -122,7 +122,7 @@ live_music_venues
 Example:
 
 ```text
-http://localhost:3000/api/places?category=museums&limit=6
+https://rooteddeployment.onrender.com/api/places?category=museums&limit=6
 ```
 
 ## Build the frontend

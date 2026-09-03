@@ -8,7 +8,7 @@ export function AuthProvider({ children }) {
 
   const fetchMe = async () => {
     try {
-      const res = await fetch("http://localhost:3000/api/users/me", {
+      const res = await fetch("https://rooteddeployment.onrender.com/server/api/users/me", {
         credentials: "include",
       });
       if (res.ok) {
@@ -31,7 +31,7 @@ export function AuthProvider({ children }) {
   }, []);
 
   const login = async (username, password) => {
-    const res = await fetch("http://localhost:3000/api/users/login", {
+    const res = await fetch("https://rooteddeployment.onrender.com/api/users/login", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       credentials: "include",
@@ -44,7 +44,7 @@ export function AuthProvider({ children }) {
   };
 
   const register = async (username, email, password) => {
-    const res = await fetch("http://localhost:3000/api/users/register", {
+    const res = await fetch("https://rooteddeployment.onrender.com/api/users/register", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       credentials: "include",
@@ -57,7 +57,7 @@ export function AuthProvider({ children }) {
   };
 
   const logout = async () => {
-    await fetch("http://localhost:3000/api/users/logout", {
+    await fetch("https://rooteddeployment.onrender.com/api/users/logout", {
       method: "POST",
       credentials: "include",
     });
@@ -65,9 +65,7 @@ export function AuthProvider({ children }) {
   };
 
   return (
-    <AuthContext.Provider
-      value={{ user, loading, login, register, logout, fetchMe }}
-    >
+    <AuthContext.Provider value={{ user, loading, login, register, logout, fetchMe }}>
       {children}
     </AuthContext.Provider>
   );

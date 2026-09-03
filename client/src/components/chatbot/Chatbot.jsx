@@ -20,7 +20,7 @@ export default function Chatbot({ onClose }) {
     setIsLoading(true);
 
     try {
-      const response = await fetch("http://localhost:3000/api/chatbot", {
+      const response = await fetch("https://rooteddeployment.onrender.com/api/chatbot", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ messages: updatedMessages }),
@@ -53,8 +53,7 @@ export default function Chatbot({ onClose }) {
               setMessages([
                 {
                   role: "assistant",
-                  content:
-                    "Hello! History cleared. How can I help you fresh today?",
+                  content: "Hello! History cleared. How can I help you fresh today?",
                 },
               ])
             }
@@ -62,11 +61,7 @@ export default function Chatbot({ onClose }) {
             Clear Chat
           </button>
           {onClose && (
-            <button
-              className="chatbot-close-btn"
-              onClick={onClose}
-              aria-label="Close chat"
-            >
+            <button className="chatbot-close-btn" onClick={onClose} aria-label="Close chat">
               ✕
             </button>
           )}
