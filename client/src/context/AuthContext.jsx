@@ -8,7 +8,7 @@ export function AuthProvider({ children }) {
 
   const fetchMe = async () => {
     try {
-      const res = await fetch("https://rooteddeployment.onrender.com/server/api/users/me", {
+      const res = await fetch("https://rooteddeployment.onrender.com/api/users/me", {
         credentials: "include",
       });
       if (res.ok) {
