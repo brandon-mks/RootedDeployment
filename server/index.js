@@ -11,7 +11,7 @@ const app = express();
 const allowedOrigins = [
   "http://localhost:5173",
   "https://rooted-portfolio.netlify.app",
-  "https://server-o0qo.onrender.com",
+  "https://rooteddeployment.onrender.com",
 ];
 
 const corsOptions = {
