@@ -38,9 +38,18 @@ app.use("/assets", express.static(path.join(__dirname, "../client/dist/assets"))
 //use api routes
 app.use("/api", router);
 
-//express routes catch all
-app.use("/{*path}", (req, res, next) => {
-  res.status(404).send("Incorrect resource request");
+// Let React Router handle browser routes such as /discover after a refresh or
+// direct visit. API requests that did not match a router stay API 404s.
+app.use("/{*path}", (req, res) => {
+  if (req.path === "/api" || req.path.startsWith("/api/")) {
+    return res.status(404).send("Incorrect resource request");
+  }
+
+  if (req.method !== "GET") {
+    return res.status(404).send("Incorrect resource request");
+  }
+
+  return res.sendFile(path.join(__dirname, "../client/dist/index.html"));
 });
 
 //custom error handling route
